@@ -10,6 +10,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@alpinejs/persist": "^3.13.5",
     "@astrojs/alpinejs": "^0.4.0",
     "@astrojs/check": "^0.5.4",
     "@astrojs/node": "^8.2.0",
@@ -21,5 +22,8 @@
     "htmx.org": "^1.9.10",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/alpinejs__persist": "^3.13.3"
   }
 }

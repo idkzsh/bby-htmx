@@ -1,7 +1,8 @@
 ---
 import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import Main from "../components/Main.astro";
 import "../global.css";
-
 ---
 
 <html lang="en">
@@ -24,17 +25,10 @@ import "../global.css";
   <body
     x-data="{ switchOn: $persist(false) }"
     :class="{ 'dark': switchOn }"
-    class="min-h-[100vh]"
+    class="flex flex-col min-h-[100vh] justify-between"
   >
-
     <Header />
-    <div x-data="{ open: false }">
-      <button x-on:click="open = ! open">Toggle Dropdown</button>
-   
-      <div x-show="open">
-          Dropdown Contents...
-      </div>
-  </div>
-
+    <Main />
+    <Footer />
   </body>
 </html>

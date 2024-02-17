@@ -1,0 +1,22 @@
+---
+import vendors from "../../data/vendors.ts";
+export const partial = true;
+
+const query = (
+  Astro.url.searchParams.get("vendorSearch") || ""
+).toLocaleLowerCase();
+
+const foundVendors = vendors
+  .filter((v) => v.toLocaleLowerCase().includes(query))
+  .slice(0, 10);
+---
+
+<div class="w-[80%] text-sm">
+  Searching for '{query}'
+  <ul class="text-xs mt-3">
+    {foundVendors.length > 0 ? foundVendors.map((v) => <li>{v}</li>) : <li>No results</li>}
+    
+  </ul>
+</div>
+
+

@@ -20,6 +20,9 @@ export default {
 		  ring: "hsl(var(--ring))",
 		  background: "var(--background)",
 		  headerbg: "var(--header-background)",
+		  "btn-bg":"var(--btn-bg)",
+		  "btn-txt":"var(--btn-txt)",
+
 		  foreground: "hsl(var(--foreground))",
 		  
 		  primary: {

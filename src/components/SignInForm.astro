@@ -2,11 +2,11 @@
 
 ---
 
-<div class="flex flex-col gap-2">
+<div class="flex flex-col gap-4">
   <h2>Vendor Sign In</h2>
   <form
     action=""
-    class="flex justify-evenly w-72 h-60 p-4 border rounded-md flex-col relative"
+    class="flex justify-evenly w-72 h-72 p-4 border rounded-md flex-col relative shadow-lg gap-2"
     x-data="{ searchResultsVisible: false }"
   >
     <label for="vendor">Vendor</label>
@@ -19,17 +19,21 @@
       hx-target="#search-results"
       hx-trigger="keyup changed delay:200ms"
       autocomplete="false"
-      @keydown.window="searchResultsVisible = true"
+      @keydown="searchResultsVisible = true"
       @blur="searchResultsVisible = false"
+      hx-indicator=".htmx-indicator"
+      required
     />
     <div
       id="search-results"
       x-show="searchResultsVisible"
-      class="mt-3 p3 rounded-md absolute bg-headerbg top-[110px] w-[88%] p-3"
+      class="mt-3 p3 rounded-md absolute border bg-headerbg top-[105px] w-[88%] p-3"
     >
     </div>
-    <label for="vendor">Password</label>
-    <input type="password" class="bg-headerbg w-full p-3 rounded-md" />
+    <label for="password">Password</label>
+    <input type="password" name="password" class="bg-headerbg w-full p-3 rounded-md" required/>
+    <button type="submit" class="btn">Submit</button>
   </form>
   <span class="text-xs w-full text-center">Not seeing your company? <a href="/register"><u>Register here</u></a></span>
 </div>
+

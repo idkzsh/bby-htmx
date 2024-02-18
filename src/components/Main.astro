@@ -1,11 +1,18 @@
 ---
-import SignInForm from "../components/SignInForm.astro"
-import Command from "./ui/Command.astro"
-import Select from "./ui/Select.astro"
+const { cookies, redirect } = Astro;
+
+const accessToken = cookies.get("sb-access-token");
+const refreshToken = cookies.get("sb-refresh-token");
+
+if (accessToken && refreshToken) {
+  return redirect("/dashboard");
+}
 ---
 
-<main class="flex flex-col items-center w-full justify-center">
-    <SignInForm />
-
+<main class="flex flex-col items-center w-full justify-center" id="main" >
+    <div class="flex flex-col w-48 h-32 rounded-md justify-center items-center gap-3">
+        <button class="bg-primary text-secondary p-2 rounded-md w-[80%]" hx-get="/signin" hx-swap="innerHTML transition:true" hx-target="#main" hx-replace-url="true">Sign In</button>
+        <button class="bg-primary text-secondary p-2 rounded-md w-[80%]" hx-get="/register" hx-swap="innerHTML transition:true" hx-target="#main" hx-replace-url="true">Register</button>
+    </div>
     
 </main>

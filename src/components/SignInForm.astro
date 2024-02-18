@@ -1,25 +1,33 @@
 ---
 import Button from "./ui/Button.astro";
-import vendors from "../data/vendors";
-import Select from "./ui/Select.astro";
+
+const { cookies, redirect } = Astro;
+
+const accessToken = cookies.get("sb-access-token");
+const refreshToken = cookies.get("sb-refresh-token");
+
+if (accessToken && refreshToken) {
+  return redirect("/dashboard");
+}
 ---
 
 <div class="flex flex-col gap-4">
   <h2>Vendor Sign In</h2>
   <form
-    action=""
+    action="/api/auth/signin"
+    method="post"
     class="flex justify-evenly w-72 h-72 p-4 border rounded-md flex-col relative shadow-lg gap-2"
     x-data="{ searchResultsVisible: false }"
   >
-    <label for="vendor">Vendor</label>
+    <label for="vendor">Email</label>
 
-    <Select name="vendorSelect" id="vendorSelect">
-      {vendors.map((vendor, index) => (
-        <option value={Object.keys(vendor)[0]}>
-          {Object.keys(vendor)[0]}
-        </option>
-      ))}
-    </Select>
+    <input
+      type="text"
+      class="bg-headerbg w-full py-2 px-4 pr-8 rounded-md"
+      name="vendorEmail"
+      id="vendorEmail"
+    />
+
     <label for="password">Password</label>
     <input
       type="password"
@@ -30,6 +38,8 @@ import Select from "./ui/Select.astro";
     <Button type="submit" text="Submit" />
   </form>
   <span class="text-xs w-full text-center"
-    >Not seeing your company? <a href="/register"><u>Register</u></a></span
+    >Not seeing your company? <span hx-get="/register" hx-swap="innerHTML transition:true" hx-target="#main" class="cursor-pointer"><u>Register</u></span></span
   >
 </div>
+
+

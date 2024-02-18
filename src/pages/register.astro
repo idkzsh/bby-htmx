@@ -1,0 +1,22 @@
+---
+import Button from "../components/ui/Button.astro";
+export const partial = true;
+---
+
+
+  <div class="flex flex-col w-full items-center gap-4">
+    <h1>Vendor Register</h1>
+    <div class="flex flex-col w-full items-center gap-2">
+      
+      <form action="/api/auth/register" method="post" class="flex justify-evenly w-72 h-72 p-4 border rounded-md flex-col relative shadow-lg gap-2">
+        <label for="email" for="email">Email</label>
+        <input type="email" name="email" id="email" class="bg-headerbg w-full py-2 px-4 pr-8 rounded-md"/>
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" class="bg-headerbg w-full py-2 px-4 pr-8 rounded-md"/>
+        <Button type="submit" text="Register"/>
+      </form>
+      <span class="text-xs w-full text-center"
+      >Already have an account? <span hx-get="/signin" hx-swap="innerHTML transition:true" hx-target="#main" class="cursor-pointer" hx-replace-url="true"><u>Sign in</u></span></span
+    >
+    </div>
+  </div>

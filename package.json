@@ -15,6 +15,7 @@
     "@astrojs/check": "^0.5.4",
     "@astrojs/node": "^8.2.0",
     "@astrojs/tailwind": "^5.1.0",
+    "@supabase/supabase-js": "^2.39.6",
     "@types/alpinejs": "^3.13.6",
     "alpinejs": "^3.13.5",
     "astro": "^4.4.0",

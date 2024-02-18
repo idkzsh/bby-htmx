@@ -1,5 +1,7 @@
 ---
-
+import Button from "./ui/Button.astro";
+import vendors from "../data/vendors";
+import Select from "./ui/Select.astro";
 ---
 
 <div class="flex flex-col gap-4">
@@ -10,30 +12,24 @@
     x-data="{ searchResultsVisible: false }"
   >
     <label for="vendor">Vendor</label>
+
+    <Select name="vendorSelect" id="vendorSelect">
+      {vendors.map((vendor, index) => (
+        <option value={Object.keys(vendor)[0]}>
+          {Object.keys(vendor)[0]}
+        </option>
+      ))}
+    </Select>
+    <label for="password">Password</label>
     <input
-      type="search"
-      name="vendorSearch"
-      class="bg-headerbg w-full p-3 rounded-md"
-      placeholder="search"
-      hx-get="/api/search"
-      hx-target="#search-results"
-      hx-trigger="keyup changed delay:200ms"
-      autocomplete="false"
-      @keydown="searchResultsVisible = true"
-      @blur="searchResultsVisible = false"
-      hx-indicator=".htmx-indicator"
+      type="password"
+      name="password"
+      class="bg-headerbg w-full py-2 px-4 pr-8 rounded-md"
       required
     />
-    <div
-      id="search-results"
-      x-show="searchResultsVisible"
-      class="mt-3 p3 rounded-md absolute border bg-headerbg top-[105px] w-[88%] p-3"
-    >
-    </div>
-    <label for="password">Password</label>
-    <input type="password" name="password" class="bg-headerbg w-full p-3 rounded-md" required/>
-    <button type="submit" class="btn">Submit</button>
+    <Button type="submit" text="Submit" />
   </form>
-  <span class="text-xs w-full text-center">Not seeing your company? <a href="/register"><u>Register here</u></a></span>
+  <span class="text-xs w-full text-center"
+    >Not seeing your company? <a href="/register"><u>Register</u></a></span
+  >
 </div>
-

@@ -50,14 +50,6 @@
       rgb(var(--accent-light)) 30%,
       white 60%
     );
-
-    .btn {
-      font-size: 15px;
-      background-color: black;
-      color: white;
-      padding: 5px;
-      border-radius: calc(var(--radius) - 2px);
-    }
   }
 
   .dark {
@@ -79,7 +71,7 @@
     --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
 
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: black;
     --secondary-foreground: 210 40% 98%;
 
     --muted: 217.2 32.6% 17.5%;
@@ -103,14 +95,6 @@
       rgb(var(--accent-light)) 30%,
       white 60%
     );
-
-    .btn {
-      font-size: 15px;
-      background-color: white;
-      color: black;
-      padding: 5px;
-      border-radius: calc(var(--radius) - 2px);
-    }
   }
 }
 
@@ -128,7 +112,6 @@ html {
 }
 
 h1 {
-
   line-height: 1;
   text-align: center;
 }
@@ -144,3 +127,4 @@ h1 {
 #transition {
   transition: all 1s ease-in;
 }
+

@@ -24,6 +24,7 @@ export default {
 		  "btn-txt":"var(--btn-txt)",
 
 		  foreground: "hsl(var(--foreground))",
+		  "list-hover" : "var(--list-hover)",
 		  
 		  primary: {
 			DEFAULT: "hsl(var(--primary))",

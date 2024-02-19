@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    --background: rgba(188, 188, 188, 0.298);
+    --background: rgb(255, 254, 254);
     --header-background: rgb(227, 227, 227);
     --foreground: 222.2 84% 4.9%;
 

@@ -1,11 +1,38 @@
 ---
+import Button from "./ui/Button.astro";
 import Switch from "./ui/Switch.astro";
+const { cookies, redirect } = Astro;
+
+const accessToken = cookies.get("sb-access-token");
+const refreshToken = cookies.get("sb-refresh-token");
+
+let signedIn = false;
+
+if (accessToken && refreshToken) {
+  signedIn = true;
+}
 ---
 
 <header class="w-full antialiased bg-headerbg shadow-sm">
   <nav class="flex z-50 h-20 justify-evenly" x-data="{ showMenu: false }">
-    <div class="flex h-full items-center justify-center w-[33%]"><img src="bby-logo.png" class="w-[50px]"></div>
-    <h1 class="flex h-full items-center justify-center w-[33%] font-medium">BestBuy SKU Setup Portal</h1>
-    <Switch />
+    <div class="flex h-full items-center justify-center w-[33%]">
+      <img src="bby-logo.png" class="w-[50px]" />
+    </div>
+    <h1 class="flex h-full items-center justify-center w-[33%] font-medium">
+      BestBuy SKU Setup Portal
+    </h1>
+    <div class="flex w-[33%] items-center justify-evenly ">
+      <Switch />
+      {
+        signedIn ? (
+          <form action="/api/auth/signout">
+            <Button type="submit" text="Log Out"></Button>
+          </form>
+        ) :
+        (
+        <button class="bg-primary text-secondary p-2 rounded-md " hx-get="/login" hx-swap="innerHTML transition:true" hx-target="#main">Log In</button>
+        )
+      }
+    </div>
   </nav>
 </header>

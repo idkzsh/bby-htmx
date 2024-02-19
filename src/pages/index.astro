@@ -1,9 +1,34 @@
 ---
-import Main from "../components/Main.astro";
 import Layout from "../layouts/Layout.astro";
 import "../global.css";
+
+const { cookies, redirect } = Astro;
+
+const accessToken = cookies.get("sb-access-token");
+const refreshToken = cookies.get("sb-refresh-token");
+
+if (accessToken && refreshToken) {
+  return redirect("/dashboard");
+}
 ---
 
 <Layout>
-  <Main />
+  <main class="flex flex-col items-center w-full justify-center" id="main">
+    <div
+      class="flex flex-col w-48 h-32 rounded-md justify-center items-center gap-3"
+    >
+      <button
+        class="bg-primary text-secondary p-2 rounded-md w-[80%]"
+        hx-get="/login"
+        hx-swap="innerHTML transition:true"
+        hx-target="#main">Log In</button
+      >
+      <button
+        class="bg-primary text-secondary p-2 rounded-md w-[80%]"
+        hx-get="/register"
+        hx-swap="innerHTML transition:true"
+        hx-target="#main">Register</button
+      >
+    </div>
+  </main>
 </Layout>

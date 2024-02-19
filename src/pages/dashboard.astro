@@ -1,5 +1,4 @@
 ---
-import Button from "../components/ui/Button.astro";
 import Layout from "../layouts/Layout.astro";
 import { supabase } from "../lib/supabase";
 
@@ -39,7 +38,7 @@ const email = data?.user?.email;
           class="flex justify-evenly w-72 h-auto p-4 border rounded-md flex-col relative shadow-lg gap-2"
         >
         <button
-        class="bg-primary text-secondary p-2 rounded-md "
+        class="btn"
         hx-get="/api/setup-config"
         hx-swap="innerHTML transition:true"
         hx-target="#main">SKU Setup</button

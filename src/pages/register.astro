@@ -1,24 +1,48 @@
 ---
-import Button from "../components/ui/Button.astro";
 export const partial = true;
 ---
 
-
-  <div class="flex flex-col w-full items-center gap-4">
-    <h1>Vendor Register</h1>
-    <div class="flex flex-col w-full items-center gap-2">
-      
-      <form action="/api/auth/register" method="post" class="flex justify-evenly w-72 h-auto p-4 border rounded-md flex-col relative shadow-lg gap-2">
-        <label for="magic-code" >Magic Code</label>
-        <input type="text" name="magic-code" id="magic-code" class="bg-headerbg w-full py-2 px-4 pr-8 rounded-md" required/>
-        <label for="email" >Email</label>
-        <input type="email" name="email" id="email" class="bg-headerbg w-full py-2 px-4 pr-8 rounded-md" required/>
-        <label for="password">Password</label>
-        <input type="password" name="password" id="password" class="bg-headerbg w-full py-2 px-4 pr-8 rounded-md" required/>
-        <Button type="submit" text="Register"/>
-      </form>
-      <span class="text-xs w-full text-center"
-      >Already have an account? <span hx-get="/login" hx-swap="innerHTML transition:true" hx-target="#main" class="cursor-pointer"><u>Log in</u></span></span
+<div class="flex flex-col w-full items-center gap-4">
+  <h1>Vendor Register</h1>
+  <div class="flex flex-col w-full items-center gap-2">
+    <form
+      action="/api/auth/register"
+      method="post"
+      class="flex justify-evenly w-72 h-auto p-4 border rounded-md flex-col relative shadow-lg gap-2"
     >
-    </div>
+      <label for="magic-code">Magic Code</label>
+      <input
+        type="text"
+        name="magic-code"
+        id="magic-code"
+        class="bg-headerbg w-full py-2 px-4 pr-8 rounded-md"
+        required
+      />
+      <label for="email">Email</label>
+      <input
+        type="email"
+        name="email"
+        id="email"
+        class="bg-headerbg w-full py-2 px-4 pr-8 rounded-md"
+        required
+      />
+      <label for="password">Password</label>
+      <input
+        type="password"
+        name="password"
+        id="password"
+        class="bg-headerbg w-full py-2 px-4 pr-8 rounded-md"
+        required
+      />
+      <button type="submit" class="btn">Register</button>
+    </form>
+    <span class="text-xs w-full text-center"
+      >Already have an account? <span
+        hx-get="/login"
+        hx-swap="innerHTML transition:true"
+        hx-target="#main"
+        class="cursor-pointer"><u>Log in</u></span
+      ></span
+    >
   </div>
+</div>

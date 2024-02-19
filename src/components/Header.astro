@@ -1,5 +1,4 @@
 ---
-import Button from "./ui/Button.astro";
 import Switch from "./ui/Switch.astro";
 const { cookies, redirect } = Astro;
 
@@ -26,11 +25,11 @@ if (accessToken && refreshToken) {
       {
         signedIn ? (
           <form action="/api/auth/signout">
-            <Button type="submit" text="Log Out"></Button>
+            <button type="submit" class="btn">Log Out</button>
           </form>
         ) :
         (
-        <button class="bg-primary text-secondary p-2 rounded-md " hx-get="/login" hx-swap="innerHTML transition:true" hx-target="#main">Log In</button>
+        <button class="btn" hx-get="/login" hx-swap="innerHTML transition:true" hx-target="#main">Log In</button>
         )
       }
     </div>

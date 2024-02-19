@@ -120,6 +120,13 @@ h1 {
   text-align: center;
 }
 
+button.btn {
+  background-color: var(--btn-bg);
+  color: var(--btn-txt);
+  padding: 0.5rem;
+  border-radius: calc(var(--radius) - 2px);
+}
+
 .text-gradient {
   background-image: var(--accent-gradient);
   -webkit-background-clip: text;
@@ -131,4 +138,6 @@ h1 {
 #transition {
   transition: all 1s ease-in;
 }
+
+
 

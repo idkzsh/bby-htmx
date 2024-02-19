@@ -1,6 +1,5 @@
 ---
 // login component - needs to be a page route in order for HTMX to swap
-import Button from "../components/ui/Button.astro";
 
 const { cookies, redirect } = Astro;
 
@@ -37,7 +36,7 @@ export const partial = true;
         class="bg-headerbg w-full py-2 px-4 pr-8 rounded-md"
         required
       />
-      <Button type="submit" text="Login" />
+      <button type="submit" class="btn">Login</button>
     </form>
     <span class="text-xs w-full text-center"
       >Don't have an account? <span

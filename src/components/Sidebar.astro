@@ -1,0 +1,13 @@
+---
+import { headers } from "../data/setup";
+---
+
+<div class="flex flex-col w-40">
+  {
+    Object.entries(headers).map(([key, val]) => (
+      <div class="flex h-16 border-r border-b text-xs font-bold items-center px-2">
+        {key}
+      </div>
+    ))
+  }
+</div>

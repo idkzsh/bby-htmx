@@ -2,7 +2,7 @@
 const { name, id, array } = Astro.props;
 ---
 
-<div x-data="{ isOpen: false, selection: 'Select a category' }"> 
+<div x-data="{ isOpen: false }"> 
     <div 
         class="flex items-center px-2 w-full rounded-md h-10 bg-background shadow-md border cursor-pointer"
         x-text="selection"

@@ -1,20 +1,41 @@
 ---
-import Select from "../../components/ui/Select.astro"
-import {d} from "../../data/hierarchy"
+import Select from "../../components/ui/Select.astro";
+import { d } from "../../data/hierarchy";
+
+import Toast from "../../components/ui/Toast.astro";
 export const partial = true;
 ---
 
+<div
+  x-data="{ toastOpen: false}"
+  class="flex flex-col justify-center items-center w-full h-full relative"
+>
+  <form
+    action="/setup"
+    class="flex justify-evenly w-72 h-auto p-4 border rounded-md flex-col relative shadow-lg gap-2"
+    x-data="{selection: 'Select a category', formValid: false}"
+    @submit.prevent="selection === 'Select a category' ? toastOpen = true : $el.submit()">
+    <label for="product-category">Product Category</label>
+    <input
+      type="text"
+      x-show="false"
+      name="product-category"
+      id="product-category"
+      x-model="selection"
+    />
+    <Select array={d} />
 
-    <form
-      action="/setup"
-      class="flex justify-evenly w-72 h-auto p-4 border rounded-md flex-col relative shadow-lg gap-2"
-      x-data="{selection: ''}"
-    >
-      <label for="product-category">Product Category</label>
-        <input type="text" x-show="none" name="product-category" id="product-category" value="selection">
-        <Select array={d} required></Select>
-        
-      <label for="numOfSKUs">Number of SKUs</label>
-        <input name="numOfSKUs" id="numOfSKUs" type="number" class="bg-background border rounded-lg h-10 px-2 shadow-md" required/>
-      <button type="submit">Submit</button>
-    </form>
+    <label for="numOfSKUs">Number of SKUs</label>
+    <input
+      name="numOfSKUs"
+      id="numOfSKUs"
+      type="number"
+      class="bg-background border rounded-lg h-10 px-2 shadow-md"
+      min="1"
+      required
+    />
+    <button type="submit" class="btn">Submit</button>
+  </form>
+
+  <Toast x-show={"toastOpen"} message="Please select a category"/>
+</div>

@@ -1,6 +1,4 @@
 ---
-import Button from "./ui/Button.astro";
-
 const { cookies, redirect } = Astro;
 
 const accessToken = cookies.get("sb-access-token");
@@ -35,11 +33,14 @@ if (accessToken && refreshToken) {
       class="bg-headerbg w-full py-2 px-4 pr-8 rounded-md"
       required
     />
-    <Button type="submit" text="Submit" />
+    <button type="submit" class="btn">Log In</button>
   </form>
   <span class="text-xs w-full text-center"
-    >Not seeing your company? <span hx-get="/register" hx-swap="innerHTML transition:true" hx-target="#main" class="cursor-pointer"><u>Register</u></span></span
+    >Not seeing your company? <span
+      hx-get="/register"
+      hx-swap="innerHTML transition:true"
+      hx-target="#main"
+      class="cursor-pointer"><u>Register</u></span
+    ></span
   >
 </div>
-
-

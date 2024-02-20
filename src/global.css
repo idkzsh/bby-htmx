@@ -144,3 +144,6 @@ button.btn {
 
 
 
+.dark ::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}

@@ -1,7 +1,14 @@
 ---
 interface inputObj {
   name: string;
-  type: "text" | "password" | "number" | "checkbox" | "radio" | "select" | "date";
+  type:
+    | "text"
+    | "password"
+    | "number"
+    | "checkbox"
+    | "radio"
+    | "select"
+    | "date";
   maxLen: number;
   minLen: number;
   step: number;
@@ -11,21 +18,22 @@ interface inputObj {
   options: object;
 }
 
-const today = new Date().toISOString().split('T')[0];
+const today = new Date().toISOString().split("T")[0];
 
-const { obj, columns } = Astro.props;
+const { obj, columns, formName } = Astro.props;
 ---
 
 <!-- Setup column. For every SKU there is one column of inputs -->
-<form id="columnForm" class="flex" action="" method="post">
+<form id={formName} class="flex" action="" method="post">
   {
     Array.from({ length: columns }).map((_, index) => (
       <div class="w-40 border-r">
+        <div class="h-4 border-b text-xs text-center font-bold">SKU {index+1}</div>
         {obj.map((item: inputObj) => (
-          <div class="flex border-b h-16 justify-center items-center">
+          <div class="flex border-b h-16 justify-center items-center text-sm">
             {item.type === "text" && (
               <input
-                class="w-[80%] border"
+                class="w-[80%] border bg-background h-6 text-sm"
                 name={item.name + `-${index}`}
                 id={item.name + `-${index}`}
                 type={item.type}
@@ -36,7 +44,7 @@ const { obj, columns } = Astro.props;
             )}
             {item.type === "number" && (
               <input
-                class="w-[80%] border"
+                class="w-[80%] border bg-background h-6 text-sm"
                 name={item.name + `-${index}`}
                 id={item.name + `-${index}`}
                 type={item.type}
@@ -45,7 +53,12 @@ const { obj, columns } = Astro.props;
               />
             )}
             {item.type === "select" && (
-              <select class="w-[80%] border bg-background h-6">
+              <select
+                name={item.name + `-${index}`}
+                id={item.name + `-${index}`}
+                class="w-[80%] border bg-background h-6 text-sm"
+                required={item.required}
+              >
                 <option />
                 {Object.entries(item.options).map(([key, val]) => (
                   <option value={key}>{val}</option>
@@ -53,7 +66,15 @@ const { obj, columns } = Astro.props;
               </select>
             )}
             {item.type === "date" && (
-              <input type="date" min={today} class="z-1">
+              <input
+                class="w-[80%] border bg-background h-6 text-sm"
+                type="date"
+                min={today}
+                class="z-1"
+                name={item.name + `-${index}`}
+                id={item.name + `-${index}`}
+                required={item.required}
+              />
             )}
           </div>
         ))}

@@ -2,7 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 import Sidebar from "../components/Sidebar.astro";
 import SetupColumn from "../components/SetupColumn.astro";
-import { headers, inputs } from "../data/setup";
+import { headers, inputs, formats, unCodes } from "../data/compliance";
 import Spacer from "../components/Spacer.astro";
 
 let columns = Number(Astro.url.searchParams.get("numOfSKUs") || 1);
@@ -20,12 +20,12 @@ if (columns > 50) {
       <button class="btn h-8 text-xs">Add Column</button>
       <button class="btn h-8 text-xs">Import Excel</button>
     </div>
-    <button class="btn h-8 text-xs" type="submit" form="setupForm">Submit</button>
+    <button class="btn h-8 text-xs" type="submit" form="complianceForm">Submit</button>
   </nav>
   <Spacer height={12} />
-  <div class="flex w-[8150px]">
+  <div class="flex w-[10000px]">
     <Sidebar obj={headers} />
 
-    <SetupColumn obj={inputs} columns={columns} formName="setupForm"/>
+    <SetupColumn  columns={columns} obj={inputs} formName="complianceForm"/>
   </div>
 </Layout>

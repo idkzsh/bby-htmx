@@ -1,7 +1,7 @@
 const headers = {
   "Vendor Part Number": "Maximum 20 characters",
-  "Description (Short)": "Maximum 20 characters",
-  "Description (Long)": "Maximum 40 characters",
+  "SKU Title (Short)": "Maximum 20 characters",
+  "SKU Title (Long)": "Maximum 40 characters",
   UPC: "12 or 13 digits only",
   "Secondary UPC": "12 or 13 digits only",
   Brand: "Maximum 20 characters",

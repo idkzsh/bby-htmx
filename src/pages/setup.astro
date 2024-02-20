@@ -10,18 +10,17 @@ let columns = Number(Astro.url.searchParams.get("numOfSKUs") || 1);
 if (columns > 50) {
   columns = 50;
 }
-
-
-
 ---
 
 <Layout>
   <nav
     class="flex h-12 w-full border-b items-center px-2 justify-between fixed top-20 bg-background z-50"
   >
-    <button class="btn h-8" >Add Column</button>
-    <button class="btn h-8">Import</button>
-    <button class="btn h-8" type="submit" form="columnForm">Submit</button>
+    <div class="flex gap-2">
+      <button class="btn h-8 text-xs">Add Column</button>
+      <button class="btn h-8 text-xs">Import Excel</button>
+    </div>
+    <button class="btn h-8 text-xs" type="submit" form="columnForm">Submit</button>
   </nav>
   <Spacer height={12} />
   <div class="flex w-[10000px]">

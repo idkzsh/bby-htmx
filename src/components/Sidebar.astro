@@ -2,7 +2,7 @@
 const {obj} = Astro.props
 ---
 
-<div class="flex flex-col w-40 sticky left-0 bg-background h-auto">
+<div class="flex flex-col w-40 sticky left-0 bg-background h-auto z-10">
   {
     Object.entries(obj).map(([key, val]) => (
       <div class="flex h-16 border-r border-b text-xs font-bold items-center px-2">

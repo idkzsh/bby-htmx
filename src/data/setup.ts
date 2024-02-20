@@ -46,4 +46,159 @@ const headers = {
     "Dangerous Product/Material": "(Required) Select Yes or No",
   };
 
-  export {headers};
+  const inputs = [
+    {
+      name: "VPN",
+      type: "text",
+      minLen: 1,
+      maxLen: 20,
+      required: true
+    },
+    {
+      name: "SHORT_DESC",
+      type: "text",
+      minLen: 1,
+      maxLen: 20,
+      required: true
+    },
+    {
+      name: "SKU_DESC",
+      type: "text",
+      minLen: 1,
+      maxLen: 40,
+      required: true
+    },
+    {
+      name: "UPC",
+      type: "text",
+      minLen: 12,
+      maxLen: 13,
+      required: true
+    },
+    {
+      name: "SECONDARY_UPC",
+      type: "text",
+      minLen: 12,
+      maxLen: 13,
+      required: false
+    },
+    {
+      name: "BRAND_NAME",
+      type: "text",
+      minLen: 1,
+      maxLen: 20,
+      required: true
+    },
+    {
+      name: "MODEL_NO",
+      type: "text",
+      minLen: 1,
+      maxLen: 20,
+      required: true
+    },
+    {
+      name: "MANUFACTURER",
+      type: "text",
+      minLen: 1,
+      maxLen: 20,
+      required: true
+    },
+    {
+      name: "UNIT_COST",
+      type: "number",
+      min: 0.01,
+      max: 100000,
+      step: 0.01,
+      required: true
+    },
+    {
+      name: "ORIGINAL_RETAIL",
+      type: "number",
+      min: 0.01,
+      max: 100000,
+      step: 0.01,
+      required: true
+    },
+    {
+      name: "SHIP_CARTON_WID",
+      type: "number",
+      min: 0.01,
+      max: 100,
+      step: 0.01,
+      required: true
+    },
+    {
+      name: "SHIP_CARTON_HT",
+      type: "number",
+      min: 0.01,
+      max: 100,
+      step: 0.01,
+      required: true
+    },
+    {
+      name: "SHIP_CARTON_LEN",
+      type: "number",
+      min: 0.01,
+      max: 100,
+      step: 0.01,
+      required: true
+    },
+    {
+      name: "SHIP_CARTON_WT",
+      type: "number",
+      min: 0.01,
+      max: 100,
+      step: 0.01,
+      required: true
+    },
+    {
+      name: "S_UNIT_WIDTH",
+      type: "number",
+      min: 0.01,
+      max: 100,
+      step: 0.01,
+      required: true
+    },
+    {
+      name: "S_UNIT_HEIGHT",
+      type: "number",
+      min: 0.01,
+      max: 100,
+      step: 0.01,
+      required: true
+    },
+    {
+      name: "S_UNIT_LENGTH",
+      type: "number",
+      min: 0.01,
+      max: 100,
+      step: 0.01,
+      required: true
+    },
+    {
+      name: "S_UNIT_WEIGHT",
+      type: "number",
+      min: 0.01,
+      max: 100,
+      step: 0.01,
+      required: true
+    },
+    {
+      name: "SUPP_PACK_SIZE",
+      type: "number",
+      min: 1,
+      max: 500,
+      step: 1,
+      required: true
+    },
+    {
+      name: "INNERPACK_SIZE",
+      type: "number",
+      min: 1,
+      max: 500,
+      step: 1,
+      required: true
+    },
+  ]
+
+  export {headers, inputs};

@@ -13,8 +13,9 @@ export const partial = true;
   <form
     action="/setup"
     class="flex justify-evenly w-72 h-auto p-4 border rounded-md flex-col relative shadow-lg gap-2"
-    x-data="{selection: 'Select a category', formValid: false}"
-    @submit.prevent="selection === 'Select a category' ? toastOpen = true : $el.submit()">
+    x-data="{selection: 'Select a category'}"
+    @submit.prevent="selection === 'Select a category' ? toastOpen = true : $el.submit()"
+  >
     <label for="product-category">Product Category</label>
     <input
       type="text"
@@ -37,5 +38,5 @@ export const partial = true;
     <button type="submit" class="btn">Submit</button>
   </form>
 
-  <Toast x-show={"toastOpen"} message="Please select a category"/>
+  <Toast x-show={"toastOpen"} message="Please select a category" />
 </div>

@@ -1,0 +1,50 @@
+---
+interface inputObj {
+  name: string;
+  type: "text" | "password" | "number" | "checkbox" | "radio" | "select";
+  maxLen: number;
+  minLen: number;
+  step: number;
+  required: boolean;
+  min: number;
+  max: number;
+}
+
+const { obj, columns } = Astro.props;
+
+---
+
+<form id="columnForm" class="flex">
+  {
+    Array.from({ length: columns }).map((_, index) => (
+      <div class="w-40 border-r">
+        {obj.map((item: inputObj) => (
+          <div class="flex border-b h-16 justify-center items-center">
+            {item.type === "text" && (
+              <input
+                class="w-[80%] border"
+                name={item.name + `-${index}`}
+                id={item.name + `-${index}`}
+                type={item.type}
+                minlength={item.minLen}
+                maxlength={item.maxLen}
+                required={item.required}
+              />
+
+            )}
+            {item.type === "number" && (
+              <input
+                class="w-[80%] border"
+                name={item.name + `-${index}`}
+                id={item.name + `-${index}`}
+                type={item.type}
+                step={item.step}
+                max={item.max}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+    ))
+  }
+</form>

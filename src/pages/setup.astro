@@ -4,6 +4,32 @@ import Sidebar from "../components/Sidebar.astro";
 import SetupColumn from "../components/SetupColumn.astro";
 import { headers, inputs } from "../data/setup";
 import Spacer from "../components/Spacer.astro";
+import { supabase } from "../lib/supabase";
+
+const { cookies, redirect } = Astro;
+
+const accessToken = cookies.get("sb-access-token");
+const refreshToken = cookies.get("sb-refresh-token");
+
+if (!accessToken || !refreshToken) {
+  return redirect("/");
+}
+
+const { data, error } = await supabase.auth.setSession({
+  refresh_token: refreshToken.value,
+  access_token: accessToken.value,
+});
+
+if (error) {
+  cookies.delete("sb-access-token", {
+    path: "/",
+  });
+  cookies.delete("sb-refresh-token", {
+    path: "/",
+  });
+
+  return redirect("/");
+}
 
 let columns = Number(Astro.url.searchParams.get("numOfSKUs") || 1);
 

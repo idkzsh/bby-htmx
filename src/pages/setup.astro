@@ -42,16 +42,33 @@ if (columns > 50) {
   <nav
     class="flex h-12 w-full border-b items-center px-2 justify-between fixed top-20 bg-background z-50"
   >
-    <div class="flex gap-2">
+    <div class="flex gap-2 items-center">
       <button class="btn h-8 text-xs">Add Column</button>
-      <button class="btn h-8 text-xs">Import Excel</button>
+      <form
+        class="flex items-center justify-center gap-2 w-[600px]"
+        x-data="{ submitting: false }"
+        id="uploadForm"
+        x-on:submit.prevent="submitting = true; console.log('hello world')"
+        action="/api/process"
+        method="post"
+      >
+        Import Excel File: <input
+          type="file"
+          class="flex items-center justify-center pt-[2px] pl-[2px] w-60 border rounded-md h-8 shadow-sm"
+          id="excelFileInput"
+          accept=".csv, .xlsx, .xlsb"
+        />
+        <button class="btn h-8 text-xs" type="submit">Upload</button>
+      </form>
     </div>
-    <button class="btn h-8 text-xs" type="submit" form="setupForm">Submit</button>
+    <button class="btn h-8 text-xs" type="submit" form="setupForm"
+      >Submit</button
+    >
   </nav>
   <Spacer height={12} />
-  <div class="flex w-[8150px]">
+  <div class=`flex w-[8150px]`>
     <Sidebar obj={headers} />
 
-    <SetupColumn obj={inputs} columns={columns} formName="setupForm"/>
+    <SetupColumn obj={inputs} columns={columns} formName="setupForm" />
   </div>
 </Layout>

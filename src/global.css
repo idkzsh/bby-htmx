@@ -142,8 +142,6 @@ button.btn {
   transition: all 1s ease-in;
 }
 
-
-
 .dark ::-webkit-calendar-picker-indicator {
   filter: invert(1);
 }

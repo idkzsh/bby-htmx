@@ -17,18 +17,27 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
     const data: any[] = xlsx.utils.sheet_to_json(worksheet);
     console.log(data[0]['SKU_DESC']);
-    html = `<div>${Object.entries(data[0]).map(([key,val]) => (
-        `<p>${key}</p>
-        <p>${val}</p>
-        `
-    ))}</div>`
+    html = `<div>
+              <form id="setupForm" class="flex" action="" method="post">
+                <input required/>
+                ${Object.entries(data[0]).map(([key,val]) => (
+                `<p>${key}</p>
+                  <p>${val}</p>
+                `            
+    ))}
+     </form>
+            </div>`
     // Process the fileBuffer as needed
   } else {
     console.error("Uploaded file not found or is not an instance of File");
     html = `  
-    <div w-full h-full flex justify-center items-center>
-      ${data ? data[0]["SKU_DESC"]: "no data found"}
-    </div>`;
+    <form id={"setupForm"} class="flex" action="" method="post">
+      <input required/>
+      <div w-full h-full flex justify-center items-center>
+        ${data ? data[0]["SKU_DESC"]: "no data found"}
+      </div>
+    </form>
+    `;
   }
 
 

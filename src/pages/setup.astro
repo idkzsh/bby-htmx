@@ -50,9 +50,10 @@ if (columns > 50) {
         id="uploadForm"
         name="uploadForm"
         hx-post="/api/processing/process"
-        hx-swap="none"
+        hx-swap="innerHTML"
         hx-trigger="submit"
         hx-encoding="multipart/form-data"
+        hx-target="#setup-col"
       >
         Import Excel File: <input
           type="file"
@@ -72,6 +73,6 @@ if (columns > 50) {
   <div class=`flex w-[8150px]`>
     <Sidebar obj={headers} />
 
-    <SetupColumn obj={inputs} columns={columns} formName="setupForm" id="setup-col"/>
+    <SetupColumn obj={inputs} columns={columns} formName="setupForm" />
   </div>
 </Layout>

@@ -4,6 +4,7 @@ import Sidebar from "../components/Sidebar.astro";
 import SetupColumn from "../components/SetupColumn.astro";
 import { headers, inputs } from "../data/setup";
 import Spacer from "../components/Spacer.astro";
+import Spinner from "../components/ui/spinner.astro"
 import { supabase } from "../lib/supabase";
 import * as xlsx from "xlsx";
 
@@ -40,24 +41,24 @@ if (columns > 50) {
 
 let excelData;
 
+
 if (Astro.request.method === "POST") {
   try {
     const data = await Astro.request.formData();
-    const excelFile = data.get("excelFileInput"); 
-
+    const excelFile = data.get("excelFileInput");
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     if (excelFile instanceof File) {
       const fileBuffer = await excelFile.arrayBuffer();
       const workbook = xlsx.read(fileBuffer, { type: "array" });
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       excelData = xlsx.utils.sheet_to_json(worksheet);
-
     }
   } catch (error) {
     if (error instanceof Error) {
       console.error(error.message);
       excelData = null;
     }
-  }
+  } 
 }
 ---
 
@@ -68,6 +69,7 @@ if (Astro.request.method === "POST") {
     <div class="flex gap-2 items-center">
       <button class="btn h-8 text-xs">Add Column</button>
       <form
+        x-data="{ loading: false }"
         class="flex items-center justify-center gap-2 w-[600px]"
         id="uploadForm"
         name="uploadForm"
@@ -82,7 +84,10 @@ if (Astro.request.method === "POST") {
           accept=".csv, .xlsx, .xlsb"
         />
         <input type="hidden" name="columns" value={columns} />
-        <button class="btn h-8 text-xs" type="submit">Upload</button>
+        <div class="relative w-24">
+          <button class="btn h-8 text-xs" type="submit" @click="loading = true">Upload</button>
+          <Spinner />
+        </div>
       </form>
     </div>
     <button class="btn h-8 text-xs" type="submit" form="setupForm"

@@ -10,6 +10,8 @@
     --header-background: rgb(227, 227, 227);
     --foreground: 222.2 84% 4.9%;
 
+    --spinner: #000000;
+
     --btn-bg: black;
     --btn-txt: white;
 
@@ -61,6 +63,8 @@
 
     --btn-bg: white;
     --btn-txt: black;
+
+    --spinner: #ffffff;
 
     --list-hover: rgb(128, 128, 128);
 
@@ -144,4 +148,8 @@ button.btn {
 
 .dark ::-webkit-calendar-picker-indicator {
   filter: invert(1);
+}
+
+.spinner {
+  fill: var(--spinner)
 }

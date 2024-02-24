@@ -26,7 +26,7 @@ const { obj, columns, formName, data } = Astro.props;
 ---
 
 <!-- Setup column. For every SKU there is one column of inputs -->
-<form id={formName} class="flex" action="" method="post">
+<form id={formName} class="flex" action="/compliance" method="post">
   {
     Array.from({ length: columns }).map((_, index) => (
       <div class="w-40 border-r">
@@ -56,6 +56,8 @@ const { obj, columns, formName, data } = Astro.props;
                 type={item.type}
                 step={item.step}
                 max={item.max}
+                value={data && data[index] ? data[index][item.name.split("-")[0]] : ""}
+                required={item.required}
               />
             )}
             {item.type === "select" && (
@@ -64,6 +66,7 @@ const { obj, columns, formName, data } = Astro.props;
                 id={item.name + `-${index}`}
                 class="w-[80%] border bg-background h-6 text-sm"
                 required={item.required}
+                value={data && data[index] ? data[index][item.name.split("-")[0]] : ""}
               >
                 <option />
                 {Object.entries(item.options).map(([key, val]) => (
@@ -81,6 +84,7 @@ const { obj, columns, formName, data } = Astro.props;
                 id={item.name + `-${index}`}
                 required={item.required}
                 pattern="\d{4}-\d{2}-\d{2}"
+                value={data && data[index] ? data[index][item.name.split("-")[0]] : ""}
               />
             )}
           </div>

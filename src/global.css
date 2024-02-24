@@ -153,3 +153,8 @@ button.btn {
 .spinner {
   fill: var(--spinner)
 }
+
+.btn[disabled] {
+  opacity: 0.5; /* Reduce opacity for a greyed-out effect */
+  cursor: not-allowed; /* Change cursor to indicate it's not clickable */
+}

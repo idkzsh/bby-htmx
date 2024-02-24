@@ -2,12 +2,18 @@
 
 import * as xlsx from "xlsx";
 import type { APIRoute } from "astro";
+import { headers, inputs } from "../../../data/setup";
+
+
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   const formData = await request.formData(); // Extract form data
+  const columns = formData.get("columns");
   const excelFile = formData.get("excelFileInput"); // Corrected field name
+  const today = new Date().toISOString().split("T")[0];
+  console.log(columns);
 
-  let html;
+  let response: any;
   let data = null;
   if (excelFile instanceof File) {
     console.log("File uploaded:", excelFile.name); // Log file name
@@ -16,35 +22,16 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const workbook = xlsx.read(fileBuffer, { type: "array" });
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
     const data: any[] = xlsx.utils.sheet_to_json(worksheet);
-    console.log(data[0]['SKU_DESC']);
-    html = `<div>
-              <form id="setupForm" class="flex" action="" method="post">
-                <input required/>
-                ${Object.entries(data[0]).map(([key,val]) => (
-                `<p>${key}</p>
-                  <p>${val}</p>
-                `            
-    ))}
-     </form>
-            </div>`
+    console.log(data[0]["SKU_DESC"]);
+    response = data;
     // Process the fileBuffer as needed
-  } else {
-    console.error("Uploaded file not found or is not an instance of File");
-    html = `  
-    <form id={"setupForm"} class="flex" action="" method="post">
-      <input required/>
-      <div w-full h-full flex justify-center items-center>
-        ${data ? data[0]["SKU_DESC"]: "no data found"}
-      </div>
-    </form>
-    `;
-  }
+    } else {
+      console.error("Uploaded file not found or is not an instance of File");
+    }
 
-
-
-  return new Response(html, {
+  return new Response(response, {
     headers: {
-      "Content-Type": "text/html",
+      "Content-Type": "JSON",
     },
   });
 };

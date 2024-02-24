@@ -5,6 +5,7 @@ import SetupColumn from "../components/SetupColumn.astro";
 import { headers, inputs } from "../data/setup";
 import Spacer from "../components/Spacer.astro";
 import { supabase } from "../lib/supabase";
+import * as xlsx from "xlsx";
 
 const { cookies, redirect } = Astro;
 
@@ -36,6 +37,27 @@ let columns = Number(Astro.url.searchParams.get("numOfSKUs") || 1);
 if (columns > 50) {
   columns = 50;
 }
+
+let excelData;
+
+if (Astro.request.method === "POST") {
+  try {
+    const data = await Astro.request.formData();
+    const excelFile = data.get("excelFileInput"); 
+
+    if (excelFile instanceof File) {
+      const fileBuffer = await excelFile.arrayBuffer();
+      const workbook = xlsx.read(fileBuffer, { type: "array" });
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+      excelData = xlsx.utils.sheet_to_json(worksheet);
+
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+  }
+}
 ---
 
 <Layout>
@@ -46,22 +68,19 @@ if (columns > 50) {
       <button class="btn h-8 text-xs">Add Column</button>
       <form
         class="flex items-center justify-center gap-2 w-[600px]"
-        x-data="{ submitting: false }"
         id="uploadForm"
         name="uploadForm"
-        hx-post="/api/processing/process"
-        hx-swap="innerHTML"
-        hx-trigger="submit"
-        hx-encoding="multipart/form-data"
-        hx-target="#setup-col"
+        method="POST"
+        enctype="multipart/form-data"
       >
         Import Excel File: <input
           type="file"
-          class="flex items-center justify-center pt-[2px] pl-[2px] w-60 border rounded-md h-8 shadow-sm"
+          class="flex items-center justify-center pt-[2px] pl-[2px] w-60 rounded-md h-8 shadow-sm"
           id="excelFileInput"
           name="excelFileInput"
           accept=".csv, .xlsx, .xlsb"
         />
+        <input type="hidden" name="columns" value={columns} />
         <button class="btn h-8 text-xs" type="submit">Upload</button>
       </form>
     </div>
@@ -70,9 +89,14 @@ if (columns > 50) {
     >
   </nav>
   <Spacer height={12} />
-  <div class=`flex w-[8150px]`>
+  <div class=`flex w-[8150px] `>
     <Sidebar obj={headers} />
 
-    <SetupColumn obj={inputs} columns={columns} formName="setupForm" />
+    <SetupColumn
+      obj={inputs}
+      columns={columns}
+      formName="setupForm"
+      data={excelData}
+    />
   </div>
 </Layout>

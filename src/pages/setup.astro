@@ -67,7 +67,7 @@ if (Astro.request.method === "POST") {
     class="flex h-12 w-full border-b items-center px-2 justify-between fixed top-20 bg-background z-50"
   >
     <div class="flex gap-2 items-center">
-      <button class="btn h-8 text-xs">Add Column</button>
+      <button class="btn text-xs">Add Column</button>
       <form
         x-data="{ loading: false, fileSelected: false }"
         class="flex items-center justify-center gap-2 w-[600px]"
@@ -86,13 +86,13 @@ if (Astro.request.method === "POST") {
         />
         <input type="hidden" name="columns" value={columns} />
         <div class="relative w-24">
-          <button class="btn h-8 text-xs" type="submit" @click="loading = true" :disabled="!fileSelected">Upload</button>
+          <button class="btn text-xs" type="submit" @click="loading = true" :disabled="!fileSelected">Upload</button>
           <Spinner />
         </div>
       </form>
     </div>
-    <button class="btn h-8 text-xs" type="submit" form="setupForm"
-      >Submit</button
+    <button class="btn text-xs" type="submit" form="setupForm"
+      >Next</button
     >
   </nav>
   <Spacer height={12} />

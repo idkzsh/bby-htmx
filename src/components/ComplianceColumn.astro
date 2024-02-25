@@ -23,7 +23,7 @@ interface inputObj {
 
 const today = new Date().toISOString().split("T")[0];
 
-let { obj, columns, formName, data, setupData } = Astro.props;
+let { obj, columns, formName,  setupData } = Astro.props;
 ---
 
 <script>
@@ -51,7 +51,7 @@ let { obj, columns, formName, data, setupData } = Astro.props;
     unCodes[value].forEach((item: string) => {
       hazmat.innerHTML += `<option value='${item}'>${item}</option>`;
     });
-    // Add any additional actions you want to perform when the value changes
+
   }
 
   // Add event listeners to all elements with IDs starting with "BATTERY_TYPE-"
@@ -64,8 +64,8 @@ let { obj, columns, formName, data, setupData } = Astro.props;
     });
   });
 </script>
-<!-- Setup column. For every SKU there is one column of inputs -->
-<form id={formName} class="flex" action="/compliance" method="post">
+<!-- Compliance column. For every SKU there is one column of inputs -->
+<form id={formName} class="flex" action="/compliance" method="post" >
   {
     Array.from({ length: columns }).map((_, index) => (
       <div class="w-40 border-r">
@@ -84,19 +84,16 @@ let { obj, columns, formName, data, setupData } = Astro.props;
             x-data="{battType: ''}"
           >
             {item.type === "file" && (
+           <label for={item.name + `-${index}`} class="btn cursor-pointer">Upload</label>
               <input
-                class="w-[80%] bg-background h-8 text-sm"
+                class="hidden"
                 name={item.name + `-${index}`}
                 id={item.name + `-${index}`}
                 type={item.type}
                 minlength={item.minLen}
                 maxlength={item.maxLen}
                 required={item.required}
-                value={
-                  data && data[index]
-                    ? data[index][item.name.split("-")[0]]
-                    : ""
-                }
+
               />
             )}
             {item.type === "text" && (
@@ -108,11 +105,7 @@ let { obj, columns, formName, data, setupData } = Astro.props;
                 minlength={item.minLen}
                 maxlength={item.maxLen}
                 required={item.required}
-                value={
-                  data && data[index]
-                    ? data[index][item.name.split("-")[0]]
-                    : ""
-                }
+
               />
             )}
             {item.type === "number" && (
@@ -124,11 +117,7 @@ let { obj, columns, formName, data, setupData } = Astro.props;
                 step={item.step}
                 min={item.min}
                 max={item.max}
-                value={
-                  data && data[index]
-                    ? data[index][item.name.split("-")[0]]
-                    : ""
-                }
+
                 required={item.required}
               />
             )}
@@ -138,11 +127,7 @@ let { obj, columns, formName, data, setupData } = Astro.props;
                 id={item.name + `-${index}`}
                 class="w-[80%] border bg-background h-6 text-sm"
                 required={item.required}
-                value={
-                  data && data[index]
-                    ? data[index][item.name.split("-")[0]]
-                    : ""
-                }
+
               >
                 <option />
               </select>
@@ -153,11 +138,7 @@ let { obj, columns, formName, data, setupData } = Astro.props;
                 id={item.name + `-${index}`}
                 class="w-[80%] border bg-background h-6 text-sm"
                 required={item.required}
-                value={
-                  data && data[index]
-                    ? data[index][item.name.split("-")[0]]
-                    : ""
-                }
+
               >
                 <option />
               </select>
@@ -170,11 +151,7 @@ let { obj, columns, formName, data, setupData } = Astro.props;
                   id={item.name + `-${index}`}
                   class="w-[80%] border bg-background h-6 text-sm"
                   required={item.required}
-                  value={
-                    data && data[index]
-                      ? data[index][item.name.split("-")[0]]
-                      : ""
-                  }
+ 
                 >
                   <option />
                   {Object.entries(item.options).map(([key, val]) => (
@@ -192,11 +169,7 @@ let { obj, columns, formName, data, setupData } = Astro.props;
                 id={item.name + `-${index}`}
                 required={item.required}
                 pattern="\d{4}-\d{2}-\d{2}"
-                value={
-                  data && data[index]
-                    ? data[index][item.name.split("-")[0]]
-                    : ""
-                }
+  
               />
             )}
           </div>

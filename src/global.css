@@ -124,14 +124,15 @@ h1 {
   text-align: center;
 }
 
-button.btn {
+.btn {
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: var(--btn-bg);
   color: var(--btn-txt);
-  padding: 0.5rem;
+  padding: 0.3rem 0.5rem;
   border-radius: calc(var(--radius) - 2px);
+
 }
 
 .text-gradient {

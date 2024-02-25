@@ -1,6 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Sidebar from "../components/Sidebar.astro";
+import ComplianceSidebar from "../components/ComplianceSidebar.astro";
 import ComplianceColumn from "../components/ComplianceColumn.astro";
 import { headers, inputs, formats, unCodes } from "../data/compliance";
 import Spacer from "../components/Spacer.astro";
@@ -32,10 +32,12 @@ if (error) {
 }
 
 let columns;
+let setupData;
 if (Astro.request.method === "POST") {
   try {
-    const data = await Astro.request.formData();
-    columns = data.get("columns");
+    setupData = await Astro.request.formData();
+    columns = setupData.get("columns");
+    console.log(setupData.get("UPC-0"))
   } catch (error) {
     if (error instanceof Error) {
       console.error(error.message);
@@ -58,12 +60,13 @@ if (Astro.request.method === "POST") {
   </nav>
   <Spacer height={12} />
   <div class="flex w-[10000px]">
-    <Sidebar obj={headers} />
+    <ComplianceSidebar obj={headers} />
 
     <ComplianceColumn
       columns={columns}
       obj={inputs}
       formName="complianceForm"
+      setupData={setupData}
     />
   </div>
 </Layout>

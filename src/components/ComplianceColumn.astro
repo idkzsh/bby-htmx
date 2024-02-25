@@ -1,5 +1,5 @@
 ---
-import { formats } from "../data/compliance";
+import { formats, unCodes } from "../data/compliance";
 
 interface inputObj {
   name: string;
@@ -10,6 +10,7 @@ interface inputObj {
     | "checkbox"
     | "radio"
     | "select"
+    | "file"
     | "date";
   maxLen: number;
   minLen: number;
@@ -23,20 +24,28 @@ interface inputObj {
 const today = new Date().toISOString().split("T")[0];
 
 
-let { obj, columns, formName, data } = Astro.props;
+let { obj, columns, formName, data, setupData } = Astro.props;
+
 ---
 
 <script>
-  import { formats } from "../data/compliance";
+  import { formats, unCodes } from "../data/compliance";
   
   // Function to handle input change for dynamic elements
   function handleInputChange(event) {
     const value = event.target.value;
     const formatId = event.target.id.replace("BATTERY_TYPE", "SIZE_FORMAT");
+    const hazmatId = event.target.id.replace("BATTERY_TYPE", "HAZMAT_ID");
     const format = document.getElementById(formatId);
+    const hazmat = document.getElementById(hazmatId);
     format.innerHTML = `<option />`;
     formats[value].forEach((item) => {
       format.innerHTML += `<option value='${item}'>${item}</option>`
+    });
+
+    hazmat.innerHTML = `<option />`;
+    unCodes[value].forEach((item) => {
+      hazmat.innerHTML += `<option value='${item}'>${item}</option>`
     });
     // Add any additional actions you want to perform when the value changes
   }
@@ -47,6 +56,8 @@ let { obj, columns, formName, data } = Astro.props;
     batteryTypeInputs.forEach((input) => {
       input.addEventListener("input", handleInputChange);
     });
+
+
   });
 </script>
 <!-- Setup column. For every SKU there is one column of inputs -->
@@ -57,11 +68,33 @@ let { obj, columns, formName, data } = Astro.props;
         <div class="h-4 border-b text-xs text-center font-bold">
           SKU {index + 1}
         </div>
+        <div class="h-4 border-b text-xs text-center font-bold">
+          {setupData.get(`UPC-${index}`)}
+        </div>
+        <div class="h-4 border-b text-xs text-center font-bold">
+          {setupData.get(`SKU_DESC-${index}`)}
+        </div>
         {obj.map((item: inputObj) => (
           <div
             class="flex border-b h-16 justify-center items-center text-sm"
             x-data="{battType: ''}"
           >
+          {item.type === "file" && (
+              <input
+                class="w-[80%] bg-background h-8 text-sm"
+                name={item.name + `-${index}`}
+                id={item.name + `-${index}`}
+                type={item.type}
+                minlength={item.minLen}
+                maxlength={item.maxLen}
+                required={item.required}
+                value={
+                  data && data[index]
+                    ? data[index][item.name.split("-")[0]]
+                    : ""
+                }
+              />
+            )}
             {item.type === "text" && (
               <input
                 class="w-[80%] border bg-background h-6 text-sm"
@@ -85,6 +118,7 @@ let { obj, columns, formName, data } = Astro.props;
                 id={item.name + `-${index}`}
                 type={item.type}
                 step={item.step}
+                min={item.min}
                 max={item.max}
                 value={
                   data && data[index]
@@ -94,7 +128,7 @@ let { obj, columns, formName, data } = Astro.props;
                 required={item.required}
               />
             )}
-            {item.type === "select" && item.options === formats && (
+            {item.type === "select" && item.options === formats  && (
               <select
                 name={item.name + `-${index}`}
                 id={item.name + `-${index}`}
@@ -109,7 +143,22 @@ let { obj, columns, formName, data } = Astro.props;
                 <option />
               </select>
             )}
-            {item.type === "select" && item.options != formats && (
+            {item.type === "select" &&  item.options === unCodes && (
+              <select
+                name={item.name + `-${index}`}
+                id={item.name + `-${index}`}
+                class="w-[80%] border bg-background h-6 text-sm"
+                required={item.required}
+                value={
+                  data && data[index]
+                    ? data[index][item.name.split("-")[0]]
+                    : ""
+                }
+              >
+                <option />
+              </select>
+            )}
+            {item.type === "select" && item.options != formats && item.options != unCodes && (
               <select
                 name={item.name + `-${index}`}
                 id={item.name + `-${index}`}

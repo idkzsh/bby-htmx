@@ -1,4 +1,5 @@
 const headers = {
+  MSDS: "Upload MSDS file here",
   "Battery Type": "Select from list of values",
   "Size/Format": "Select from list of values",
   "*Qty (total no. of batteries for this type)": "Enter a number",
@@ -9,7 +10,7 @@ const headers = {
   "# Lithium Content (Primary) (grams)": "Required for lithium metal batteries",
   "Watt Hours": "Required for lithium ion batteries",
   "Individual Li Battery Net Weight (kg)": "Enter a number",
-  MSDS: "Upload MSDS file here",
+  
 };
 
 const formats = {
@@ -31,9 +32,37 @@ const formats = {
     "RCR-V3",
     "OTHER",
   ],
+  "Lithium-manganese(LiMn204)": [    "AA",
+  "AAA",
+  "C",
+  "D",
+  "9V",
+  "Lantern",
+  "CR-V3",
+  "CR-P2 (CR-P2/5024LC)",
+  "2CR5 (2CR5/5032LC)",
+  "CR2 (CR17355/5046LC)",
+  "CR123A",
+  "CR123A (CR17345/5018LC)",
+  "RCR123A",
+  "RCR123",
+  "RCR-V3",
+  "OTHER",],
+};
+
+const unCodes = {
+  "Lithium-Ion": ["3480", "3481", "3171"],
+  "Lithium-Polymer": ["3480", "3481", "3171"],
+  "Lithium-manganese(LiMn204)": ["3090", "3091"],
+  "Lithium-Carbon-Fluoride": ["3090", "3091"],
 };
 
 const inputs = [
+  {
+    name: "MSDS",
+    type: "file",
+    required: true,
+  },
   {
     name: "BATTERY_TYPE",
     type: "select",
@@ -66,13 +95,65 @@ const inputs = [
     options: formats,
     required: true,
   },
+  {
+    name: "QUANTITY",
+    type: "number",
+    min: 1,
+    max: 20,
+    required: true,
+  },
+  {
+    name: "HAZMAT_ID",
+    type: "select",
+    options: unCodes,
+    required: true,
+  },
+  {
+    name: "BATTERIES_IN",
+    type: "number",
+    min: 0,
+    max: 20,
+    required: true,
+  },
+  {
+    name: "BATTERIES_OUT",
+    type: "number",
+    min: 0,
+    max: 20,
+    required: true,
+  },
+  {
+    name: "LITHIUM_CELLS",
+    type: "select",
+    options: {M: "Multiple", S: "Single"},
+    required: true,
+  },
+  {
+    name: "LITHIUM_CONTENT",
+    type: "number",
+    min: 0.001,
+    max: 20,
+    step: 0.001,
+    required: true,
+  },
+  {
+    name: "WATT_HOURS",
+    type: "number",
+    min: 0.001,
+    max: 500,
+    step: 0.001,
+    required: true,
+  },
+  {
+    name: "BATTERY_WEIGHT",
+    type: "number",
+    min: 0.001,
+    max: 20,
+    step: 0.001,
+    required: true,
+  },
 ];
 
-const unCodes = {
-  "lithium-ion": ["3480", "3481", "3171"],
-  "lithium-polymer": ["3480", "3481", "3171"],
-  "lithium-manganese": ["3090", "3091"],
-  "lithium-carbon-fluoride": ["3090", "3091"],
-};
+
 
 export { headers, inputs, formats, unCodes };

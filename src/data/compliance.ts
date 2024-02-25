@@ -1,3 +1,7 @@
+interface BatteryTypes {
+  [key: string]: string[]; // Index signature allowing any string key with a value of string array
+}
+
 const headers = {
   MSDS: "Upload MSDS file here",
   "Battery Type": "Select from list of values",
@@ -13,7 +17,7 @@ const headers = {
   
 };
 
-const formats = {
+const formats : BatteryTypes = {
   "Lithium-Ion": [
     "AA",
     "AAA",
@@ -50,7 +54,7 @@ const formats = {
   "OTHER",],
 };
 
-const unCodes = {
+const unCodes: BatteryTypes = {
   "Lithium-Ion": ["3480", "3481", "3171"],
   "Lithium-Polymer": ["3480", "3481", "3171"],
   "Lithium-manganese(LiMn204)": ["3090", "3091"],

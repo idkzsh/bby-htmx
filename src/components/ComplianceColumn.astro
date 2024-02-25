@@ -1,4 +1,6 @@
 ---
+import { formats } from "../data/compliance";
+
 interface inputObj {
   name: string;
   type:
@@ -20,20 +22,46 @@ interface inputObj {
 
 const today = new Date().toISOString().split("T")[0];
 
-const { obj, columns, formName, data } = Astro.props;
+
+let { obj, columns, formName, data } = Astro.props;
 ---
 
+<script>
+  import { formats } from "../data/compliance";
+  
+  // Function to handle input change for dynamic elements
+  function handleInputChange(event) {
+    const value = event.target.value;
+    const formatId = event.target.id.replace("BATTERY_TYPE", "SIZE_FORMAT");
+    const format = document.getElementById(formatId);
+    format.innerHTML = `<option />`;
+    formats[value].forEach((item) => {
+      format.innerHTML += `<option value='${item}'>${item}</option>`
+    });
+    // Add any additional actions you want to perform when the value changes
+  }
+
+  // Add event listeners to all elements with IDs starting with "BATTERY_TYPE-"
+  document.addEventListener("DOMContentLoaded", function () {
+    const batteryTypeInputs = document.querySelectorAll('[id^="BATTERY_TYPE-"]');
+    batteryTypeInputs.forEach((input) => {
+      input.addEventListener("input", handleInputChange);
+    });
+  });
+</script>
 <!-- Setup column. For every SKU there is one column of inputs -->
 <form id={formName} class="flex" action="/compliance" method="post">
   {
     Array.from({ length: columns }).map((_, index) => (
-    <input type="hidden" name="columns" value={columns} />
       <div class="w-40 border-r">
         <div class="h-4 border-b text-xs text-center font-bold">
           SKU {index + 1}
         </div>
         {obj.map((item: inputObj) => (
-          <div class="flex border-b h-16 justify-center items-center text-sm">
+          <div
+            class="flex border-b h-16 justify-center items-center text-sm"
+            x-data="{battType: ''}"
+          >
             {item.type === "text" && (
               <input
                 class="w-[80%] border bg-background h-6 text-sm"
@@ -66,7 +94,22 @@ const { obj, columns, formName, data } = Astro.props;
                 required={item.required}
               />
             )}
-            {item.type === "select" && (
+            {item.type === "select" && item.options === formats && (
+              <select
+                name={item.name + `-${index}`}
+                id={item.name + `-${index}`}
+                class="w-[80%] border bg-background h-6 text-sm"
+                required={item.required}
+                value={
+                  data && data[index]
+                    ? data[index][item.name.split("-")[0]]
+                    : ""
+                }
+              >
+                <option />
+              </select>
+            )}
+            {item.type === "select" && item.options != formats && (
               <select
                 name={item.name + `-${index}`}
                 id={item.name + `-${index}`}

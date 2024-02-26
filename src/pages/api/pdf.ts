@@ -1,11 +1,17 @@
 import type { APIRoute } from "astro";
-import * as pdfjsLib from "pdfjs-dist"
+import * as pdfjs from "../../../pdf.js"
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+
+type TextItem = { str: string };
+type TextMarkedContent = { textContent: string };
+
+// Union type representing both TextItem and TextMarkedContent
+type PdfTextItem = TextItem | TextMarkedContent;
 
 async function extractTextFromPDF(pdfUrl: ArrayBuffer): Promise<string> {
   // Loading the PDF file
-  const loadingTask = pdfjsLib.getDocument(pdfUrl);
+  const loadingTask = pdfjs.getDocument(pdfUrl);
   const pdf = await loadingTask.promise;
 
   // Initialize an empty string to store extracted text
@@ -15,7 +21,7 @@ async function extractTextFromPDF(pdfUrl: ArrayBuffer): Promise<string> {
   for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
     const page = await pdf.getPage(pageNumber);
     const textContent = await page.getTextContent();
-    textContent.items.forEach((item) => { // Explicitly define the type of 'item'
+    textContent.items.forEach((item : PdfTextItem) => { // Explicitly define the type of 'item'
       if ('str' in item) {
         fullText += item.str + ' ';
       } else if ('textContent' in item) {

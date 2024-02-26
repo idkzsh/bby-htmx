@@ -12,8 +12,6 @@ msdsForm?.addEventListener('submit', async (event: Event) => {
     const file = formData.get("MSDS") as File;
     const pdfData = await file?.arrayBuffer();
 
-    console.log(pdfData)
-
     try {
         if (msdsForm instanceof HTMLFormElement) {
             const formData = new FormData(msdsForm); // Get form data

@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import * as pdfjsLib from 'pdfjs-dist';
 
+
 async function extractTextFromPDF(pdfUrl: ArrayBuffer): Promise<string> {
   // Loading the PDF file
   const loadingTask = pdfjsLib.getDocument(pdfUrl);
@@ -33,15 +34,15 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const formData = await request.formData();
     const file = formData.get("MSDS") as File;
     
-    // const pdfData = await file.arrayBuffer();
+    const pdfData = await file.arrayBuffer();
 
-    // const extractedText = await extractTextFromPDF(pdfData);
-    // console.log('Extracted text:', extractedText);
+    const extractedText = await extractTextFromPDF(pdfData);
+    console.log('Extracted text:', extractedText);
     // const loadingTask = pdfjsLib.getDocument(pdfData);
 
     // Assuming you have some data to return
     const responseData = {
-      message: "testing response",
+      message: extractedText,
       // Add more data here as needed
     };
 

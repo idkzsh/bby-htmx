@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
-import * as pdfjsLib from '../../pdfjs-4.0.379-dist/build/pdf.mjs';
+import * as pdfjsLib from '../../pdfjs/pdf.mjs';
+
 
 
 type TextItem = { str: string };

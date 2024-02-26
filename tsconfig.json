@@ -1,3 +1,9 @@
 {
   "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "module": "ESNext", // Specify ESNext or ES6 to enable ECMAScript module syntax
+    "moduleResolution": "node", // Ensure that module resolution follows Node.js resolution algorithm
+    "allowSyntheticDefaultImports": true, // Allow synthetic default imports for ECMAScript modules
+    "esModuleInterop": true // Enable interop with CommonJS modules for ECMAScript modules
+  }
 }

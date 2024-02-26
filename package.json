@@ -8,7 +8,7 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "now-build": "node build.js"
+    "now-build": "npm run build"
   },
   "dependencies": {
     "@alpinejs/persist": "^3.13.5",

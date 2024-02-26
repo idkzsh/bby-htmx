@@ -37,7 +37,6 @@ if (Astro.request.method === "POST") {
   try {
     setupData = await Astro.request.formData();
     columns = setupData.get("columns");
-
   } catch (error) {
     if (error instanceof Error) {
       console.error(error.message);
@@ -46,15 +45,26 @@ if (Astro.request.method === "POST") {
 }
 ---
 
+<script src="../scripts/complianceForm.ts"></script>
+
 <Layout>
   <nav
     class="flex h-12 w-full border-b items-center px-2 justify-between fixed top-20 bg-background z-50"
   >
     <div class="flex gap-2">
-      <button class="btn text-xs">Add Column</button>
-      <button class="btn text-xs">Import Excel</button>
+      <form
+        action=""
+        name="msdsForm"
+        id="msdsForm"
+        class="flex w-72"
+        enctype="multipart/form-data"
+        method="POST"
+      >
+        <input name="MSDS" id="MSDS" type="file" />
+        <button class="btn text-xs" type="submit">Upload</button>
+      </form>
     </div>
-    <button class="btn h-8 text-xs" type="submit" form="complianceForm"
+    <button class="btn text-xs" type="submit" form="complianceForm"
       >Submit</button
     >
   </nav>

@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import * as pdfjsLib from '../../pdfjs/pdf.mjs';
+import * as pdfjsLib from '../../../pdfjs/pdf.mjs';
 
 
 

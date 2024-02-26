@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import * as pdfjs from "../../../pdf.mjs"
+import * as pdfjs from "../../../pdf.min.mjs"
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 

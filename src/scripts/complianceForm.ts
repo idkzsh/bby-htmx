@@ -19,7 +19,7 @@ msdsForm?.addEventListener('submit', async (event: Event) => {
             const formData = new FormData(msdsForm); // Get form data
             
             // Create a fetch request to /api/PDF.ts
-            const response = await fetch('./api/PDF', {
+            const response = await fetch('./api/pdf', {
                 method: 'POST', // or 'GET', 'PUT', 'DELETE', etc.
                 body: formData // Pass the form data as the request body
             });
@@ -30,7 +30,7 @@ msdsForm?.addEventListener('submit', async (event: Event) => {
                 const responseData = await response.json();
                 console.log(responseData); // Log the response data to the console
             } else {
-                console.error('Failed to fetch /api/PDF:', response.status, response.statusText);
+                console.error('Failed to fetch /api/pdf:', response.status, response.statusText);
             }
 
             // Perform your specific logic for MSDS form submission here

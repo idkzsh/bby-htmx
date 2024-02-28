@@ -6,8 +6,9 @@
 
 @layer base {
   :root {
+
     --background: rgb(255, 254, 254);
-    --header-background: rgb(227, 227, 227);
+    --header-background: rgb(10, 74, 191);
     --foreground: 222.2 84% 4.9%;
 
     --spinner: #000000;
@@ -28,7 +29,7 @@
     --primary: 222.2 47.4% 11.2%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: white;
+    --secondary: black;
     --secondary-foreground: 222.2 47.4% 11.2%;
 
     --muted: 210 40% 96.1%;
@@ -159,3 +160,4 @@ h1 {
   opacity: 0.5; /* Reduce opacity for a greyed-out effect */
   cursor: not-allowed; /* Change cursor to indicate it's not clickable */
 }
+

@@ -47,6 +47,55 @@ if (Astro.request.method === "POST") {
 
 <script src="../scripts/complianceForm.ts"></script>
 
+<!-- unfortunately the script/cdn must be used for pdfjs as far as i can tell as it does not work very well on serverless as a dependency -->
+<script
+  src="https://unpkg.com/pdfjs-dist@4.0.379/build/pdf.min.mjs"
+  type="module"></script>
+
+<script type="module">
+  const { pdfjsLib } = globalThis;
+  const msdsForm = document.getElementById("msdsForm");
+
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://unpkg.com/pdfjs-dist@4.0.379/build/pdf.worker.min.mjs";
+
+  msdsForm?.addEventListener("submit", async (event) => {
+    event.preventDefault(); // Prevent default form submission
+
+    const formData = new FormData(msdsForm);
+
+    const file = formData.get("MSDS");
+    const pdfData = await file?.arrayBuffer();
+    console.log(pdfData);
+
+    const loadingTask = pdfjsLib.getDocument(pdfData);
+    const pdf = await loadingTask.promise;
+
+    let fullText = "";
+
+    // Loop through each page to extract text
+    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+      const page = await pdf.getPage(pageNumber);
+      const textContent = await page.getTextContent();
+      textContent.items.forEach((item) => {
+        // Explicitly define the type of 'item'
+        if ("str" in item) {
+          fullText += item.str + " ";
+        } else if ("textContent" in item) {
+          fullText += item.textContent + " ";
+        }
+      });
+    }
+
+    console.log(fullText);
+  });
+
+  // Loading the PDF file
+  
+
+  // Initialize an empty string to store extracted text
+</script>
+
 <Layout>
   <nav
     class="flex h-12 w-full border-b items-center px-2 justify-between fixed top-20 bg-background z-50"

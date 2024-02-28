@@ -26,7 +26,7 @@ export default {
 		  foreground: "hsl(var(--foreground))",
 		  "list-hover" : "var(--list-hover)",
 		  spinner:"var(--spinner)",
-		  
+		  "bby-blue" : "var(--bby-blue)",
 		  primary: {
 			DEFAULT: "hsl(var(--primary))",
 			foreground: "hsl(var(--primary-foreground))",

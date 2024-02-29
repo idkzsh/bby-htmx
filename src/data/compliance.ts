@@ -17,6 +17,30 @@ const headers = {
   
 };
 
+const batteryTypes = {
+
+    "Alkaline Coin/Button": "Alkaline Coin/Button",
+    "Lead-Acid": "Lead-Acid",
+    "Lithium Carbon Flouride (Li-CFx)": "Lithium Carbon Flouride (Li-CFx)",
+    "Lithium Coin/Button": "Lithium Coin/Button",
+    "Lithium Iron Disulfide (LiFe2)": "Lithium Iron Disulfide (LiFe2)",
+    "Lithium iron phosphate (LiFePO4)": "Lithium iron phosphate (LiFePO4)",
+    "Lithium-cobalt (LiCoO2)": "Lithium-cobalt (LiCoO2)",
+    "Lithium-Ion": "Lithium-Ion",
+    "Lithium-manganese(LiMn204)": "Lithium-manganese(LiMn204)",
+    "Lithium Manganese Dioxide(LiMnO2)": "Lithium Manganese Dioxide(LiMnO2)",
+    "Lithium-Polymer": "Lithium-Polymer",
+    "Manganese Titanium Lithium": "Manganese Titanium Lithium",
+    "Nickel-Cadmium (NiCd)": "Nickel-Cadmium (NiCd)",
+    "Nickel-Metal Hydride (NiMH)": "Nickel-Metal Hydride (NiMH)",
+    "Silver Oxide Coin/Button": "Silver Oxide Coin/Button",
+    "Zinc Air Coin/Button": "Zinc Air Coin/Button",
+    "Zinc Carbon": "Zinc Carbon",
+    Other: "Other",
+    "Alkaline Battery": "Alkaline Battery",
+
+}
+
 const formats : BatteryTypes = {
   "Lithium-Ion": [
     "AA",
@@ -71,27 +95,7 @@ const inputs = [
   {
     name: "BATTERY_TYPE",
     type: "select",
-    options: {
-      "Alkaline Coin/Button": "Alkaline Coin/Button",
-      "Lead-Acid": "Lead-Acid",
-      "Lithium Carbon Flouride (Li-CFx)": "Lithium Carbon Flouride (Li-CFx)",
-      "Lithium Coin/Button": "Lithium Coin/Button",
-      "Lithium Iron Disulfide (LiFe2)": "Lithium Iron Disulfide (LiFe2)",
-      "Lithium iron phosphate (LiFePO4)": "Lithium iron phosphate (LiFePO4)",
-      "Lithium-cobalt (LiCoO2)": "Lithium-cobalt (LiCoO2)",
-      "Lithium-Ion": "Lithium-Ion",
-      "Lithium-manganese(LiMn204)": "Lithium-manganese(LiMn204)",
-      "Lithium Manganese Dioxide(LiMnO2)": "Lithium Manganese Dioxide(LiMnO2)",
-      "Lithium-Polymer": "Lithium-Polymer",
-      "Manganese Titanium Lithium": "Manganese Titanium Lithium",
-      "Nickel-Cadmium (NiCd)": "Nickel-Cadmium (NiCd)",
-      "Nickel-Metal Hydride (NiMH)": "Nickel-Metal Hydride (NiMH)",
-      "Silver Oxide Coin/Button": "Silver Oxide Coin/Button",
-      "Zinc Air Coin/Button": "Zinc Air Coin/Button",
-      "Zinc Carbon": "Zinc Carbon",
-      Other: "Other",
-      "Alkaline Battery": "Alkaline Battery",
-    },
+    options: batteryTypes,
     required: true,
   },
   {
@@ -161,4 +165,4 @@ const inputs = [
 
 
 
-export { headers, inputs, formats, unCodes };
+export { headers, inputs, formats, unCodes, batteryTypes };

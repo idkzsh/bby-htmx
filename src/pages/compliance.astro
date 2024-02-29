@@ -90,6 +90,22 @@ if (Astro.request.method === "POST") {
         });
       }
 
+      const response = await fetch("/api/gpt", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ fullText }), // Send the fullText string in the request body
+      });
+
+      // Check if the request was successful
+      if (response.ok) {
+        const result = await response.json();
+        console.log("GPT response:", result);
+      } else {
+        console.error("Error:", response.status);
+      }
+
       for (let i = 0; i <= 50; i++) {
         const inputId = `MSDS-${i}`; // Construct the input ID dynamically
         if (document.getElementById(inputId)) {

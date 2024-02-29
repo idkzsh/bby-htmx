@@ -45,8 +45,6 @@ if (Astro.request.method === "POST") {
 }
 ---
 
-<script src="../scripts/complianceForm.ts"></script>
-
 <!-- unfortunately the script/cdn must be used for pdfjs as far as i can tell as it does not work very well on serverless as a dependency -->
 <script
   src="https://unpkg.com/pdfjs-dist@4.0.379/build/pdf.min.mjs"
@@ -78,7 +76,6 @@ if (Astro.request.method === "POST") {
       const page = await pdf.getPage(pageNumber);
       const textContent = await page.getTextContent();
       textContent.items.forEach((item) => {
-        // Explicitly define the type of 'item'
         if ("str" in item) {
           fullText += item.str + " ";
         } else if ("textContent" in item) {
@@ -89,11 +86,6 @@ if (Astro.request.method === "POST") {
 
     console.log(fullText);
   });
-
-  // Loading the PDF file
-  
-
-  // Initialize an empty string to store extracted text
 </script>
 
 <Layout>

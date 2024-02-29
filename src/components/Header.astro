@@ -25,11 +25,11 @@ if (accessToken && refreshToken) {
       {
         signedIn ? (
           <form action="/api/auth/signout">
-            <button type="submit" class="btn">Log Out</button>
+            <button type="submit" class="bg-white px-2 py-1 rounded-md text-black">Log Out</button>
           </form>
         ) :
         (
-        <button class="btn" hx-get="/login" hx-swap="innerHTML transition:true" hx-target="#main">Log In</button>
+        <button class="bg-white px-2 py-1 rounded-md text-black" hx-get="/login" hx-swap="innerHTML transition:true" hx-target="#main">Log In</button>
         )
       }
     </div>

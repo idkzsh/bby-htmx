@@ -68,7 +68,7 @@ if (Astro.request.method === "POST") {
     const files = formData.getAll("MSDS");
 
     for (const file of files) {
-      forms[file.name] = file.name;
+      forms[file.name] = [file.name];
 
       const pdfData = await file.arrayBuffer();
 
@@ -101,7 +101,9 @@ if (Astro.request.method === "POST") {
       // Check if the request was successful
       if (response.ok) {
         const result = await response.json();
-        console.log("GPT response:", result);
+        forms[file.name]["batteryType"] = result.batteryType;
+        forms[file.name]["wattHours"] = result.wattHours;
+        forms[file.name]["totalMassKg"] = result.totalMassKg;
       } else {
         console.error("Error:", response.status);
       }
@@ -111,6 +113,18 @@ if (Astro.request.method === "POST") {
         if (document.getElementById(inputId)) {
           const msds = document.getElementById(inputId);
           msds.innerHTML += `<option value="${file.name}">${file.name}</option>`;
+
+          msds.addEventListener("change", (event) => {
+            const battType = document.getElementById(`BATTERY_TYPE-${i}`)
+            const wattHours = document.getElementById(`WATT_HOURS-${i}`)
+            const netWeight = document.getElementById(`BATTERY_WEIGHT-${i}`)
+            battType.value = forms[file.name]['batteryType'] === "Lithium Ion" || "Li-ion Polymer" ? "Lithium-Ion" : null;
+            wattHours.value = forms[file.name]['wattHours']
+            netWeight.value = forms[file.name]['totalMassKg']
+
+            
+            console.log("MSDS input changed:", event.target.value);
+          });
         } else {
           break;
         }

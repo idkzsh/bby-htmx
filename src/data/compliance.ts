@@ -64,7 +64,8 @@ const unCodes: BatteryTypes = {
 const inputs = [
   {
     name: "MSDS",
-    type: "file",
+    type: "select",
+    options: {},
     required: true,
   },
   {

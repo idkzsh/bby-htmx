@@ -5,6 +5,7 @@ import ComplianceColumn from "../components/ComplianceColumn.astro";
 import { headers, inputs, formats, unCodes } from "../data/compliance";
 import Spacer from "../components/Spacer.astro";
 import { supabase } from "../lib/supabase";
+import Spinner from "../components/ui/spinner.astro";
 
 const { cookies, redirect } = Astro;
 
@@ -31,18 +32,21 @@ if (error) {
   return redirect("/");
 }
 
-let columns;
+
+let columns: number = 1;
 let setupData;
 if (Astro.request.method === "POST") {
   try {
     setupData = await Astro.request.formData();
-    columns = setupData.get("columns");
+    columns = Number(setupData.get("columns"));
   } catch (error) {
     if (error instanceof Error) {
       console.error(error.message);
     }
   }
 }
+
+
 ---
 
 <!-- unfortunately the script/cdn must be used for pdfjs as far as i can tell as it does not work very well on serverless as a dependency -->
@@ -57,14 +61,17 @@ if (Astro.request.method === "POST") {
   pdfjsLib.GlobalWorkerOptions.workerSrc =
     "https://unpkg.com/pdfjs-dist@4.0.379/build/pdf.worker.min.mjs";
 
+  const forms = {};
+
   msdsForm?.addEventListener("submit", async (event) => {
     event.preventDefault(); // Prevent default form submission
 
     const formData = new FormData(msdsForm);
 
     const file = formData.get("MSDS");
+
+    console.log(file)
     const pdfData = await file?.arrayBuffer();
-    console.log(pdfData);
 
     const loadingTask = pdfjsLib.getDocument(pdfData);
     const pdf = await loadingTask.promise;
@@ -84,7 +91,21 @@ if (Astro.request.method === "POST") {
       });
     }
 
-    console.log(fullText);
+    forms.key = "msds";
+
+    for (let i = 0; i <= 50; i++) {
+      const inputId = `MSDS-${i}`; // Construct the input ID dynamically
+      if (document.getElementById(inputId)) {
+        const msds = document.getElementById(inputId)
+        msds.innerHTML += `<option value=${file.name}>${file.name}</option>`;
+      } else {
+        break;
+      }
+      
+      
+    }
+    
+    
   });
 </script>
 
@@ -94,6 +115,7 @@ if (Astro.request.method === "POST") {
   >
     <div class="flex gap-2">
       <form
+        x-data="{ loading: false, fileSelected: false }"
         action=""
         name="msdsForm"
         id="msdsForm"
@@ -101,8 +123,21 @@ if (Astro.request.method === "POST") {
         enctype="multipart/form-data"
         method="POST"
       >
-        <input name="MSDS" id="MSDS" type="file" />
-        <button class="btn text-xs" type="submit">Upload</button>
+        <input
+          name="MSDS"
+          id="MSDS"
+          type="file"
+          accept=".pdf"
+          @change="fileSelected = $event.target.files.length > 0"
+        />
+        <div class="relative w-24">
+          <button
+            class="btn text-xs"
+            type="submit"
+            @click="loading = true"
+            :disabled="!fileSelected">Upload</button
+          >
+        </div>
       </form>
     </div>
     <button class="btn text-xs" type="submit" form="complianceForm"

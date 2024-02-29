@@ -27,83 +27,91 @@ const { obj, columns, formName, data } = Astro.props;
 <form id={formName} class="flex" action="/compliance" method="post">
   {
     Array.from({ length: columns }).map((_, index) => (
-    <input type="hidden" name="columns" value={columns} />
-      <div class="w-40 border-r">
-        <div class="h-4 border-b text-xs text-center font-bold">
-          SKU {index + 1}
-        </div>
-        {obj.map((item: inputObj) => (
-          <div class="flex border-b h-16 justify-center items-center text-sm">
-            {item.type === "text" && (
-              <input
-                class="w-[80%] border bg-background h-6 text-sm"
-                name={item.name + `-${index}`}
-                id={item.name + `-${index}`}
-                type={item.type}
-                minlength={item.minLen}
-                maxlength={item.maxLen}
-                required={item.required}
-                value={
-                  data && data[index]
-                    ? data[index][item.name.split("-")[0]]
-                    : ""
-                }
-              />
-            )}
-            {item.type === "number" && (
-              <input
-                class="w-[80%] border bg-background h-6 text-sm"
-                name={item.name + `-${index}`}
-                id={item.name + `-${index}`}
-                type={item.type}
-                step={item.step}
-                max={item.max}
-                value={
-                  data && data[index]
-                    ? data[index][item.name.split("-")[0]]
-                    : ""
-                }
-                required={item.required}
-              />
-            )}
-            {item.type === "select" && (
-              <select
-                name={item.name + `-${index}`}
-                id={item.name + `-${index}`}
-                class="w-[80%] border bg-background h-6 text-sm"
-                required={item.required}
-                value={
-                  data && data[index]
-                    ? data[index][item.name.split("-")[0]]
-                    : ""
-                }
-              >
-                <option />
-                {Object.entries(item.options).map(([key, val]) => (
-                  <option value={key}>{val}</option>
-                ))}
-              </select>
-            )}
-            {item.type === "date" && (
-              <input
-                class="w-[80%] border bg-background h-6 text-sm text-primary"
-                type="date"
-                min={today}
-                class="z-1"
-                name={item.name + `-${index}`}
-                id={item.name + `-${index}`}
-                required={item.required}
-                pattern="\d{4}-\d{2}-\d{2}"
-                value={
-                  data && data[index]
-                    ? data[index][item.name.split("-")[0]]
-                    : ""
-                }
-              />
-            )}
+      <>
+        <input type="hidden" name="columns" value={columns} />
+        <div class="w-40 border-r">
+          <div class="h-4 border-b text-xs text-center font-bold">
+            SKU {index + 1}
           </div>
-        ))}
-      </div>
+          {obj.map((item: inputObj) => (
+            <div class="flex border-b h-16 justify-center items-center text-sm">
+              {item.type === "text" && (
+                <input
+                  class="w-[80%] border bg-background h-6 text-sm"
+                  name={item.name + `-${index}`}
+                  id={item.name + `-${index}`}
+                  type={item.type}
+                  minlength={item.minLen}
+                  maxlength={item.maxLen}
+                  required={item.required}
+                  value={
+                    data && data[index]
+                      ? data[index][item.name.split("-")[0]]
+                      : ""
+                  }
+                />
+              )}
+              {item.type === "number" && (
+                <input
+                  class="w-[80%] border bg-background h-6 text-sm"
+                  name={item.name + `-${index}`}
+                  id={item.name + `-${index}`}
+                  type={item.type}
+                  step={item.step}
+                  max={item.max}
+                  value={
+                    data && data[index]
+                      ? data[index][item.name.split("-")[0]]
+                      : ""
+                  }
+                  required={item.required}
+                />
+              )}
+              {item.type === "select" && (
+                <select
+                  name={item.name + `-${index}`}
+                  id={item.name + `-${index}`}
+                  class="w-[80%] border bg-background h-6 text-sm"
+                  required={item.required}
+                  value={
+                    data && data[index]
+                      ? data[index][item.name.split("-")[0]]
+                      : ""
+                  }
+                >
+                  <option />
+                  {Object.entries(item.options).map(([key, val]) => (
+                    <option value={key}>{val}</option>
+                  ))}
+                </select>
+              )}
+              {item.type === "date" && (
+                <input
+                  class="w-[80%] border bg-background h-6 text-sm text-primary"
+                  type="date"
+                  min={today}
+                  class="z-1"
+                  name={item.name + `-${index}`}
+                  id={item.name + `-${index}`}
+                  required={item.required}
+                  pattern="\d{4}-\d{2}-\d{2}"
+                  value={
+                    data && data[index] && data[index][item.name.split("-")[0]]
+                      ? new Date(
+                          (data[index][item.name.split("-")[0]] - 25569) *
+                            86400 *
+                            1000
+                        )
+                          .toISOString()
+                          .split("T")[0]
+                      : ""
+                  }
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      </>
     ))
   }
 </form>

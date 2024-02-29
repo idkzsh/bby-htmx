@@ -32,7 +32,6 @@ if (error) {
   return redirect("/");
 }
 
-
 let columns: number = 1;
 let setupData;
 if (Astro.request.method === "POST") {
@@ -45,8 +44,6 @@ if (Astro.request.method === "POST") {
     }
   }
 }
-
-
 ---
 
 <!-- unfortunately the script/cdn must be used for pdfjs as far as i can tell as it does not work very well on serverless as a dependency -->
@@ -68,44 +65,43 @@ if (Astro.request.method === "POST") {
 
     const formData = new FormData(msdsForm);
 
-    const file = formData.get("MSDS");
+    const files = formData.getAll("MSDS");
 
-    console.log(file)
-    const pdfData = await file?.arrayBuffer();
+    for (const file of files) {
+      forms[file.name] = file.name;
 
-    const loadingTask = pdfjsLib.getDocument(pdfData);
-    const pdf = await loadingTask.promise;
+      const pdfData = await file.arrayBuffer();
 
-    let fullText = "";
+      const loadingTask = pdfjsLib.getDocument(pdfData);
+      const pdf = await loadingTask.promise;
 
-    // Loop through each page to extract text
-    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
-      const page = await pdf.getPage(pageNumber);
-      const textContent = await page.getTextContent();
-      textContent.items.forEach((item) => {
-        if ("str" in item) {
-          fullText += item.str + " ";
-        } else if ("textContent" in item) {
-          fullText += item.textContent + " ";
-        }
-      });
-    }
+      let fullText = "";
 
-    forms.key = "msds";
-
-    for (let i = 0; i <= 50; i++) {
-      const inputId = `MSDS-${i}`; // Construct the input ID dynamically
-      if (document.getElementById(inputId)) {
-        const msds = document.getElementById(inputId)
-        msds.innerHTML += `<option value=${file.name}>${file.name}</option>`;
-      } else {
-        break;
+      // Loop through each page to extract text
+      for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+        const page = await pdf.getPage(pageNumber);
+        const textContent = await page.getTextContent();
+        textContent.items.forEach((item) => {
+          if ("str" in item) {
+            fullText += item.str + " ";
+          } else if ("textContent" in item) {
+            fullText += item.textContent + " ";
+          }
+        });
       }
-      
-      
+
+      for (let i = 0; i <= 50; i++) {
+        const inputId = `MSDS-${i}`; // Construct the input ID dynamically
+        if (document.getElementById(inputId)) {
+          const msds = document.getElementById(inputId);
+          msds.innerHTML += `<option value="${file.name}">${file.name}</option>`;
+        } else {
+          break;
+        }
+      }
     }
-    
-    
+
+    console.log(forms); // Log the forms object co
   });
 </script>
 
@@ -129,6 +125,7 @@ if (Astro.request.method === "POST") {
           type="file"
           accept=".pdf"
           @change="fileSelected = $event.target.files.length > 0"
+          multiple
         />
         <div class="relative w-24">
           <button

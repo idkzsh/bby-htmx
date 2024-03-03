@@ -87,7 +87,7 @@ if (Astro.request.method === "POST") {
         <input type="hidden" name="columns" value={columns} />
         <div class="relative w-24">
           <button class="btn text-xs" type="submit" @click="loading = true" :disabled="!fileSelected">Upload</button>
-          <Spinner top="0" right="0"/>
+          <Spinner top="0" right="0" show="loading"/>
         </div>
       </form>
     </div>

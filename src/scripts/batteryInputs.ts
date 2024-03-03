@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
     '[id^="BATTERY_TYPE-"]'
   );
   batteryTypeInputs.forEach((input) => {
-    input.addEventListener("input", handleInputChange);
+    input.addEventListener("change", handleInputChange);
   });
 });
 

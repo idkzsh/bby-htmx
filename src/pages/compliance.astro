@@ -122,7 +122,7 @@ if (Astro.request.method === "POST") {
       if (document.getElementById(inputId)) {
         const msds = document.getElementById(inputId);
 
-        msds.innerHTML = "<option></option>";
+        msds.innerHTML = "<option>Select MSDS</option>";
 
         Object.entries(forms).map(([key, val]) => {
           msds.innerHTML += `<option value=${key}>${key}</option>`;
@@ -136,7 +136,7 @@ if (Astro.request.method === "POST") {
           const netWeight = document.getElementById(`BATTERY_WEIGHT-${i}`);
           battType.value =
             forms[selection]["batteryType"] === "Lithium Ion" ||
-            "Li-ion Polymer"
+            forms[selection]["batteryType"] === "Li-ion Polymer"
               ? "Lithium-Ion"
               : null;
           wattHours.value = forms[selection]["wattHours"];

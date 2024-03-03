@@ -3,7 +3,7 @@ const { message } = Astro.props;
 ---
 
 <div
-  class="flex w-80 h-20 items-center justify-evenly border shadow-md rounded-md absolute top-[140%]"
+  class="flex w-80 h-20 items-center justify-evenly border shadow-md rounded-md absolute bottom-[50px] z-30"
   x-show="toastOpen"
   x-transition:enter="transition ease-out duration-300 transform"
   x-transition:enter-start="translate-y-full opacity-0"
@@ -27,5 +27,5 @@ const { message } = Astro.props;
       >
       {message}
   </div>
-  <button class="btn h-12" @click="toastOpen = false">dismiss</button>
+  <button class="btn" @click="toastOpen = false">dismiss</button>
 </div>

@@ -54,17 +54,25 @@ if (Astro.request.method === "POST") {
 <script type="module">
   const { pdfjsLib } = globalThis;
   const msdsForm = document.getElementById("msdsForm");
+  const spinner = document.getElementById("spinner"); // Get the spinner element
+
+  spinner.setAttribute('x-show', 'false');
+
 
   pdfjsLib.GlobalWorkerOptions.workerSrc =
     "https://unpkg.com/pdfjs-dist@4.0.379/build/pdf.worker.min.mjs";
 
   const forms = {};
+
+
   // event listener for when the user uploads MSDS files
   msdsForm?.addEventListener("submit", async (event) => {
     event.preventDefault(); // Prevent default form submission
+    spinner.setAttribute('x-show', 'true');
 
     const formData = new FormData(msdsForm);
     const files = formData.getAll("MSDS");
+    
 
     // looping over all the files that the user uploaded
     for (const file of files) {
@@ -107,37 +115,41 @@ if (Astro.request.method === "POST") {
       } else {
         console.error("Error:", response.status);
       }
-
     }
 
     for (let i = 0; i <= 50; i++) {
-    const inputId = `MSDS-${i}`; // Construct the input ID dynamically
-    if (document.getElementById(inputId)) {
-      const msds = document.getElementById(inputId);
-      
-      Object.entries(forms).map(([key,val]) => {
-        msds.innerHTML += `<option value=${key}>${key}</option>`;
-      })
-      // this event listener is for when the user selects one of the MSDS forms from the dropdown menu,
-      // it will autofill the BATTERY_TYPE, WATT_HOURS and BATTERY_WEIGHT inputs with the response data from GPT
-      msds.addEventListener("change", (event) => {
-        const selection = (event.target.value);
-        const battType = document.getElementById(`BATTERY_TYPE-${i}`);
-        const wattHours = document.getElementById(`WATT_HOURS-${i}`);
-        const netWeight = document.getElementById(`BATTERY_WEIGHT-${i}`);
-        battType.value =
-          forms[selection]["batteryType"] === "Lithium Ion" || "Li-ion Polymer"
-            ? "Lithium-Ion"
-            : null;
-        wattHours.value = forms[selection]["wattHours"];
-        netWeight.value = forms[selection]["totalMassKg"];
-      });
-    } else {
-      break;
-    }
-  }
-  });
+      const inputId = `MSDS-${i}`; // Construct the input ID dynamically
+      if (document.getElementById(inputId)) {
+        const msds = document.getElementById(inputId);
 
+        msds.innerHTML = "<option></option>";
+
+        Object.entries(forms).map(([key, val]) => {
+          msds.innerHTML += `<option value=${key}>${key}</option>`;
+        });
+        // this event listener is for when the user selects one of the MSDS forms from the dropdown menu,
+        // it will autofill the BATTERY_TYPE, WATT_HOURS and BATTERY_WEIGHT inputs with the response data from GPT
+        msds.addEventListener("change", (event) => {
+          const selection = event.target.value;
+          const battType = document.getElementById(`BATTERY_TYPE-${i}`);
+          const wattHours = document.getElementById(`WATT_HOURS-${i}`);
+          const netWeight = document.getElementById(`BATTERY_WEIGHT-${i}`);
+          battType.value =
+            forms[selection]["batteryType"] === "Lithium Ion" ||
+            "Li-ion Polymer"
+              ? "Lithium-Ion"
+              : null;
+          wattHours.value = forms[selection]["wattHours"];
+          netWeight.value = forms[selection]["totalMassKg"];
+        });
+      } else {
+        break;
+      }
+    }
+
+    msdsForm.reset();
+    spinner.setAttribute('x-show', 'false');
+  });
 
   // looping through however many columns there are
 </script>
@@ -148,11 +160,11 @@ if (Astro.request.method === "POST") {
   >
     <div class="flex gap-2">
       <form
-        x-data="{ loading: false, fileSelected: false }"
+        x-data="{ fileSelected: false }"
         action=""
         name="msdsForm"
         id="msdsForm"
-        class="flex w-72"
+        class="flex w-auto"
         enctype="multipart/form-data"
         method="POST"
       >
@@ -165,12 +177,10 @@ if (Astro.request.method === "POST") {
           multiple
         />
         <div class="relative w-24">
-          <button
-            class="btn text-xs"
-            type="submit"
-            @click="loading = true"
-            :disabled="!fileSelected">Upload</button
+          <button class="btn text-xs" type="submit" :disabled="!fileSelected"
+            >Upload</button
           >
+          <Spinner top="0" right="0" show="true"/>
         </div>
       </form>
     </div>

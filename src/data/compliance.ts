@@ -3,7 +3,7 @@ interface BatteryTypes {
 }
 
 const headers = {
-  "MSDS": "Upload MSDS file here",
+  MSDS: "Upload MSDS file here",
   "Battery Type": "Select from list of values",
   "Size/Format": "Select from list of values",
   "*Qty (total no. of batteries for this type)": "Enter a number",
@@ -14,34 +14,31 @@ const headers = {
   "# Lithium Content (Primary) (grams)": "Required for lithium metal batteries",
   "Watt Hours": "Required for lithium ion batteries",
   "Individual Li Battery Net Weight (kg)": "Enter a number",
-  
 };
 
 const batteryTypes = {
+  "Alkaline Coin/Button": "Alkaline Coin/Button",
+  "Lead-Acid": "Lead-Acid",
+  "Lithium Carbon Flouride (Li-CFx)": "Lithium Carbon Flouride (Li-CFx)",
+  "Lithium Coin/Button": "Lithium Coin/Button",
+  "Lithium Iron Disulfide (LiFe2)": "Lithium Iron Disulfide (LiFe2)",
+  "Lithium iron phosphate (LiFePO4)": "Lithium iron phosphate (LiFePO4)",
+  "Lithium-cobalt (LiCoO2)": "Lithium-cobalt (LiCoO2)",
+  "Lithium-Ion": "Lithium-Ion",
+  "Lithium-manganese(LiMn204)": "Lithium-manganese(LiMn204)",
+  "Lithium Manganese Dioxide(LiMnO2)": "Lithium Manganese Dioxide(LiMnO2)",
+  "Lithium-Polymer": "Lithium-Polymer",
+  "Manganese Titanium Lithium": "Manganese Titanium Lithium",
+  "Nickel-Cadmium (NiCd)": "Nickel-Cadmium (NiCd)",
+  "Nickel-Metal Hydride (NiMH)": "Nickel-Metal Hydride (NiMH)",
+  "Silver Oxide Coin/Button": "Silver Oxide Coin/Button",
+  "Zinc Air Coin/Button": "Zinc Air Coin/Button",
+  "Zinc Carbon": "Zinc Carbon",
+  Other: "Other",
+  "Alkaline Battery": "Alkaline Battery",
+};
 
-    "Alkaline Coin/Button": "Alkaline Coin/Button",
-    "Lead-Acid": "Lead-Acid",
-    "Lithium Carbon Flouride (Li-CFx)": "Lithium Carbon Flouride (Li-CFx)",
-    "Lithium Coin/Button": "Lithium Coin/Button",
-    "Lithium Iron Disulfide (LiFe2)": "Lithium Iron Disulfide (LiFe2)",
-    "Lithium iron phosphate (LiFePO4)": "Lithium iron phosphate (LiFePO4)",
-    "Lithium-cobalt (LiCoO2)": "Lithium-cobalt (LiCoO2)",
-    "Lithium-Ion": "Lithium-Ion",
-    "Lithium-manganese(LiMn204)": "Lithium-manganese(LiMn204)",
-    "Lithium Manganese Dioxide(LiMnO2)": "Lithium Manganese Dioxide(LiMnO2)",
-    "Lithium-Polymer": "Lithium-Polymer",
-    "Manganese Titanium Lithium": "Manganese Titanium Lithium",
-    "Nickel-Cadmium (NiCd)": "Nickel-Cadmium (NiCd)",
-    "Nickel-Metal Hydride (NiMH)": "Nickel-Metal Hydride (NiMH)",
-    "Silver Oxide Coin/Button": "Silver Oxide Coin/Button",
-    "Zinc Air Coin/Button": "Zinc Air Coin/Button",
-    "Zinc Carbon": "Zinc Carbon",
-    Other: "Other",
-    "Alkaline Battery": "Alkaline Battery",
-
-}
-
-const formats : BatteryTypes = {
+const formats: BatteryTypes = {
   "Lithium-Ion": [
     "AA",
     "AAA",
@@ -60,22 +57,24 @@ const formats : BatteryTypes = {
     "RCR-V3",
     "OTHER",
   ],
-  "Lithium-manganese(LiMn204)": [    "AA",
-  "AAA",
-  "C",
-  "D",
-  "9V",
-  "Lantern",
-  "CR-V3",
-  "CR-P2 (CR-P2/5024LC)",
-  "2CR5 (2CR5/5032LC)",
-  "CR2 (CR17355/5046LC)",
-  "CR123A",
-  "CR123A (CR17345/5018LC)",
-  "RCR123A",
-  "RCR123",
-  "RCR-V3",
-  "OTHER",],
+  "Lithium-manganese(LiMn204)": [
+    "AA",
+    "AAA",
+    "C",
+    "D",
+    "9V",
+    "Lantern",
+    "CR-V3",
+    "CR-P2 (CR-P2/5024LC)",
+    "2CR5 (2CR5/5032LC)",
+    "CR2 (CR17355/5046LC)",
+    "CR123A",
+    "CR123A (CR17345/5018LC)",
+    "RCR123A",
+    "RCR123",
+    "RCR-V3",
+    "OTHER",
+  ],
 };
 
 const unCodes: BatteryTypes = {
@@ -134,7 +133,7 @@ const inputs = [
   {
     name: "LITHIUM_CELLS",
     type: "select",
-    options: {M: "Multiple", S: "Single"},
+    options: { M: "Multiple", S: "Single" },
     required: true,
   },
   {
@@ -163,6 +162,6 @@ const inputs = [
   },
 ];
 
+const forms = {};
 
-
-export { headers, inputs, formats, unCodes, batteryTypes };
+export { headers, inputs, formats, unCodes, batteryTypes, forms };

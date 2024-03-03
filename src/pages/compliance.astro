@@ -59,7 +59,6 @@ if (Astro.request.method === "POST") {
     "https://unpkg.com/pdfjs-dist@4.0.379/build/pdf.worker.min.mjs";
 
   const forms = {};
-
   // event listener for when the user uploads MSDS files
   msdsForm?.addEventListener("submit", async (event) => {
     event.preventDefault(); // Prevent default form submission
@@ -90,6 +89,7 @@ if (Astro.request.method === "POST") {
         });
       }
 
+      // send the file to GPT to extract watt hours, net weight and battery type
       const response = await fetch("/api/gpt", {
         method: "POST",
         headers: {
@@ -108,48 +108,39 @@ if (Astro.request.method === "POST") {
         console.error("Error:", response.status);
       }
 
-      // looping through however many columns there are
-      for (let i = 0; i <= 50; i++) {
-        const inputId = `MSDS-${i}`; // Construct the input ID dynamically
-        if (document.getElementById(inputId)) {
-          const msds = document.getElementById(inputId);
-          // setting the options dynamically when the user uploads the MSDS form
-          msds.innerHTML += `<option value="${file.name}">${file.name}</option>`;
-
-          // this event listener is for when the user selects one of the MSDS forms from the dropdown menu,
-          // it will autofill the BATTERY_TYPE, WATT_HOURS and BATTERY_WEIGHT inputs with the response data from GPT
-
-        } else {
-          break;
-        }
-      }
     }
 
+    for (let i = 0; i <= 50; i++) {
+    const inputId = `MSDS-${i}`; // Construct the input ID dynamically
+    if (document.getElementById(inputId)) {
+      const msds = document.getElementById(inputId);
+      
+      Object.entries(forms).map(([key,val]) => {
+        msds.innerHTML += `<option value=${key}>${key}</option>`;
+      })
+      // this event listener is for when the user selects one of the MSDS forms from the dropdown menu,
+      // it will autofill the BATTERY_TYPE, WATT_HOURS and BATTERY_WEIGHT inputs with the response data from GPT
+      msds.addEventListener("change", (event) => {
+        const selection = (event.target.value);
+        const battType = document.getElementById(`BATTERY_TYPE-${i}`);
+        const wattHours = document.getElementById(`WATT_HOURS-${i}`);
+        const netWeight = document.getElementById(`BATTERY_WEIGHT-${i}`);
+        battType.value =
+          forms[selection]["batteryType"] === "Lithium Ion" || "Li-ion Polymer"
+            ? "Lithium-Ion"
+            : null;
+        wattHours.value = forms[selection]["wattHours"];
+        netWeight.value = forms[selection]["totalMassKg"];
+      });
+    } else {
+      break;
+    }
+  }
   });
 
-       // looping through however many columns there are
-       for (let i = 0; i <= 50; i++) {
-        const inputId = `MSDS-${i}`; // Construct the input ID dynamically
-        if (document.getElementById(inputId)) {
-          const msds = document.getElementById(inputId);
 
-          // this event listener is for when the user selects one of the MSDS forms from the dropdown menu,
-          // it will autofill the BATTERY_TYPE, WATT_HOURS and BATTERY_WEIGHT inputs with the response data from GPT
-          msds.addEventListener("change", (event) => {
-            const battType = document.getElementById(`BATTERY_TYPE-${i}`)
-            const wattHours = document.getElementById(`WATT_HOURS-${i}`)
-            const netWeight = document.getElementById(`BATTERY_WEIGHT-${i}`)
-            battType.value = forms[file.name]['batteryType'] === "Lithium Ion" || "Li-ion Polymer" ? "Lithium-Ion" : null;
-            wattHours.value = forms[file.name]['wattHours']
-            netWeight.value = forms[file.name]['totalMassKg']
-          });
-        } else {
-          break;
-        }
-      }
+  // looping through however many columns there are
 </script>
-
-
 
 <Layout>
   <nav

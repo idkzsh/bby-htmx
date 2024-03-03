@@ -45,8 +45,6 @@ export default async function apiCall(pdf: String) {
       if (aiResponse !== null) {
         const aiJSON = JSON.parse(aiResponse);
   
-        console.log(aiResponse); // Log the decoded body
-  
         // Assuming you have some data to return
         const responseData = {
             batteryType: aiJSON.batteryType,

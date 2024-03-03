@@ -8,12 +8,12 @@
   :root {
 
     --background: rgb(255, 254, 254);
-    --header-background: rgb(10, 74, 191);
+    --header-background: rgb(255, 255, 255);
     --foreground: 222.2 84% 4.9%;
 
     --spinner: #000000;
 
-    --btn-bg: black;
+    --btn-bg: rgb(10, 74, 191);
     --btn-txt: white;
 
     --list-hover: rgb(241, 241, 241);

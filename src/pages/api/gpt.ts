@@ -17,7 +17,7 @@ export default async function apiCall(pdf: String) {
   
           for lithium ion batteries output = batteryType/wattHours/totalMassKg.
           
-          for lithium metal batteries output = battery type/lithium amount in grams/total mass in kilograms.
+          for lithium metal batteries output = batteryType/lithiumContent/totalMassKg.
           
           return only values in json`,
         },
@@ -32,12 +32,14 @@ export default async function apiCall(pdf: String) {
 
   export const POST: APIRoute = async ({ request, cookies }) => {
     try {
-      // Your logic to handle the request and process the data
       const body = await request.arrayBuffer(); // Get the request body as an ArrayBuffer
       const decoder = new TextDecoder(); // Create a TextDecoder instance
-  
+        
+      console.log(request)
       // Decode the ArrayBuffer (Uint8Array) to a string
       const decodedBody = decoder.decode(body);
+
+      // send request to openAI API 
       const aiResponse = await apiCall(decodedBody);
   
       if (aiResponse !== null) {

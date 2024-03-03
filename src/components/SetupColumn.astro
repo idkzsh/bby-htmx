@@ -34,7 +34,7 @@ const { obj, columns, formName, data } = Astro.props;
             SKU {index + 1}
           </div>
           {obj.map((item: inputObj) => (
-            <div class="flex border-b h-16 justify-center items-center text-sm">
+            <div class="flex border-b h-10 justify-center items-center text-sm">
               {item.type === "text" && (
                 <input
                   class="w-[80%] border bg-background h-6 text-sm"

@@ -46,7 +46,7 @@ if (Astro.request.method === "POST") {
 }
 ---
 
-<!-- unfortunately the script/cdn must be used for pdfjs as far as i can tell as it does not work very well on serverless as a dependency -->
+<!-- unfortunately the cdn must be used for pdfjs as far as i can tell as it does not work very well on serverless as a dependency -->
 <script
   src="https://unpkg.com/pdfjs-dist@4.0.379/build/pdf.min.mjs"
   type="module"></script>
@@ -60,18 +60,18 @@ if (Astro.request.method === "POST") {
 
   const forms = {};
 
+  // event listener for when the user uploads MSDS files
   msdsForm?.addEventListener("submit", async (event) => {
     event.preventDefault(); // Prevent default form submission
 
     const formData = new FormData(msdsForm);
-
     const files = formData.getAll("MSDS");
 
+    // looping over all the files that the user uploaded
     for (const file of files) {
       forms[file.name] = [file.name];
 
       const pdfData = await file.arrayBuffer();
-
       const loadingTask = pdfjsLib.getDocument(pdfData);
       const pdf = await loadingTask.promise;
 
@@ -108,12 +108,33 @@ if (Astro.request.method === "POST") {
         console.error("Error:", response.status);
       }
 
+      // looping through however many columns there are
       for (let i = 0; i <= 50; i++) {
         const inputId = `MSDS-${i}`; // Construct the input ID dynamically
         if (document.getElementById(inputId)) {
           const msds = document.getElementById(inputId);
+          // setting the options dynamically when the user uploads the MSDS form
           msds.innerHTML += `<option value="${file.name}">${file.name}</option>`;
 
+          // this event listener is for when the user selects one of the MSDS forms from the dropdown menu,
+          // it will autofill the BATTERY_TYPE, WATT_HOURS and BATTERY_WEIGHT inputs with the response data from GPT
+
+        } else {
+          break;
+        }
+      }
+    }
+
+  });
+
+       // looping through however many columns there are
+       for (let i = 0; i <= 50; i++) {
+        const inputId = `MSDS-${i}`; // Construct the input ID dynamically
+        if (document.getElementById(inputId)) {
+          const msds = document.getElementById(inputId);
+
+          // this event listener is for when the user selects one of the MSDS forms from the dropdown menu,
+          // it will autofill the BATTERY_TYPE, WATT_HOURS and BATTERY_WEIGHT inputs with the response data from GPT
           msds.addEventListener("change", (event) => {
             const battType = document.getElementById(`BATTERY_TYPE-${i}`)
             const wattHours = document.getElementById(`WATT_HOURS-${i}`)
@@ -121,23 +142,18 @@ if (Astro.request.method === "POST") {
             battType.value = forms[file.name]['batteryType'] === "Lithium Ion" || "Li-ion Polymer" ? "Lithium-Ion" : null;
             wattHours.value = forms[file.name]['wattHours']
             netWeight.value = forms[file.name]['totalMassKg']
-
-            
-            console.log("MSDS input changed:", event.target.value);
           });
         } else {
           break;
         }
       }
-    }
-
-    console.log(forms); // Log the forms object co
-  });
 </script>
+
+
 
 <Layout>
   <nav
-    class="flex h-12 w-full border-b items-center px-2 justify-between fixed top-20 bg-background z-50"
+    class="flex h-12 w-full border-b items-center px-2 justify-between fixed top-20 bg-background z-40"
   >
     <div class="flex gap-2">
       <form

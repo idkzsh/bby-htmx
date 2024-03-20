@@ -25,14 +25,15 @@ const {title} = Astro.props;
     ></script>
   </head>
   <body
-    x-data="{ switchOn: $persist(false) }"
+    
     :class="{ 'dark': switchOn }"
     class="flex flex-col min-h-[100vh]"
+    x-data="{ switchOn: 'true' }"
   >
     <Header />
     <Spacer height={20}/>
     <slot />
     <Spacer height={20}/>
-    <Footer />
+    <Footer :theme="localStorage.getItem('_x_switchOn')"/>
   </body>
 </html>

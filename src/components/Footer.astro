@@ -1,11 +1,18 @@
 ---
 
+const {theme} = Astro.props;
+console.log(theme)
 ---
+
+<!-- <script>
+   console.log(document.body.classList)
+</script> -->
 <footer class="w-full fixed bottom-0 h-20 z-20 border-t">
     <section class="text-gray-700 bg-headerbg body-font">
         <div class="container flex flex-col items-center px-8 py-2 mx-auto max-w-7xl sm:flex-row">
             <!-- <a href="#_" class="text-xl font-black leading-none text-primary select-none logo">BestBuy Canada<span class="text-indigo-600">.</span></a> -->
-            <img src="/BestBuyLogoReversedRGB.svg" class="w-[100px]">
+            <img src="/bby-dark.svg" class="w-[100px]" x-show="localStorage.getItem('_x_switchOn') == 'true'">
+            <img src="/bby-light.svg" class="w-[100px]" x-show="localStorage.getItem('_x_switchOn') == 'false'">
             <p class="mt-4 text-sm sm:ml-4 sm:pl-4 sm:border-l sm:border-gray-200 sm:mt-0">&copy; 2024
             </p>
             <span class="inline-flex justify-center mt-4 space-x-5 sm:ml-auto sm:mt-0 sm:justify-start">

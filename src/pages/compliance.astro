@@ -51,28 +51,28 @@ if (Astro.request.method === "POST") {
   src="https://unpkg.com/pdfjs-dist@4.0.379/build/pdf.min.mjs"
   type="module"></script>
 
+ <!-- Parses uploaded MSDS PDF files using pdf.js to extract text.  Sends text
+to /api/gpt endpoint to extract battery details. * Populates dropdown with MSDS
+filenames.  Autofills battery details when MSDS is selected.  -->
 <script type="module">
   const { pdfjsLib } = globalThis;
   const msdsForm = document.getElementById("msdsForm");
   const spinner = document.getElementById("spinner"); // Get the spinner element
 
-  spinner.setAttribute('x-show', 'false');
-
+  spinner.setAttribute("x-show", "false");
 
   pdfjsLib.GlobalWorkerOptions.workerSrc =
     "https://unpkg.com/pdfjs-dist@4.0.379/build/pdf.worker.min.mjs";
 
   const forms = {};
 
-
   // event listener for when the user uploads MSDS files
   msdsForm?.addEventListener("submit", async (event) => {
     event.preventDefault(); // Prevent default form submission
-    spinner.setAttribute('x-show', 'true');
+    spinner.setAttribute("x-show", "true");
 
     const formData = new FormData(msdsForm);
     const files = formData.getAll("MSDS");
-    
 
     // looping over all the files that the user uploaded
     for (const file of files) {
@@ -148,7 +148,7 @@ if (Astro.request.method === "POST") {
     }
 
     msdsForm.reset();
-    spinner.setAttribute('x-show', 'false');
+    spinner.setAttribute("x-show", "false");
   });
 
   // looping through however many columns there are

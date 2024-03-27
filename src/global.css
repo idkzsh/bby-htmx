@@ -6,7 +6,6 @@
 
 @layer base {
   :root {
-
     --background: rgb(255, 254, 254);
     --header-background: rgb(255, 255, 255);
     --foreground: 222.2 84% 4.9%;
@@ -133,7 +132,6 @@ h1 {
   color: var(--btn-txt);
   padding: 0.3rem 0.5rem;
   border-radius: calc(var(--radius) - 2px);
-
 }
 
 .text-gradient {
@@ -153,11 +151,24 @@ h1 {
 }
 
 .spinner {
-  fill: var(--spinner)
+  fill: var(--spinner);
 }
 
 .btn[disabled] {
   opacity: 0.5; /* Reduce opacity for a greyed-out effect */
   cursor: not-allowed; /* Change cursor to indicate it's not clickable */
 }
+
+.st1 {
+  fill: var(white);
+}
+
+.st0 {
+  fill: #ffee35;
+}
+
+.st2 {
+  fill: #1c252c;
+}
+
 

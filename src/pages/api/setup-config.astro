@@ -12,7 +12,7 @@ export const partial = true;
 >
   <form
     action="/setup"
-    class="flex justify-evenly w-72 h-auto p-4 border rounded-md flex-col relative shadow-lg gap-2"
+    class="flex justify-evenly w-72 h-auto p-4 border rounded-md flex-col relative shadow-lg gap-2 bg-headerbg"
     x-data="{selection: 'Select a category'}"
     @submit.prevent="selection === 'Select a category' ? toastOpen = true : $el.submit()"
   >

@@ -35,7 +35,6 @@ export default async function apiCall(pdf: String) {
       const body = await request.arrayBuffer(); // Get the request body as an ArrayBuffer
       const decoder = new TextDecoder(); // Create a TextDecoder instance
         
-      console.log(request)
       // Decode the ArrayBuffer (Uint8Array) to a string
       const decodedBody = decoder.decode(body);
 

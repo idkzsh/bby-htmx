@@ -10,7 +10,7 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   };
 
   try {
-    const response = await fetch("https://go-test-embed.vercel.app/api/index", {
+    const response = await fetch(import.meta.env.EMAIL_ENDPOINT, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -1,9 +1,13 @@
 import type { APIRoute } from "astro";
 
 export const POST: APIRoute = async ({ request, cookies, redirect }) => {
-  console.log(request);
+  const formData = await request.formData();
+  const formDataObject = Object.fromEntries(formData.entries());
 
-  const resp = { response: "response" };
+  const resp = {
+    subject: "test",
+    body: JSON.stringify(formDataObject),
+  };
 
   try {
     const response = await fetch("https://go-test-embed.vercel.app/api/index", {
@@ -12,10 +16,8 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(resp),
-      
     });
 
-    console.log(response)
     if (response.ok) {
       // Request was successful
       console.log("POST request sent successfully");

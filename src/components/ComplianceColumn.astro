@@ -24,7 +24,7 @@ interface inputObj {
 const today = new Date().toISOString().split("T")[0];
 
 
-let { obj, columns, formName,  setupData } = Astro.props;
+let { obj, columns, formName,  setupData, email } = Astro.props;
 const dataSetup = JSON.stringify(Object.fromEntries(setupData))
 
 ---
@@ -34,6 +34,7 @@ const dataSetup = JSON.stringify(Object.fromEntries(setupData))
 <!-- Compliance column. For every SKU there is one column of inputs -->
 <form id={formName} class="flex" action="/api/email" method="POST" >
   <input type="text" name="setupData" hidden value={dataSetup}>
+  <input type="text" name="email" hidden value={email}>
   {
     Array.from({ length: columns }).map((_, index) => (
       <div class="w-40 border-r">

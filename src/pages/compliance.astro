@@ -32,6 +32,8 @@ if (error) {
   return redirect("/");
 }
 
+const email = data?.user?.email;
+
 let columns: number = 1;
 let setupData;
 if (Astro.request.method === "POST") {
@@ -197,6 +199,7 @@ filenames.  Autofills battery details when MSDS is selected.  -->
       obj={inputs}
       formName="complianceForm"
       setupData={setupData}
+      email={email}
     />
   </div>
 </Layout>

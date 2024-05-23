@@ -25,12 +25,15 @@ const today = new Date().toISOString().split("T")[0];
 
 
 let { obj, columns, formName,  setupData } = Astro.props;
+const dataSetup = JSON.stringify(Object.fromEntries(setupData))
+
 ---
 
 <script src="../scripts/batteryInputs.ts"></script>
 
 <!-- Compliance column. For every SKU there is one column of inputs -->
 <form id={formName} class="flex" action="/api/email" method="POST" >
+  <input type="text" name="setupData" hidden value={dataSetup}>
   {
     Array.from({ length: columns }).map((_, index) => (
       <div class="w-40 border-r">

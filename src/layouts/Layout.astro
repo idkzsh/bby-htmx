@@ -1,10 +1,11 @@
 ---
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
-import Spacer from "../components/Spacer.astro";
+import Navbar from "../components/Navbar.astro";
+import SetupNavbar from "../components/SetupNavbar.astro";
+
 import "../global.css";
 
 const { title } = Astro.props;
+const isSetupPage = Astro.url.pathname === "/setup";
 ---
 
 <html lang="en">
@@ -14,26 +15,11 @@ const { title } = Astro.props;
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
-    <script
-      defer
-      src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"
-    ></script>
-
-    <script
-      defer
-      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
-    ></script>
   </head>
-  <body
-    x-data="{ switchOn: $persist(false) }"
-    :class="{ 'dark': switchOn }"
-    class="flex flex-col min-h-[100vh]"
+  <body class="flex bg-neutral-100 h-screen" id="body">
 
-  >
-    <Header />
-    <Spacer height={20} />
+    {isSetupPage ? <SetupNavbar /> : <Navbar />}
     <slot />
-    <Spacer height={20} />
-    <Footer />
+
   </body>
 </html>

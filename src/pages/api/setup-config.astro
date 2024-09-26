@@ -1,45 +1,19 @@
 ---
-import Select from "../../components/ui/Select.astro";
 import { d } from "../../data/hierarchy";
 
-import Toast from "../../components/ui/Toast.astro";
-export const partial = true;
 ---
 
-<div
-  x-data="{ toastOpen: false}"
-  class="flex flex-col justify-center items-center w-full h-full relative"
->
-  <form
-    action="/setup"
-    class="flex justify-evenly w-72 h-auto p-4 border rounded-md flex-col relative shadow-lg gap-2 bg-headerbg"
-    x-data="{selection: 'Select a category'}"
-    @submit.prevent="selection === 'Select a category' ? toastOpen = true : $el.submit()"
-  >
-    <label for="product-category">Product Category</label>
-    <input
-      type="text"
-      x-show="false"
-      name="product-category"
-      id="product-category"
-      x-model="selection"
-    />
-    <Select array={d} />
 
-    <label for="numOfSKUs">Number of SKUs</label>
-    <input
-      name="numOfSKUs"
-      id="numOfSKUs"
-      type="number"
-      class="bg-background border rounded-lg h-10 px-2 shadow-md"
-      min="1"
-      max="50"
-      required
-      x-data="{skuNum : $persist(false)}"
-      
-    />
-    <button type="submit" class="btn">Submit</button>
-  </form>
-
-  <Toast x-show={"toastOpen"} message="Please select a category" />
-</div>
+<form action="/setup" class="border rounded-md flex flex-col p-4 gap-4 shadow-md font-normal text-base tracking-tight" id="new">
+    <label for="email">Email</label>
+    <input name="email" type="email" class="border rounded-md p-1 w-80">
+    <label for="department">Product Type</label>
+    <select name="department" id="department" class="border h-10 rounded-md px-2">
+      {d.map((category, index) => (
+        <option value={index}>{category}</option>
+      ))}
+      </select>
+<label for="numOfSKUs"># of SKUs</label>
+    <input name="numOfSKUs" type="number" class="border rounded-md p-1">
+    <button type="submit" form="new" class="w-80 hover:opacity-80 bg-black text-white rounded-md p-2">Submit</button>
+</form>

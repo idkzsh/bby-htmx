@@ -7,14 +7,7 @@
     <div
       class="container flex flex-col items-center px-8 py-2 mx-auto max-w-7xl sm:flex-row"
     >
-      <!-- <a href="#_" class="text-xl font-black leading-none text-primary select-none logo">BestBuy Canada<span class="text-indigo-600">.</span></a> -->
-
-      <div x-data="{ switchOn: $persist(false) }" @toggle-dark-mode.window="switchOn = $event.detail.darkMode">
         <img src="/bby-light.svg" class="w-[100px]" x-show="!switchOn" />
-        <img src="/bby-dark.svg" class="w-[100px]" x-show="switchOn" />
-      </div>
-      
-
       <p
         class="mt-4 text-sm sm:ml-4 sm:pl-4 sm:border-l sm:border-gray-200 sm:mt-0 text-gray-500" 
       >

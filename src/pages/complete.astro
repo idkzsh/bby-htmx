@@ -1,26 +1,27 @@
 ---
 import Layout from "../layouts/Layout.astro";
+
+let columns: number = 1;
+let setupData;
+
+if (Astro.request.method === "POST") {
+  try {
+    setupData = await Astro.request.formData();
+    columns = Number(setupData.get("columns"));
+    console.log(setupData)
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+  }
+}
 ---
 
 <Layout title="complete">
   <main
-    class="flex flex-col items-center w-full justify-center h-[80vh]"
-    id="main"
+    class="flex flex-col w-[89.5%] h-[98%] bg-white mt-2 rounded-md border justify-center items-center gap-8 tracking-tighter" id="main"
   >
-    <div class="flex flex-col justify-evenly items-center h-80">
-      <div class="flex flex-col gap-3 items-center">
-        <h1 class="text-6xl tracking-tighter font-bold">Done!</h1>
-
-        <span>You will receive an email when your submission has been processed</span>
-      </div>
-      <div
-        class="flex flex-col w-48 h-32 rounded-md justify-center items-center gap-3 border shadow-md bg-headerbg"
-      >
-        <a href="/dashboard" class="btn w-[80%]">New Setup</a>
-        <form action="/api/auth/signout" class="flex justify-center w-full">
-          <button type="submit" class="btn w-[80%]">Log Out</button>
-        </form>
-      </div>
-    </div>
+        <h1 class="text-5xl tracking-tighter font-bold">Done!</h1>
+        <span class="text-base">You will receive an email when your submission has been processed</span>
   </main>
 </Layout>

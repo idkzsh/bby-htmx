@@ -1,4 +1,5 @@
 ---
+import ComplianceNavbar from "../components/ComplianceNavbar.astro";
 import Navbar from "../components/Navbar.astro";
 import SetupNavbar from "../components/SetupNavbar.astro";
 
@@ -6,6 +7,9 @@ import "../global.css";
 
 const { title } = Astro.props;
 const isSetupPage = Astro.url.pathname === "/setup";
+const isCompliancePage = Astro.url.pathname === "/compliance";
+
+
 ---
 
 <html lang="en">
@@ -18,7 +22,11 @@ const isSetupPage = Astro.url.pathname === "/setup";
   </head>
   <body class="flex bg-neutral-100 h-screen" id="body">
 
-    {isSetupPage ? <SetupNavbar /> : <Navbar />}
+    {(() => {
+      if (isSetupPage) return <SetupNavbar />;
+      if (isCompliancePage) return <ComplianceNavbar />;
+      return <Navbar />;
+    })()}
     <slot />
 
   </body>

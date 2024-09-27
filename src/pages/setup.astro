@@ -1,37 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Sidebar from "../components/Sidebar.astro";
-import SetupColumn from "../components/SetupColumn.astro";
 import { headers, inputs } from "../data/setup";
-import Spacer from "../components/Spacer.astro";
-import Spinner from "../components/ui/spinner.astro"
-import { supabase } from "../lib/supabase";
 import * as xlsx from "xlsx";
-
-// const { cookies, redirect } = Astro;
-
-// const accessToken = cookies.get("sb-access-token");
-// const refreshToken = cookies.get("sb-refresh-token");
-
-// if (!accessToken || !refreshToken) {
-//   return redirect("/");
-// }
-
-// const { data, error } = await supabase.auth.setSession({
-//   refresh_token: refreshToken.value,
-//   access_token: accessToken.value,
-// });
-
-// if (error) {
-//   cookies.delete("sb-access-token", {
-//     path: "/",
-//   });
-//   cookies.delete("sb-refresh-token", {
-//     path: "/",
-//   });
-
-//   return redirect("/");
-// }
 
 let columns = Number(Astro.url.searchParams.get("numOfSKUs") || 1);
 
@@ -40,7 +10,6 @@ if (columns > 50) {
 }
 
 let excelData;
-
 
 if (Astro.request.method === "POST") {
   try {
@@ -58,17 +27,21 @@ if (Astro.request.method === "POST") {
       console.error(error.message);
       excelData = null;
     }
-  } 
+  }
 }
 ---
 
 <Layout title="Setup">
   <main
-    class="flex w-[90%] h-[98%] bg-white mt-2 rounded-md border tracking-tight overflow-scroll" id="main"
+    class="flex w-[90%] h-[98%] bg-white mt-2 rounded-md border tracking-tight overflow-scroll"
+    id="main"
   >
-<!-- <Sidebar obj={headers} /> -->
-  <div id="handsontable-container" class="w-full h-[400px]"></div>
-      <!-- <form
+    <form action="/compliance" method="POST" id="setupForm" class="hidden">
+      <input type="hidden" value={columns}>
+      <!-- Hidden inputs will be dynamically added here -->
+    </form>
+    <div id="handsontable-container" class="w-full h-[400px]"></div>
+    <!-- <form
         class="flex items-center justify-center gap-2 w-[600px]"
         id="uploadForm"
         name="uploadForm"
@@ -88,7 +61,7 @@ if (Astro.request.method === "POST") {
         </div>
       </form> -->
 
-      <!-- <Sidebar obj={headers} />
+    <!-- <Sidebar obj={headers} />
       <SetupColumn
       obj={inputs}
       columns={columns}
@@ -98,44 +71,53 @@ if (Astro.request.method === "POST") {
   </main>
 </Layout>
 
-<script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css" />
+<script
+  src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"
+></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css"
+/>
 
 <script define:vars={{ headers, columns }}>
-  document.addEventListener('DOMContentLoaded', function() {
-    const container = document.getElementById('handsontable-container');
-    
+  document.addEventListener("DOMContentLoaded", function () {
+    const container = document.getElementById("handsontable-container");
+
     const headerNames = Object.keys(headers);
     const rows = headerNames.length;
-    
-    const data = Array(rows).fill().map(() => Array(columns).fill(''));
+
+    const data = Array(rows)
+      .fill()
+      .map(() => Array(columns).fill(""));
 
     const hot = new Handsontable(container, {
       data: data,
       rowHeaders: headerNames,
-      colHeaders: Array(columns).fill().map((_, i) => `SKU ${i + 1}`),
-      height: '100%',
-      width: '100%',
-      licenseKey: 'non-commercial-and-evaluation',
-      cells: function(row, col) {
+      colHeaders: Array(columns)
+        .fill()
+        .map((_, i) => `SKU ${i + 1}`),
+      height: "100%",
+      width: "100%",
+      licenseKey: "non-commercial-and-evaluation",
+      cells: function (row, col) {
         const cellProperties = {};
         const rowHeader = headerNames[row];
         cellProperties.placeholder = headers[rowHeader];
-        
+
         // Add validator for VPN row
-        const requiredFields = ['Vendor Part Number', 'UPC', 'SKU Title (Long)'];
-        
+        const requiredFields = ["Vendor Part Number"];
+
         // Add required validator to specified fields
         if (requiredFields.includes(rowHeader)) {
-          cellProperties.validator = function(value, callback) {
-            callback(value !== null && value !== '');
+          cellProperties.validator = function (value, callback) {
+            callback(value !== null && value !== "");
           };
           cellProperties.allowEmpty = false;
         }
 
         switch (rowHeader) {
-          case 'Vendor Part Number':
-            cellProperties.validator = function(value, callback) {
+          case "Vendor Part Number":
+            cellProperties.validator = function (value, callback) {
               if (value.length <= 20) {
                 callback(true);
               } else {
@@ -144,8 +126,8 @@ if (Astro.request.method === "POST") {
             };
             cellProperties.allowInvalid = false;
             break;
-            case 'SKU Title (Long)':
-            cellProperties.validator = function(value, callback) {
+          case "SKU Title (Long)":
+            cellProperties.validator = function (value, callback) {
               if (value.length <= 40) {
                 callback(true);
               } else {
@@ -154,23 +136,23 @@ if (Astro.request.method === "POST") {
             };
             cellProperties.allowInvalid = false;
             break;
-            case 'UPC':
-            cellProperties.validator = function(value, callback) {
-              const numericValue = value.toString().replace(/\D/g, '');
-              const isValid = numericValue.length >= 12 && numericValue.length <= 13;
+          case "UPC":
+            cellProperties.validator = function (value, callback) {
+              const numericValue = value.toString().replace(/\D/g, "");
+              const isValid =
+                numericValue.length >= 12 && numericValue.length <= 13;
               callback(isValid);
             };
             cellProperties.allowInvalid = false;
             break;
         }
 
-        
         return cellProperties;
       },
       manualColumnResize: true,
       manualColumnResizeMinWidth: 100,
       manualColumnMove: true,
-      stretchH: 'all',
+      stretchH: "all",
       // Set the width of the row header column
       rowHeaderWidth: 250,
       // Allow row header resizing
@@ -179,7 +161,53 @@ if (Astro.request.method === "POST") {
       wordWrap: true,
       // Optional: Adjust cell padding for better text visibility
       cellPadding: 5,
-      
+    });
+
+    document.addEventListener("submit-handsontable", function () {
+      const requiredFields = ["Vendor Part Number"];
+      const missingFields = [];
+
+      // Check required fields
+      requiredFields.forEach((field, rowIndex) => {
+        for (let col = 0; col < columns; col++) {
+          const cellValue = hot.getDataAtCell(rowIndex, col);
+          if (!cellValue || cellValue.trim() === "") {
+            missingFields.push(`${field} for SKU ${col + 1}`);
+          }
+        }
+      });
+
+      if (missingFields.length > 0) {
+        alert(
+          `Please fill in the following required fields:\n${missingFields.join("\n")}`
+        );
+        return;
+      }
+
+      setupForm
+        .querySelectorAll('input[type="hidden"]')
+        .forEach((input) => input.remove());
+
+      // Add hidden input for columns
+      const columnsInput = document.createElement("input");
+      columnsInput.type = "hidden";
+      columnsInput.name = "columns";
+      columnsInput.value = columns;
+      setupForm.appendChild(columnsInput);
+
+      // Add hidden inputs with Handsontable data
+      const tableData = hot.getData();
+      headerNames.forEach((header, rowIndex) => {
+        const rowData = tableData[rowIndex];
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = header;
+        input.value = JSON.stringify(rowData);
+        setupForm.appendChild(input);
+      });
+
+      // Submit the form
+      setupForm.submit();
     });
   });
 </script>

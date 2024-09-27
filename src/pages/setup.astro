@@ -37,7 +37,6 @@ if (Astro.request.method === "POST") {
     id="main"
   >
     <form action="/compliance" method="POST" id="setupForm" class="hidden">
-      <input type="hidden" value={columns}>
       <!-- Hidden inputs will be dynamically added here -->
     </form>
     <div id="handsontable-container" class="w-full h-[400px]"></div>
@@ -71,15 +70,13 @@ if (Astro.request.method === "POST") {
   </main>
 </Layout>
 
-<script
-  src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"
-></script>
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css"
-/>
 
-<script define:vars={{ headers, columns }}>
+<script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css" />
+
+<script define:vars={{ headers, columns }} type="module">
+
+
   document.addEventListener("DOMContentLoaded", function () {
     const container = document.getElementById("handsontable-container");
 

@@ -26,7 +26,7 @@ async function processExcelFile(formDataObject: Record<string, any>) {
   try {
     const XlsxPopulate = await import('xlsx-populate') as any;
     
-    const workbook = await XlsxPopulate.default.fromFileAsync("public/setup_template.xlsm");
+    const workbook = await XlsxPopulate.default.fromFileAsync("/setup_template.xlsm");
     const sheet = workbook.sheet(0);
 
     const parseJSON = (value: string) => {

@@ -89,7 +89,7 @@ async function sendEmail(buffer: Buffer) {
     secure: false,
     auth: {
       user: "zachflentgewong@gmail.com",
-      pass: import.meta.env.APP_PASS,
+      pass: process.env.APP_PASS,
     },
   });
 

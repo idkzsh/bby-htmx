@@ -1,7 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { headers, inputs } from "../data/setup";
-import * as xlsx from "xlsx";
 
 let columns = Number(Astro.url.searchParams.get("numOfSKUs") || 1);
 
@@ -14,14 +13,7 @@ let excelData;
 if (Astro.request.method === "POST") {
   try {
     const data = await Astro.request.formData();
-    const excelFile = data.get("excelFileInput");
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    if (excelFile instanceof File) {
-      const fileBuffer = await excelFile.arrayBuffer();
-      const workbook = xlsx.read(fileBuffer, { type: "array" });
-      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      excelData = xlsx.utils.sheet_to_json(worksheet);
-    }
   } catch (error) {
     if (error instanceof Error) {
       console.error(error.message);

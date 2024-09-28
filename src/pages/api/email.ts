@@ -8,11 +8,10 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   const formDataObject = Object.fromEntries(formData.entries());
 
   console.log(formDataObject)
-
+  
   try {
     const buffer = await processExcelFile(formDataObject);
     await sendEmail(buffer);
-    // await sendPostRequest(formDataObject);
     
     return redirect("/complete");
   } catch (error) {

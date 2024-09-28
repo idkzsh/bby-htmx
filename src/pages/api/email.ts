@@ -1,5 +1,8 @@
 import type { APIRoute } from "astro";
 import nodemailer from 'nodemailer';
+import { readFile } from 'fs/promises';
+import path from 'path';
+
 
 export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   const formData = await request.formData();
@@ -26,13 +29,28 @@ async function processExcelFile(formDataObject: Record<string, any>) {
   try {
     const XlsxPopulate = await import('xlsx-populate') as any;
     
-    // Fetch the template file from your deployed URL
-    const templateUrl = `${process.env.VERCEL_URL || 'http://localhost:4321'}/setup_template.xlsm`;
-    const response = await fetch(templateUrl);
-    if (!response.ok) throw new Error(`Failed to fetch template: ${response.statusText}`);
-    const arrayBuffer = await response.arrayBuffer();
+    let workbook;
+    const filePath = process.env.EXCEL_FILE_PATH || '/setup_template.xlsm';
 
-    const workbook = await XlsxPopulate.default.fromDataAsync(arrayBuffer);
+    if (process.env.VERCEL_ENV === 'production') {
+      // In production, fetch the file from the deployed URL
+      const baseUrl = process.env.VERCEL_URL 
+        ? `https://${process.env.VERCEL_URL}`
+        : 'https://bby-htmx.vercel.app'; // Replace with your actual default Vercel domain
+      const templateUrl = new URL(filePath, baseUrl).toString();
+      
+      console.log('Fetching from URL:', templateUrl); // Add this for debugging
+
+      const response = await fetch(templateUrl);
+      if (!response.ok) throw new Error(`Failed to fetch template: ${response.statusText}`);
+      const arrayBuffer = await response.arrayBuffer();
+      workbook = await XlsxPopulate.default.fromDataAsync(arrayBuffer);
+    } else {
+      // In development, read the file from the local filesystem
+      const fullPath = path.join(process.cwd(), 'public', filePath);
+      const buffer = await readFile(fullPath);
+      workbook = await XlsxPopulate.default.fromDataAsync(buffer);
+    }
     const sheet = workbook.sheet(0);
 
     const parseJSON = (value: string) => {

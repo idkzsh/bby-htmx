@@ -8,7 +8,7 @@ if (Astro.request.method === "POST") {
   try {
     setupData = await Astro.request.formData();
     columns = Number(setupData.get("columns"));
-    console.log("Server-side setupData:", Object.fromEntries(setupData));
+    // console.log("Server-side setupData:", Object.fromEntries(setupData));
   } catch (error) {
     if (error instanceof Error) {
       console.error(error.message);

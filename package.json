@@ -25,6 +25,7 @@
     "exceljs": "^4.4.0",
     "htm": "^3.1.1",
     "htmx.org": "^1.9.10",
+    "nodemailer": "^6.9.15",
     "openai": "^4.28.4",
     "pdfjs-dist": "^4.0.379",
     "tailwindcss": "^3.4.1",
@@ -32,6 +33,7 @@
     "xlsx-populate": "^1.21.0"
   },
   "devDependencies": {
-    "@types/alpinejs__persist": "^3.13.3"
+    "@types/alpinejs__persist": "^3.13.3",
+    "@types/nodemailer": "^6.4.16"
   }
 }

@@ -35,5 +35,9 @@
   "devDependencies": {
     "@types/alpinejs__persist": "^3.13.3",
     "@types/nodemailer": "^6.4.16"
-  }
+  },
+  "files": [
+    "src",
+    "setup_template.xlsm"
+  ]
 }

@@ -1,7 +1,6 @@
 import type { APIRoute } from "astro";
 import nodemailer from 'nodemailer';
-import { readFile } from 'fs/promises';
-import path from 'path';
+import { excelTemplateBuffer } from '../../lib/excelTemplate';
 
 
 export const POST: APIRoute = async ({ request, cookies, redirect }) => {
@@ -30,9 +29,7 @@ async function processExcelFile(formDataObject: Record<string, any>) {
 
     const XlsxPopulate = await import('xlsx-populate') as any;
     
-    const filePath = path.join(process.cwd(), 'public', 'setup_template.xlsm');
-    const buffer = await readFile(filePath);
-    const workbook = await XlsxPopulate.default.fromDataAsync(buffer);
+    const workbook = await XlsxPopulate.default.fromDataAsync(excelTemplateBuffer);
     const sheet = workbook.sheet(0);
 
     const parseJSON = (value: string) => {

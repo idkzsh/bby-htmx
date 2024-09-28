@@ -1,5 +1,7 @@
 {
-    "routes": [
-      { "src": "/setup_template.xlsm", "dest": "/setup_template.xlsm" }
-    ]
+  "functions": {
+    "src/pages/api/*.ts": {
+      "includeFiles": "assets/**"
+    }
   }
+}

@@ -1,5 +1,5 @@
 {
     "routes": [
-      { "src": "/(.*)\\.(xlsx|xls|xlsm)", "dest": "/public/$1.$2" }
+      { "src": "/setup_template.xlsm", "dest": "/setup_template.xlsm" }
     ]
   }

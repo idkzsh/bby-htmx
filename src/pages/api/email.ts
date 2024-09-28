@@ -26,7 +26,13 @@ async function processExcelFile(formDataObject: Record<string, any>) {
   try {
     const XlsxPopulate = await import('xlsx-populate') as any;
     
-    const workbook = await XlsxPopulate.default.fromFileAsync("/setup_template.xlsm");
+    // Fetch the template file from your deployed URL
+    const templateUrl = `${process.env.VERCEL_URL || 'http://localhost:4321'}/setup_template.xlsm`;
+    const response = await fetch(templateUrl);
+    if (!response.ok) throw new Error(`Failed to fetch template: ${response.statusText}`);
+    const arrayBuffer = await response.arrayBuffer();
+
+    const workbook = await XlsxPopulate.default.fromDataAsync(arrayBuffer);
     const sheet = workbook.sheet(0);
 
     const parseJSON = (value: string) => {

@@ -27,30 +27,12 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
 
 async function processExcelFile(formDataObject: Record<string, any>) {
   try {
+
     const XlsxPopulate = await import('xlsx-populate') as any;
     
-    let workbook;
-    const filePath = process.env.EXCEL_FILE_PATH || '/setup_template.xlsm';
-
-    if (process.env.VERCEL_ENV === 'production') {
-      // In production, fetch the file from the deployed URL
-      const baseUrl = process.env.VERCEL_URL 
-        ? `https://${process.env.VERCEL_URL}`
-        : 'https://bby-htmx.vercel.app'; // Replace with your actual default Vercel domain
-      const templateUrl = new URL(filePath, baseUrl).toString();
-      
-      console.log('Fetching from URL:', templateUrl); // Add this for debugging
-
-      const response = await fetch(templateUrl);
-      if (!response.ok) throw new Error(`Failed to fetch template: ${response.statusText}`);
-      const arrayBuffer = await response.arrayBuffer();
-      workbook = await XlsxPopulate.default.fromDataAsync(arrayBuffer);
-    } else {
-      // In development, read the file from the local filesystem
-      const fullPath = path.join(process.cwd(), 'public', filePath);
-      const buffer = await readFile(fullPath);
-      workbook = await XlsxPopulate.default.fromDataAsync(buffer);
-    }
+    const filePath = path.join(process.cwd(), 'public', 'setup_template.xlsm');
+    const buffer = await readFile(filePath);
+    const workbook = await XlsxPopulate.default.fromDataAsync(buffer);
     const sheet = workbook.sheet(0);
 
     const parseJSON = (value: string) => {
@@ -96,8 +78,7 @@ async function processExcelFile(formDataObject: Record<string, any>) {
         console.log(`No value found for ${fullKey}`);
       }
     }
-    
-    await workbook.toFileAsync("public/setup_template.xlsm");
+
     return await workbook.outputAsync();
   } catch (excelError) {
     console.error("Error processing Excel file:", excelError);

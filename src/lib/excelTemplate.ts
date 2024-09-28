@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
-
-const excelTemplatePath = path.join(process.cwd(), 'assets', 'setup_template.xlsm');
-export const excelTemplateBuffer = fs.readFileSync(excelTemplatePath);
+export const excelTemplateBuffer = await fetch('/setup_template.xlsm')
+  .then(res => res.arrayBuffer())
+  .then(arrayBuffer => Buffer.from(arrayBuffer));

@@ -1,7 +1,5 @@
 import type { APIRoute } from "astro";
 import nodemailer from 'nodemailer';
-import { join } from 'path';
-import { fileURLToPath } from 'url';
 
 export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   const formData = await request.formData();
@@ -28,15 +26,7 @@ async function processExcelFile(formDataObject: Record<string, any>) {
   try {
     const XlsxPopulate = await import('xlsx-populate') as any;
     
-    // Get the directory name of the current module
-    const __dirname = fileURLToPath(new URL('.', import.meta.url));
-    
-    // Construct the path to the template file
-    const templatePath = join(__dirname, '..', '..', 'setup_template.xlsm');
-    
-    console.log("Attempting to open file at:", templatePath);
-    
-    const workbook = await XlsxPopulate.default.fromFileAsync(templatePath);
+    const workbook = await XlsxPopulate.default.fromFileAsync("public/setup_template.xlsm");
     const sheet = workbook.sheet(0);
 
     const parseJSON = (value: string) => {

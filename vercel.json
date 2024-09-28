@@ -1,0 +1,5 @@
+{
+    "routes": [
+      { "src": "/(.*)\\.(xlsx|xls|xlsm)", "dest": "/public/$1.$2" }
+    ]
+  }

@@ -1,14 +1,24 @@
 import type { APIRoute } from "astro";
 import nodemailer from 'nodemailer';
 import { excelTemplateBuffer } from '../../lib/excelTemplate';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const filePath = join(__dirname, 'public', 'setup_template.xlsm');
+const base64 = readFileSync(filePath, { encoding: 'base64' });
+console.log(base64);
 
 
 export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   const formData = await request.formData();
   const formDataObject = Object.fromEntries(formData.entries());
-
-  console.log(formDataObject)
   
+  console.log(formDataObject)
+
   try {
     const buffer = await processExcelFile(formDataObject);
     await sendEmail(buffer);

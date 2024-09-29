@@ -1,13 +1,11 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { headers, inputs, formats, unCodes } from "../data/compliance";
+import { headers, batteryTypes } from "../data/compliance";
 
 let columns: number = 1;
 let setupData;
 
 const setupDataJSON: Record<string, string> = {};
-
-
 
 if (Astro.request.method === "POST") {
   try {
@@ -212,7 +210,7 @@ filenames.  Autofills battery details when MSDS is selected.  -->
   href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css"
 />
 
-<script define:vars={{ headers, columns, setupDataJSON, setupDataObject }}>
+<script define:vars={{ headers, columns, setupDataJSON, setupDataObject, batteryTypes }}>
   document.addEventListener("DOMContentLoaded", function () {
     const container = document.getElementById("handsontable-container");
 
@@ -241,6 +239,7 @@ filenames.  Autofills battery details when MSDS is selected.  -->
       "Packaging Section",
       "Battery Section",
       "Limited Quantities Section",
+      "Other Certifications Section",
     ];
 
     
@@ -254,9 +253,14 @@ filenames.  Autofills battery details when MSDS is selected.  -->
           TH.style.fontWeight = "bold";
           TH.style.backgroundColor = "#c0c0c0";
         }
-        if (headerNames[row].includes("Battery Type")) {
+        if (headerNames[row].includes("Battery Type") || headerNames[row].includes("- UN")) {
           TH.style.fontWeight = "bold";
           TH.style.backgroundColor = "#d0d0f0";
+        }
+
+        if (headerNames[row] === "VENDOR ACKNOWLEDGEMENT") {
+          TH.style.fontWeight = "bold";
+          TH.style.backgroundColor = "#F3F0c0";
         }
         // Force text wrapping for all row headers
         TH.style.whiteSpace = "normal";
@@ -272,6 +276,34 @@ filenames.  Autofills battery details when MSDS is selected.  -->
       licenseKey: "non-commercial-and-evaluation",
       cells: function (row, col) {
         const cellProperties = {};
+        const rowHeader = headerNames[row]; // Adjust for the two extra rows
+
+        if (rowHeader.includes("Battery Type")) {
+            cellProperties.type = 'dropdown';
+            cellProperties.source = batteryTypes;
+            cellProperties.allowInvalid = false;
+          // Add more cases for other dropdown fields as needed
+        }
+
+        if (rowHeader === "VENDOR ACKNOWLEDGEMENT") {
+            cellProperties.type = 'dropdown';
+            cellProperties.source = ["Y", "N"];
+            cellProperties.allowInvalid = false;
+          // Add more cases for other dropdown fields as needed
+          cellProperties.renderer = function (
+            instance,
+            td,
+            row,
+            col,
+            prop,
+            value,
+            cellProperties
+          ) {
+            Handsontable.renderers.TextRenderer.apply(this, arguments);
+            td.style.backgroundColor = "#F3F0c0";
+
+          };
+        }
 
         // Make the first two rows non-editable
         if (readOnly.includes(headerNames[row])) {
@@ -291,11 +323,11 @@ filenames.  Autofills battery details when MSDS is selected.  -->
             td.style.verticalAlign = "middle";
           };
         } else {
-          const rowHeader = headerNames[row]; // Adjust for the two extra rows
+          
           cellProperties.placeholder = headers[rowHeader];
         }
 
-        if (headerNames[row].includes("Battery Type")) {
+        if (headerNames[row].includes("Battery Type") || headerNames[row].includes("- UN")) {
           cellProperties.renderer = function (
             instance,
             td,
@@ -372,7 +404,7 @@ filenames.  Autofills battery details when MSDS is selected.  -->
       wordWrap: true,
       // Optional: Adjust cell padding for better text visibility
       cellPadding: 5,
-      fixedRowsTop: 3
+      fixedRowsTop: 4
     });
 
     document.addEventListener("submitComplianceForm", function () {

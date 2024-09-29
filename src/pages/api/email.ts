@@ -15,6 +15,10 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
 
     const email = formDataObject['email']
 
+    if (!email) {
+      throw new Error("Email is missing from form data");
+    }
+
     await sendEmail(buffer, email.toString());
     
     return redirect("/complete");

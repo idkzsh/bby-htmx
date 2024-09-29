@@ -125,6 +125,13 @@ const headers = {
 
 };
 
+const unCodes = {
+  "Lithium-Ion": ["3480", "3481", "3171"],
+  "Lithium-Polymer": ["3480", "3481", "3171"],
+  "Lithium-manganese(LiMn204)": ["3090", "3091"],
+  "Lithium-Carbon-Fluoride": ["3090", "3091"],
+};
+
 const batteryTypes = [
   "Alkaline Coin/Button",
   "Lead-Acid",
@@ -147,51 +154,46 @@ const batteryTypes = [
   "Alkaline Battery"
 ];
 
-// const formats: BatteryTypes = {
-//   "Lithium-Ion": [
-//     "AA",
-//     "AAA",
-//     "C",
-//     "D",
-//     "9V",
-//     "Lantern",
-//     "CR-V3",
-//     "CR-P2 (CR-P2/5024LC)",
-//     "2CR5 (2CR5/5032LC)",
-//     "CR2 (CR17355/5046LC)",
-//     "CR123A",
-//     "CR123A (CR17345/5018LC)",
-//     "RCR123A",
-//     "RCR123",
-//     "RCR-V3",
-//     "OTHER",
-//   ],
-//   "Lithium-manganese(LiMn204)": [
-//     "AA",
-//     "AAA",
-//     "C",
-//     "D",
-//     "9V",
-//     "Lantern",
-//     "CR-V3",
-//     "CR-P2 (CR-P2/5024LC)",
-//     "2CR5 (2CR5/5032LC)",
-//     "CR2 (CR17355/5046LC)",
-//     "CR123A",
-//     "CR123A (CR17345/5018LC)",
-//     "RCR123A",
-//     "RCR123",
-//     "RCR-V3",
-//     "OTHER",
-//   ],
-// };
+const formats = {
+  "Lithium-Ion": [
+    "AA",
+    "AAA",
+    "C",
+    "D",
+    "9V",
+    "Lantern",
+    "CR-V3",
+    "CR-P2 (CR-P2/5024LC)",
+    "2CR5 (2CR5/5032LC)",
+    "CR2 (CR17355/5046LC)",
+    "CR123A",
+    "CR123A (CR17345/5018LC)",
+    "RCR123A",
+    "RCR123",
+    "RCR-V3",
+    "OTHER",
+  ],
+  "Lithium-manganese(LiMn204)": [
+    "AA",
+    "AAA",
+    "C",
+    "D",
+    "9V",
+    "Lantern",
+    "CR-V3",
+    "CR-P2 (CR-P2/5024LC)",
+    "2CR5 (2CR5/5032LC)",
+    "CR2 (CR17355/5046LC)",
+    "CR123A",
+    "CR123A (CR17345/5018LC)",
+    "RCR123A",
+    "RCR123",
+    "RCR-V3",
+    "OTHER",
+  ],
+};
 
-// const unCodes: BatteryTypes = {
-//   "Lithium-Ion": ["3480", "3481", "3171"],
-//   "Lithium-Polymer": ["3480", "3481", "3171"],
-//   "Lithium-manganese(LiMn204)": ["3090", "3091"],
-//   "Lithium-Carbon-Fluoride": ["3090", "3091"],
-// };
+
 
 // const inputs = [
 //   {
@@ -273,4 +275,4 @@ const batteryTypes = [
 
 // const forms = {};
 
-export { headers, batteryTypes };
+export { headers, batteryTypes, unCodes, formats };

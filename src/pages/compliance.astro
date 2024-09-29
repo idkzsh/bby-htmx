@@ -4,7 +4,10 @@ import { headers, inputs, formats, unCodes } from "../data/compliance";
 
 let columns: number = 1;
 let setupData;
+let email;
 const setupDataJSON: Record<string, string> = {};
+
+
 
 if (Astro.request.method === "POST") {
   try {
@@ -40,6 +43,9 @@ if (Astro.request.method === "POST") {
 
 // Convert setupData to a plain object if it exists
 const setupDataObject = setupData ? Object.fromEntries(setupData) : null;
+
+email = setupDataJSON['email']
+
 ---
 
 <!-- unfortunately the cdn must be used for pdfjs as far as i can tell as it does not work very well on serverless as a dependency -->
@@ -206,7 +212,7 @@ filenames.  Autofills battery details when MSDS is selected.  -->
   href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css"
 />
 
-<script define:vars={{ headers, columns, setupDataJSON }}>
+<script define:vars={{ headers, columns, email, setupDataJSON, setupDataObject }}>
   document.addEventListener("DOMContentLoaded", function () {
     const container = document.getElementById("handsontable-container");
 
@@ -234,6 +240,7 @@ filenames.  Autofills battery details when MSDS is selected.  -->
       "Mercury Section",
       "Packaging Section",
       "Battery Section",
+      "Limited Quantities Section",
     ];
 
     
@@ -365,28 +372,29 @@ filenames.  Autofills battery details when MSDS is selected.  -->
       wordWrap: true,
       // Optional: Adjust cell padding for better text visibility
       cellPadding: 5,
+      fixedRowsTop: 3
     });
 
     document.addEventListener("submitComplianceForm", function () {
-      const requiredFields = ["MSDS"];
+      const requiredFields = [""];
       const missingFields = [];
 
       // Check required fields
-      requiredFields.forEach((field, rowIndex) => {
-        for (let col = 0; col < columns; col++) {
-          const cellValue = hot.getDataAtCell(rowIndex, col);
-          if (!cellValue || cellValue.trim() === "") {
-            missingFields.push(`${field} for SKU ${col + 1}`);
-          }
-        }
-      });
+      // requiredFields.forEach((field, rowIndex) => {
+      //   for (let col = 0; col < columns; col++) {
+      //     const cellValue = hot.getDataAtCell(rowIndex, col);
+      //     if (!cellValue || cellValue.trim() === "") {
+      //       missingFields.push(`${field} for SKU ${col + 1}`);
+      //     }
+      //   }
+      // });
 
-      if (missingFields.length > 0) {
-        alert(
-          `Please fill in the following required fields:\n${missingFields.join("\n")}`
-        );
-        return;
-      }
+      // if (missingFields.length > 0) {
+      //   alert(
+      //     `Please fill in the following required fields:\n${missingFields.join("\n")}`
+      //   );
+      //   return;
+      // }
 
       complianceForm
         .querySelectorAll('input[type="hidden"]')
@@ -398,6 +406,12 @@ filenames.  Autofills battery details when MSDS is selected.  -->
       columnsInput.name = "columns";
       columnsInput.value = columns;
       complianceForm.appendChild(columnsInput);
+
+      const emailInput = document.createElement("input");
+      emailInput.type = "hidden";
+      emailInput.name = "email";
+      emailInput.value = email;
+      complianceForm.appendChild(emailInput);
 
       if (setupDataObject) {
         for (let [key, value] of Object.entries(setupDataObject)) {

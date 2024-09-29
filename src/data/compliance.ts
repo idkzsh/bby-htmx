@@ -103,6 +103,23 @@ const headers = {
   "4 - Individual Li Battery Net Weight (kg)": "Enter a number",
   "4 - MSDS": "Upload MSDS file here",
   "4 - Test Summary": "Upload Test Summary file here",
+
+  "Limited Quantities Section" : "",
+  "1 - UN# (4 digits)": "0000",
+  "1 - Qty (Liters for Aerosol, Gas or Liquid/KG for Solid)": "0.000",
+  "1 - SDS": "PDF",
+  "2 - UN# (4 digits)": "0000",
+  "2 - Qty (Liters for Aerosol, Gas or Liquid/KG for Solid)": "0.000",
+  "2 - SDS": "PDF",
+  "3 - UN# (4 digits)": "0000",
+  "3 - Qty (Liters for Aerosol, Gas or Liquid/KG for Solid)": "0.000",
+  "3 - SDS": "PDF",
+  "4 - UN# (4 digits)": "0000",
+  "4 - Qty (Liters for Aerosol, Gas or Liquid/KG for Solid)": "0.000",
+  "4 - SDS": "PDF",
+  "5 - UN# (4 digits)": "0000",
+  "5 - Qty (Liters for Aerosol, Gas or Liquid/KG for Solid)": "0.000",
+  "5 - SDS": "PDF",
 };
 
 const batteryTypes = {

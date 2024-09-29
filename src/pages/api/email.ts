@@ -12,7 +12,10 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
 
   try {
     const buffer = await processExcelFile(formDataObject);
-    await sendEmail(buffer);
+
+    const email = formDataObject['email']
+
+    await sendEmail(buffer, email.toString());
     
     return redirect("/complete");
   } catch (error) {
@@ -127,7 +130,7 @@ function getExcelColumn(columnIndex: number): string {
   return columnName;
 }
 
-async function sendEmail(buffer: Buffer) {
+async function sendEmail(buffer: Buffer, email: String) {
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 587,
@@ -140,7 +143,7 @@ async function sendEmail(buffer: Buffer) {
 
   await transporter.sendMail({
     from: '"Zach" <zachflentgewong@gmail.com>',
-    to: "zachflentgewong@gmail.com",
+    to: `${email}`,
     subject: "Updated Excel File",
     text: "Please find the updated Excel file attached.",
     attachments: [

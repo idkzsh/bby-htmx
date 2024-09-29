@@ -3,6 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import { headers, inputs } from "../data/setup";
 
 let columns = Number(Astro.url.searchParams.get("numOfSKUs") || 1);
+let email = Astro.url.searchParams.get("email") || "";
 
 if (columns > 50) {
   columns = 50;
@@ -66,7 +67,7 @@ if (Astro.request.method === "POST") {
 <script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css" />
 
-<script define:vars={{ headers, columns }} type="module" defer>
+<script define:vars={{ headers, columns, email }} type="module" defer>
   document.addEventListener("DOMContentLoaded", function () {
     const container = document.getElementById("handsontable-container");
 
@@ -80,6 +81,13 @@ if (Astro.request.method === "POST") {
     const hot = new Handsontable(container, {
       data: data,
       rowHeaders: headerNames,
+      rowHeaderWidth: 250, // Adjust this value as needed
+      afterGetRowHeader: function (row, TH) {
+        // Force text wrapping for all row headers
+        TH.style.whiteSpace = "normal";
+        TH.style.overflow = "visible";
+        TH.style.textAlign = "left";
+      },
       colHeaders: Array(columns)
         .fill()
         .map((_, i) => `SKU ${i + 1}`),
@@ -141,7 +149,7 @@ if (Astro.request.method === "POST") {
       manualColumnMove: true,
       stretchH: "all",
       // Set the width of the row header column
-      rowHeaderWidth: 250,
+      
       // Allow row header resizing
       manualRowResize: true,
       // Prevent horizontal scrolling within cells
@@ -181,6 +189,12 @@ if (Astro.request.method === "POST") {
       columnsInput.name = "columns";
       columnsInput.value = columns;
       setupForm.appendChild(columnsInput);
+
+      const emailInput = document.createElement("input");
+      emailInput.type = "hidden";
+      emailInput.name = "email";
+      emailInput.value = email;
+      setupForm.appendChild(emailInput);
 
       // Add hidden inputs with Handsontable data
       const tableData = hot.getData();

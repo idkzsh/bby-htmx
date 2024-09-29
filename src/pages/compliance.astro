@@ -236,6 +236,8 @@ filenames.  Autofills battery details when MSDS is selected.  -->
       "Battery Section",
     ];
 
+    
+
     const hot = new Handsontable(container, {
       data: data,
       rowHeaders: headerNames,
@@ -243,11 +245,16 @@ filenames.  Autofills battery details when MSDS is selected.  -->
       afterGetRowHeader: function (row, TH) {
         if (readOnly.includes(headerNames[row])) {
           TH.style.fontWeight = "bold";
+          TH.style.backgroundColor = "#c0c0c0";
+        }
+        if (headerNames[row].includes("Battery Type")) {
+          TH.style.fontWeight = "bold";
+          TH.style.backgroundColor = "#d0d0f0";
         }
         // Force text wrapping for all row headers
         TH.style.whiteSpace = "normal";
         TH.style.overflow = "visible";
-        
+        TH.style.textAlign = "left";
       },
       colHeaders: Array(columns)
         .fill()
@@ -272,9 +279,27 @@ filenames.  Autofills battery details when MSDS is selected.  -->
             cellProperties
           ) {
             Handsontable.renderers.TextRenderer.apply(this, arguments);
-            td.style.backgroundColor = "#f0f0f0";
+            td.style.backgroundColor = "#c0c0c0";
             td.style.textAlign = "center";
             td.style.verticalAlign = "middle";
+          };
+        } else {
+          const rowHeader = headerNames[row]; // Adjust for the two extra rows
+          cellProperties.placeholder = headers[rowHeader];
+        }
+
+        if (headerNames[row].includes("Battery Type")) {
+          cellProperties.renderer = function (
+            instance,
+            td,
+            row,
+            col,
+            prop,
+            value,
+            cellProperties
+          ) {
+            Handsontable.renderers.TextRenderer.apply(this, arguments);
+            td.style.backgroundColor = "#d0d0f0";
           };
         } else {
           const rowHeader = headerNames[row]; // Adjust for the two extra rows

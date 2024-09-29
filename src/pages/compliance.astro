@@ -4,11 +4,33 @@ import { headers, inputs, formats, unCodes } from "../data/compliance";
 
 let columns: number = 1;
 let setupData;
+const setupDataJSON: Record<string, string> = {};
+
 if (Astro.request.method === "POST") {
   try {
     setupData = await Astro.request.formData();
     columns = Number(setupData.get("columns"));
-    // console.log("Server-side setupData:", Object.fromEntries(setupData));
+
+    // Convert setupData to a JSON object so we don't need to do string manipulation
+    for (const [key, value] of setupData.entries()) {
+      setupDataJSON[key] = typeof value === "string" ? value : value.name;
+    }
+
+    // Parse array-like strings into actual arrays
+    for (const key in setupDataJSON) {
+      if (
+        setupDataJSON[key].startsWith("[") &&
+        setupDataJSON[key].endsWith("]")
+      ) {
+        try {
+          setupDataJSON[key] = JSON.parse(setupDataJSON[key]);
+        } catch (e) {
+          console.error(`Failed to parse ${key} as JSON:`, e);
+        }
+      }
+    }
+
+    // console.log("Server-side setupDataJSON:", setupDataJSON);
   } catch (error) {
     if (error instanceof Error) {
       console.error(error.message);
@@ -18,7 +40,6 @@ if (Astro.request.method === "POST") {
 
 // Convert setupData to a plain object if it exists
 const setupDataObject = setupData ? Object.fromEntries(setupData) : null;
-console.log(setupDataObject);
 ---
 
 <!-- unfortunately the cdn must be used for pdfjs as far as i can tell as it does not work very well on serverless as a dependency -->
@@ -185,64 +206,61 @@ filenames.  Autofills battery details when MSDS is selected.  -->
   href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css"
 />
 
-<script define:vars={{ headers, columns, setupDataObject }}>
+<script define:vars={{ headers, columns, setupDataJSON }}>
   document.addEventListener("DOMContentLoaded", function () {
     const container = document.getElementById("handsontable-container");
 
     const headerNames = Object.keys(headers);
     const rows = headerNames.length;
 
-    let shortDescArr = [];
-    let upcArr = [];
-
-    const valsToRemove = ["[", '"', "]"];
-
-    for (let i = 0; i < setupDataObject["SKU Title (Short)"].length; i++) {
-      if (!valsToRemove.includes(setupDataObject["SKU Title (Short)"][i])) {
-        shortDescArr.push(setupDataObject["SKU Title (Short)"][i]);
-      }
-    }
-
-    for (let i = 0; i < setupDataObject["UPC"].length; i++) {
-      if (!valsToRemove.includes(setupDataObject["UPC"][i])) {
-        upcArr.push(setupDataObject["UPC"][i]);
-      }
-    }
-
-    const shortDesc = shortDescArr.join("");
-    const upc = upcArr.join("");
-
     const data = Array(rows)
       .fill()
-      .map(() => Array(columns).fill(""));
+      .map((_, rowIndex) =>
+        Array(columns)
+          .fill()
+          .map((_, colIndex) => {
+            const header = headerNames[rowIndex];
+            if (setupDataJSON[header] && Array.isArray(setupDataJSON[header])) {
+              return setupDataJSON[header][colIndex] || "";
+            }
+            return "";
+          })
+      );
 
-    data[0] = Array(columns)
-      .fill()
-      .map((_, i) => shortDesc);
-    data[1] = Array(columns)
-      .fill()
-      .map((_, i) => upc);
-
-    data.push(Array(columns).fill(""));
-
-    for (let i = 0; i < rows; i++) {
-      data.push(Array(columns).fill(""));
-    }
+    const readOnly = [
+      "UPC",
+      "SKU Title (Long)",
+      "Model Number",
+      "Mercury Section",
+      "Packaging Section",
+      "Battery Section",
+    ];
 
     const hot = new Handsontable(container, {
       data: data,
       rowHeaders: headerNames,
+      rowHeaderWidth: 250, // Adjust this value as needed
+      afterGetRowHeader: function (row, TH) {
+        if (readOnly.includes(headerNames[row])) {
+          TH.style.fontWeight = "bold";
+        }
+        // Force text wrapping for all row headers
+        TH.style.whiteSpace = "normal";
+        TH.style.overflow = "visible";
+        
+      },
       colHeaders: Array(columns)
         .fill()
         .map((_, i) => `SKU ${i + 1}`),
       height: "100%",
       width: "100%",
+
       licenseKey: "non-commercial-and-evaluation",
       cells: function (row, col) {
         const cellProperties = {};
 
         // Make the first two rows non-editable
-        if (row < 2) {
+        if (readOnly.includes(headerNames[row])) {
           cellProperties.readOnly = true;
           cellProperties.renderer = function (
             instance,
@@ -259,9 +277,10 @@ filenames.  Autofills battery details when MSDS is selected.  -->
             td.style.verticalAlign = "middle";
           };
         } else {
-          const rowHeader = headerNames[row - 2]; // Adjust for the two extra rows
+          const rowHeader = headerNames[row]; // Adjust for the two extra rows
           cellProperties.placeholder = headers[rowHeader];
         }
+
         // ... rest of the cell properties logic ...
 
         // Add validator for VPN row

@@ -5,7 +5,7 @@ const headers = {
   UPC: "12 or 13 digits only",
   "Secondary UPC": "12 or 13 digits only",
   Brand: "Maximum 20 characters",
-  Model: "Maximum 20 characters",
+  "Model Number": "Maximum 20 characters",
   Manufacturer: "Maximum 20 characters",
   "Unit Cost": "Must be greater than 0",
   "Retail Price": "Must be greater than 0",

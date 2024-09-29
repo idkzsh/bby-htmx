@@ -18,7 +18,7 @@ if (Astro.request.method === "POST") {
 
 // Convert setupData to a plain object if it exists
 const setupDataObject = setupData ? Object.fromEntries(setupData) : null;
-
+console.log(setupDataObject);
 ---
 
 <!-- unfortunately the cdn must be used for pdfjs as far as i can tell as it does not work very well on serverless as a dependency -->
@@ -26,7 +26,7 @@ const setupDataObject = setupData ? Object.fromEntries(setupData) : null;
   src="https://unpkg.com/pdfjs-dist@4.0.379/build/pdf.min.mjs"
   type="module"></script>
 
- <!-- Parses uploaded MSDS PDF files using pdf.js to extract text.  Sends text
+<!-- Parses uploaded MSDS PDF files using pdf.js to extract text.  Sends text
 to /api/gpt endpoint to extract battery details. * Populates dropdown with MSDS
 filenames.  Autofills battery details when MSDS is selected.  -->
 <script type="module">
@@ -127,16 +127,15 @@ filenames.  Autofills battery details when MSDS is selected.  -->
 </script>
 
 <Layout>
-
   <main
-  class="flex w-[90%] h-[98%] bg-white mt-2 rounded-md border tracking-tight overflow-scroll" id="main"
->
-
-<form action="/api/email" method="POST" id="complianceForm" class="hidden">
-  <!-- Hidden inputs will be dynamically added here -->
-</form>
-<div id="handsontable-container" class="w-full h-[400px]"></div>
-</main>
+    class="flex w-[90%] h-[98%] bg-white mt-2 rounded-md border tracking-tight overflow-scroll"
+    id="main"
+  >
+    <form action="/api/email" method="POST" id="complianceForm" class="hidden">
+      <!-- Hidden inputs will be dynamically added here -->
+    </form>
+    <div id="handsontable-container" class="w-full h-[400px]"></div>
+  </main>
 
   <!-- <nav
     class="flex h-12 w-full border-b items-center px-2 justify-between fixed top-20 bg-background z-40"
@@ -167,9 +166,8 @@ filenames.  Autofills battery details when MSDS is selected.  -->
     >
   </nav> -->
 
-
-    <!-- <ComplianceSidebar obj={headers} /> -->
-<!-- 
+  <!-- <ComplianceSidebar obj={headers} /> -->
+  <!-- 
     <ComplianceColumn
       columns={columns}
       obj={inputs}
@@ -177,11 +175,15 @@ filenames.  Autofills battery details when MSDS is selected.  -->
       setupData={setupData}
       email={email}
     /> -->
-
 </Layout>
 
-<script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css" />
+<script
+  src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"
+></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css"
+/>
 
 <script define:vars={{ headers, columns, setupDataObject }}>
   document.addEventListener("DOMContentLoaded", function () {
@@ -190,9 +192,42 @@ filenames.  Autofills battery details when MSDS is selected.  -->
     const headerNames = Object.keys(headers);
     const rows = headerNames.length;
 
+    let shortDescArr = [];
+    let upcArr = [];
+
+    const valsToRemove = ["[", '"', "]"];
+
+    for (let i = 0; i < setupDataObject["SKU Title (Short)"].length; i++) {
+      if (!valsToRemove.includes(setupDataObject["SKU Title (Short)"][i])) {
+        shortDescArr.push(setupDataObject["SKU Title (Short)"][i]);
+      }
+    }
+
+    for (let i = 0; i < setupDataObject["UPC"].length; i++) {
+      if (!valsToRemove.includes(setupDataObject["UPC"][i])) {
+        upcArr.push(setupDataObject["UPC"][i]);
+      }
+    }
+
+    const shortDesc = shortDescArr.join("");
+    const upc = upcArr.join("");
+
     const data = Array(rows)
       .fill()
       .map(() => Array(columns).fill(""));
+
+    data[0] = Array(columns)
+      .fill()
+      .map((_, i) => shortDesc);
+    data[1] = Array(columns)
+      .fill()
+      .map((_, i) => upc);
+
+    data.push(Array(columns).fill(""));
+
+    for (let i = 0; i < rows; i++) {
+      data.push(Array(columns).fill(""));
+    }
 
     const hot = new Handsontable(container, {
       data: data,
@@ -205,51 +240,72 @@ filenames.  Autofills battery details when MSDS is selected.  -->
       licenseKey: "non-commercial-and-evaluation",
       cells: function (row, col) {
         const cellProperties = {};
-        const rowHeader = headerNames[row];
-        cellProperties.placeholder = headers[rowHeader];
+
+        // Make the first two rows non-editable
+        if (row < 2) {
+          cellProperties.readOnly = true;
+          cellProperties.renderer = function (
+            instance,
+            td,
+            row,
+            col,
+            prop,
+            value,
+            cellProperties
+          ) {
+            Handsontable.renderers.TextRenderer.apply(this, arguments);
+            td.style.backgroundColor = "#f0f0f0";
+            td.style.textAlign = "center";
+            td.style.verticalAlign = "middle";
+          };
+        } else {
+          const rowHeader = headerNames[row - 2]; // Adjust for the two extra rows
+          cellProperties.placeholder = headers[rowHeader];
+        }
+        // ... rest of the cell properties logic ...
 
         // Add validator for VPN row
-        const requiredFields = ["Vendor Part Number"];
+        // const requiredFields = ["Vendor Part Number"];
 
-        // Add required validator to specified fields
-        if (requiredFields.includes(rowHeader)) {
-          cellProperties.validator = function (value, callback) {
-            callback(value !== null && value !== "");
-          };
-          cellProperties.allowEmpty = false;
-        }
+        // // Add required validator to specified fields
+        // if (requiredFields.includes(rowHeader)) {
+        //   cellProperties.validator = function (value, callback) {
+        //     callback(value !== null && value !== "");
+        //   };
+        //   cellProperties.allowEmpty = false;
+        // }
 
-        switch (rowHeader) {
-          case "Vendor Part Number":
-            cellProperties.validator = function (value, callback) {
-              if (value.length <= 20) {
-                callback(true);
-              } else {
-                callback(false);
-              }
-            };
-            cellProperties.allowInvalid = false;
-            break;
-          case "SKU Title (Long)":
-            cellProperties.validator = function (value, callback) {
-              if (value.length <= 40) {
-                callback(true);
-              } else {
-                callback(false);
-              }
-            };
-            cellProperties.allowInvalid = false;
-            break;
-          case "UPC":
-            cellProperties.validator = function (value, callback) {
-              const numericValue = value.toString().replace(/\D/g, "");
-              const isValid =
-                numericValue.length >= 12 && numericValue.length <= 13;
-              callback(isValid);
-            };
-            cellProperties.allowInvalid = false;
-            break;
-        }
+        // switch (rowHeader) {
+        //   case "Vendor Part Number":
+        //     cellProperties.validator = function (value, callback) {
+        //       if (value.length <= 20) {
+        //         callback(true);
+        //       } else {
+        //         callback(false);
+        //       }
+        //     };
+        //     cellProperties.allowInvalid = false;
+        //     break;
+        //   case "SKU Title (Long)":
+        //     cellProperties.validator = function (value, callback) {
+        //       if (value.length <= 40) {
+        //         callback(true);
+        //       } else {
+        //         callback(false);
+        //       }
+        //     };
+        //     cellProperties.allowInvalid = false;
+        //     break;
+        //   case "UPC":
+        //     cellProperties.validator = function (value, callback) {
+        //       const numericValue = value.toString().replace(/\D/g, "");
+        //       const isValid =
+        //         numericValue.length >= 12 && numericValue.length <= 13;
+        //       callback(isValid);
+        //     };
+        //     cellProperties.allowInvalid = false;
+        //     break;
+        // }
 
         return cellProperties;
       },
@@ -300,16 +356,16 @@ filenames.  Autofills battery details when MSDS is selected.  -->
       complianceForm.appendChild(columnsInput);
 
       if (setupDataObject) {
-          for (let [key, value] of Object.entries(setupDataObject)) {
-            const input = document.createElement("input");
-            input.type = "hidden";
-            input.name = `setupData_${key}`;
-            input.value = value;
-            complianceForm.appendChild(input);
-          }
-        } else {
-          console.log("No setupData available");
+        for (let [key, value] of Object.entries(setupDataObject)) {
+          const input = document.createElement("input");
+          input.type = "hidden";
+          input.name = `setupData_${key}`;
+          input.value = value;
+          complianceForm.appendChild(input);
         }
+      } else {
+        console.log("No setupData available");
+      }
 
       // Add hidden inputs with Handsontable data
       const tableData = hot.getData();
@@ -333,5 +389,9 @@ filenames.  Autofills battery details when MSDS is selected.  -->
   .handsontable th {
     white-space: normal;
     overflow-wrap: break-word;
+  }
+
+  .handsontable .gray-background {
+    background-color: #f0f0f0 !important;
   }
 </style>

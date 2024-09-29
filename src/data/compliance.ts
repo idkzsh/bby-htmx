@@ -3,6 +3,8 @@ interface BatteryTypes {
 }
 
 const headers = {
+  "Short Title": "",
+  UPC: "",
   MSDS: "Upload MSDS file here",
   "Battery Type": "Select from list of values",
   "Size/Format": "Select from list of values",

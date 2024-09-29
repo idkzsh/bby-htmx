@@ -4,7 +4,7 @@ import { headers, inputs, formats, unCodes } from "../data/compliance";
 
 let columns: number = 1;
 let setupData;
-let email;
+
 const setupDataJSON: Record<string, string> = {};
 
 
@@ -44,7 +44,7 @@ if (Astro.request.method === "POST") {
 // Convert setupData to a plain object if it exists
 const setupDataObject = setupData ? Object.fromEntries(setupData) : null;
 
-email = setupDataJSON['email']
+
 
 ---
 
@@ -212,7 +212,7 @@ filenames.  Autofills battery details when MSDS is selected.  -->
   href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css"
 />
 
-<script define:vars={{ headers, columns, email, setupDataJSON, setupDataObject }}>
+<script define:vars={{ headers, columns, setupDataJSON, setupDataObject }}>
   document.addEventListener("DOMContentLoaded", function () {
     const container = document.getElementById("handsontable-container");
 
@@ -410,7 +410,7 @@ filenames.  Autofills battery details when MSDS is selected.  -->
       const emailInput = document.createElement("input");
       emailInput.type = "hidden";
       emailInput.name = "email";
-      emailInput.value = email;
+      emailInput.value = setupDataJSON['email'];
       complianceForm.appendChild(emailInput);
 
       if (setupDataObject) {

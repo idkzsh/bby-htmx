@@ -9,6 +9,7 @@ interface Window {
     readonly SUPABASE_ANON_KEY: string
     readonly OPENAI_API_KEY: string
     readonly EMAIL_ENDPOINT: string
+    readonly APP_PASS: string
   }
   
   interface ImportMeta {

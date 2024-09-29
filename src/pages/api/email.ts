@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import nodemailer from 'nodemailer';
 import { excelTemplateBuffer } from '../../lib/excelTemplate';
+import { getEnv } from '../../utils/env';
 
 
 export const POST: APIRoute = async ({ request, cookies, redirect }) => {
@@ -44,13 +45,47 @@ async function processExcelFile(formDataObject: Record<string, any>) {
     console.log("Number of columns:", columns);
 
     const cellMappings = {
+      "28": "Department",
       "37": 'Vendor Part Number',
       "29": 'SKU Title (Short)',
       "30": 'SKU Title (Long)',
       "31": 'UPC',
+      "32": 'Secondary UPC',
       "33": 'Brand',
       "34": 'Model',
-      "35": 'Manufacturer'
+      "35": 'Manufacturer',
+      "38": 'Unit Cost',
+      "39": 'Retail Price',
+      "40": 'Width (Boxed)',
+      "41": 'Height (Boxed)',
+      "42": 'Length (Boxed)',
+      "43": 'Weight (Boxed)',
+      "44": 'Width (Unboxed)',
+      "45": 'Height (Unboxed)',
+      "46": 'Length (Unboxed)',
+      "47": 'Weight (Unboxed)',
+      "48": 'Casepack',
+      "49": 'Innerpack',
+      "50": 'Unit Cost For Additional Supplier(1)',
+      "51": 'Case Pack Qty For Additional Supplier(1)',
+      "52": 'Inner Pack Qty For Additional Supplier(1)',
+      "53": 'Unit Cost For Additional Supplier(2)',
+      "54": 'Case Pack Qty For Additional Supplier(2)',
+      "55": 'Inner Pack Qty For Additional Supplier(2)',
+      "56": 'French Compliant',
+      "57": 'Energy Star',
+      "58": 'Refurbished',
+      "59": 'Consignment',
+      "60": 'Software Platform',
+      "61": 'Street Date',
+      "69": 'Product Warranty Days',
+      "70": 'Product Warranty Coverage',
+      "71": 'Extended Parts Warranty',
+      "72": 'Return Restrictions',
+      "74": 'Expiration Date/Lot Number',
+      "75": 'Shelf Life',
+      "76": 'Data Flag',
+      "78": 'Dangerous Product/Material',
     };
 
     for (const [row, key] of Object.entries(cellMappings)) {
@@ -62,7 +97,7 @@ async function processExcelFile(formDataObject: Record<string, any>) {
         const parsedValues = parseJSON(value);
         if (Array.isArray(parsedValues)) {
           for (let i = 0; i < columns && i < parsedValues.length; i++) {
-            const cellReference = `${String.fromCharCode(69 + i)}${row}`; // E, F, G, etc.
+            const cellReference = `${getExcelColumn(i + 5)}${row}`; // E, F, G, ..., Z, AA, AB, etc.
             console.log(`Setting ${key} in cell ${cellReference}:`, parsedValues[i]);
             sheet.cell(cellReference).value(parsedValues[i]);
           }
@@ -82,6 +117,16 @@ async function processExcelFile(formDataObject: Record<string, any>) {
   }
 }
 
+function getExcelColumn(columnIndex: number): string {
+  let columnName = '';
+  while (columnIndex > 0) {
+    columnIndex--;
+    columnName = String.fromCharCode(65 + (columnIndex % 26)) + columnName;
+    columnIndex = Math.floor(columnIndex / 26);
+  }
+  return columnName;
+}
+
 async function sendEmail(buffer: Buffer) {
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -89,7 +134,7 @@ async function sendEmail(buffer: Buffer) {
     secure: false,
     auth: {
       user: "zachflentgewong@gmail.com",
-      pass: process.env.APP_PASS,
+      pass: getEnv('APP_PASS'),
     },
   });
 
@@ -108,25 +153,3 @@ async function sendEmail(buffer: Buffer) {
 
   console.log("Email sent successfully");
 }
-
-// async function sendPostRequest(formDataObject: Record<string, any>) {
-//   const resp = {
-//     subject: "test",
-//     body: JSON.stringify(formDataObject),
-//   };
-
-//   const response = await fetch(import.meta.env.EMAIL_ENDPOINT, {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify(resp),
-//   });
-
-//   if (response.ok) {
-//     console.log("POST request sent successfully");
-//   } else {
-//     console.error("Failed to send POST request");
-//     throw new Error("Failed to send POST request");
-//   }
-// }

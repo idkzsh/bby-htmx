@@ -51,6 +51,7 @@ if (Astro.request.method === "POST") {
       
 
         <div
+        id="drop-zone"
           class="flex flex-col justify-center border-2 border-dashed border-gray-300 rounded-lg p-8 text-center h-full"
         >
           <label for="image-upload" class="cursor-pointer">
@@ -99,29 +100,76 @@ if (Astro.request.method === "POST") {
 </Layout>
 
 <script define:vars={{ columns, setupDataJSON }}>
-  document.addEventListener("DOMContentLoaded", function() {
-    const imageUpload = document.getElementById("image-upload");
-    const imagePreview = document.getElementById("image-preview");
+  let uploadedFiles = [];
 
-    imageUpload.addEventListener("change", function(event) {
-      imagePreview.innerHTML = ""; // Clear existing previews
-      const files = event.target.files;
+document.addEventListener("DOMContentLoaded", function() {
+  const imageUpload = document.getElementById("image-upload");
+  const imagePreview = document.getElementById("image-preview");
+  const dropZone = document.getElementById("drop-zone");
 
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        if (file.type.startsWith("image/")) {
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            const img = document.createElement("img");
-            img.src = e.target.result;
-            img.classList.add("w-full", "h-32", "object-cover", "rounded-md");
-            imagePreview.appendChild(img);
+  if (imageUpload) {
+    imageUpload.addEventListener("change", handleFiles);
+  }
+
+  if (dropZone) {
+    // Drag and drop events
+    dropZone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropZone.classList.add("bg-gray-100");
+    });
+
+    dropZone.addEventListener("dragleave", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropZone.classList.remove("bg-gray-100");
+    });
+
+    dropZone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropZone.classList.remove("bg-gray-100");
+      const files = e.dataTransfer.files;
+      handleFiles({ target: { files } });
+    });
+  }
+
+  function handleFiles(event) {
+    const newFiles = Array.from(event.target.files);
+    uploadedFiles = [...uploadedFiles, ...newFiles];
+    updateImagePreviews();
+  }
+
+  function updateImagePreviews() {
+    imagePreview.innerHTML = ""; // Clear existing previews
+    uploadedFiles.forEach((file, index) => {
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const imgContainer = document.createElement("div");
+          imgContainer.className = "relative";
+
+          const img = document.createElement("img");
+          img.src = e.target.result;
+          img.classList.add("w-full", "h-32", "object-cover", "rounded-md");
+          
+          const removeButton = document.createElement("button");
+          removeButton.innerHTML = "&#x2715;"; // '×' symbol
+          removeButton.className = "absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center";
+          removeButton.onclick = function() {
+            uploadedFiles.splice(index, 1);
+            updateImagePreviews();
           };
-          reader.readAsDataURL(file);
-        }
+
+          imgContainer.appendChild(img);
+          imgContainer.appendChild(removeButton);
+          imagePreview.appendChild(imgContainer);
+        };
+        reader.readAsDataURL(file);
       }
     });
-  });
+  }
+});
 
 
 

@@ -48,46 +48,45 @@ if (Astro.request.method === "POST") {
     <div class="h-[90%] px-4">
       <!-- <h1 class="text-2xl font-bold mb-6">Asset Upload</h1> -->
 
-      
-
-        <div
+      <div
         id="drop-zone"
-          class="flex flex-col justify-center border-2 border-dashed border-gray-300 rounded-lg p-8 text-center h-full"
-        >
-          <label for="image-upload" class="cursor-pointer">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="mx-auto h-12 w-12 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-            </svg>
-            <span class="mt-2 block text-sm font-medium text-gray-900">
-              Click to upload or drag and drop
-            </span>
-            <span class="mt-1 block text-xs text-gray-500">
-              PNG, JPG, GIF up to 10MB
-            </span>
-          </label>
-          <input
-            id="image-upload"
-            type="file"
-            class="hidden"
-            accept="image/*"
-            multiple
-          />
-        </div>
-     
-
-      
+        class="flex flex-col justify-center border-2 border-dashed border-gray-300 rounded-lg p-8 text-center h-full"
+      >
+        <label for="image-upload" class="cursor-pointer">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="mx-auto h-12 w-12 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          <span class="mt-2 block text-sm font-medium text-gray-900">
+            Click to upload or drag and drop
+          </span>
+          <span class="mt-1 block text-xs text-gray-500">
+            PNG, JPG, GIF up to 10MB
+          </span>
+        </label>
+        <input
+          id="image-upload"
+          type="file"
+          class="hidden"
+          accept="image/*"
+          multiple
+        />
+      </div>
     </div>
-    <div class="border-2 border-dashed border-gray-300 rounded-md w-[80%] h-[90%] overflow-scroll p-4"><div id="image-preview" class="grid grid-cols-3 gap-4"></div></div>
+    <div
+      class="border-2 border-dashed border-gray-300 rounded-md w-[80%] h-[90%] overflow-scroll p-4"
+    >
+      <div id="image-preview" class="grid grid-cols-3 gap-4"></div>
+    </div>
 
     <input
       type="hidden"
@@ -102,76 +101,91 @@ if (Astro.request.method === "POST") {
 <script define:vars={{ columns, setupDataJSON }}>
   let uploadedFiles = [];
 
-document.addEventListener("DOMContentLoaded", function() {
-  const imageUpload = document.getElementById("image-upload");
-  const imagePreview = document.getElementById("image-preview");
-  const dropZone = document.getElementById("drop-zone");
+  document.addEventListener("DOMContentLoaded", function () {
+    const imageUpload = document.getElementById("image-upload");
+    const imagePreview = document.getElementById("image-preview");
+    const dropZone = document.getElementById("drop-zone");
 
-  if (imageUpload) {
-    imageUpload.addEventListener("change", handleFiles);
-  }
+    if (imageUpload) {
+      imageUpload.addEventListener("change", handleFiles);
+    }
 
-  if (dropZone) {
-    // Drag and drop events
-    dropZone.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      dropZone.classList.add("bg-gray-100");
-    });
+    if (dropZone) {
+      // Drag and drop events
+      dropZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.add("bg-gray-100");
+      });
 
-    dropZone.addEventListener("dragleave", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      dropZone.classList.remove("bg-gray-100");
-    });
+      dropZone.addEventListener("dragleave", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.remove("bg-gray-100");
+      });
 
-    dropZone.addEventListener("drop", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      dropZone.classList.remove("bg-gray-100");
-      const files = e.dataTransfer.files;
-      handleFiles({ target: { files } });
-    });
-  }
+      dropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.remove("bg-gray-100");
+        const files = e.dataTransfer.files;
+        handleFiles({ target: { files } });
+      });
+    }
 
-  function handleFiles(event) {
-    const newFiles = Array.from(event.target.files);
-    uploadedFiles = [...uploadedFiles, ...newFiles];
-    updateImagePreviews();
-  }
+    function handleFiles(event) {
+      const newFiles = Array.from(event.target.files);
+      uploadedFiles = [...uploadedFiles, ...newFiles];
+      updateImagePreviews();
+    }
 
-  function updateImagePreviews() {
-    imagePreview.innerHTML = ""; // Clear existing previews
-    uploadedFiles.forEach((file, index) => {
-      if (file.type.startsWith("image/")) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const imgContainer = document.createElement("div");
-          imgContainer.className = "relative";
+    function updateImagePreviews() {
+      imagePreview.innerHTML = ""; // Clear existing previews
+      uploadedFiles.forEach((file, index) => {
+        if (file.type.startsWith("image/")) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const imgContainer = document.createElement("div");
+            imgContainer.className = "relative";
 
-          const img = document.createElement("img");
-          img.src = e.target.result;
-          img.classList.add("w-full", "h-32", "object-cover", "rounded-md");
-          
-          const removeButton = document.createElement("button");
-          removeButton.innerHTML = "&#x2715;"; // '×' symbol
-          removeButton.className = "absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center";
-          removeButton.onclick = function() {
-            uploadedFiles.splice(index, 1);
-            updateImagePreviews();
+            const img = document.createElement("img");
+            img.src = e.target.result;
+            img.classList.add("w-full", "h-32", "object-cover", "rounded-md");
+
+            const removeButton = document.createElement("button");
+            removeButton.innerHTML = "&#x2715;"; // '×' symbol
+            removeButton.className =
+              "absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center";
+            removeButton.onclick = function () {
+              uploadedFiles.splice(index, 1);
+              updateImagePreviews();
+            };
+
+            const infoBox = document.createElement("div");
+            infoBox.className =
+              "absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 rounded-b-md overflow-hidden w-full h-6";
+              let fileName = file.name;
+            if (fileName.length > 40) {
+              fileName = fileName.substring(0, 40) + "...";
+            }
+            let fileSize;
+            if (file.size > 1024 * 1024) {
+              fileSize = (file.size / (1024 * 1024)).toFixed(2) + " MB";
+            } else {
+              fileSize = (file.size / 1024).toFixed(2) + " KB";
+            }
+            infoBox.textContent = `${fileName} (${fileSize})`;
+
+            imgContainer.appendChild(img);
+            imgContainer.appendChild(removeButton);
+            imgContainer.appendChild(infoBox);
+            imagePreview.appendChild(imgContainer);
           };
-
-          imgContainer.appendChild(img);
-          imgContainer.appendChild(removeButton);
-          imagePreview.appendChild(imgContainer);
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-  }
-});
-
-
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+  });
 
   document.addEventListener("submitAssetsForm", function () {
     //   assetsForm

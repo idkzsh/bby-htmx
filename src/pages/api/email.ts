@@ -156,11 +156,11 @@ async function sendEmail(buffer: Buffer, email: String) {
   await transporter.sendMail({
     from: '"Zach" <zachflentgewong@gmail.com>',
     to: `${email}`,
-    subject: "Updated Excel File",
+    subject: "SKU Setup Submission",
     text: "Please find the updated Excel file attached.",
     attachments: [
       {
-        filename: "updated_setup_template.xlsm",
+        filename: "SKU Setup Sheet.xlsm",
         content: buffer,
       },
     ],

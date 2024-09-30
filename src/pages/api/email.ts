@@ -3,6 +3,7 @@ import nodemailer from 'nodemailer';
 import { excelTemplateBuffer } from '../../lib/excelTemplate';
 import { getEnv } from '../../utils/env';
 import JSZip from 'jszip';
+import sharp from 'sharp';
 
 
 export const POST: APIRoute = async ({ request, cookies, redirect }) => {
@@ -160,14 +161,21 @@ async function sendEmail(buffer: Buffer, email: String, images: File[]) {
   // Add Excel file to zip
   zip.file('SKU Setup Sheet.xlsx', buffer);
 
-  // Add images to zip
+  // Process and add images to zip
   for (const image of images) {
     const imageBuffer = await image.arrayBuffer();
-    zip.file(image.name, imageBuffer);
+    const optimizedImageBuffer = await optimizeImage(Buffer.from(imageBuffer));
+    zip.file(image.name, optimizedImageBuffer);
   }
 
   // Generate zip file
-  const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
+  const zipBuffer = await zip.generateAsync({ 
+    type: 'nodebuffer',
+    compression: 'DEFLATE',
+    compressionOptions: {
+      level: 9 // max compression
+    }
+  });
 
   // Send email with zip attachment
   await transporter.sendMail({
@@ -184,6 +192,13 @@ async function sendEmail(buffer: Buffer, email: String, images: File[]) {
   });
 
   console.log(`Zip file containing Excel file and ${images.length} images sent successfully`);
+}
+
+async function optimizeImage(buffer: Buffer): Promise<Buffer> {
+  return sharp(buffer)
+    .resize(1000, 1000, { fit: 'inside', withoutEnlargement: true }) // Resize large images
+    .jpeg({ quality: 80 }) // Convert to JPEG and reduce quality
+    .toBuffer();
 }
 
 function formatDate(dateString: string, format: 'yyyyMMddHHmmss' | 'yyyyMMdd'): string {

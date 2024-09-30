@@ -157,31 +157,33 @@ async function sendEmail(buffer: Buffer, email: String, images: File[]) {
 
   const zip = new JSZip();
 
+  // Add Excel file to zip
+  zip.file('SKU Setup Sheet.xlsx', buffer);
+
+  // Add images to zip
   for (const image of images) {
     const imageBuffer = await image.arrayBuffer();
     zip.file(image.name, imageBuffer);
   }
 
-  const zipBuffer = await zip.generateAsync({ type: "nodebuffer" });
+  // Generate zip file
+  const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
 
+  // Send email with zip attachment
   await transporter.sendMail({
     from: '"Zach" <zachflentgewong@gmail.com>',
     to: `${email}`,
-    subject: "Updated Excel File",
-    text: "Please find the updated Excel file attached.",
+    subject: `SKU Setup Forms and Images`,
+    text: `Attached is a zip file containing the SKU Setup Sheet and related images.`,
     attachments: [
       {
-        filename: "updated_setup_template.xlsm",
-        content: buffer,
-      },
-      {
-        filename: "assets.zip",
+        filename: 'SKU_Setup_Package.zip',
         content: zipBuffer,
       },
     ],
   });
 
-  console.log("Email sent successfully");
+  console.log(`Zip file containing Excel file and ${images.length} images sent successfully`);
 }
 
 function formatDate(dateString: string, format: 'yyyyMMddHHmmss' | 'yyyyMMdd'): string {

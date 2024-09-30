@@ -178,27 +178,44 @@ async function sendEmail(buffer: Buffer, email: String, images: File[]) {
   });
 
   // Send email with zip attachment
-  await transporter.sendMail({
-    from: '"Zach" <zachflentgewong@gmail.com>',
-    to: `${email}`,
-    subject: `SKU Setup Forms and Images`,
-    text: `Attached is a zip file containing the SKU Setup Sheet and related images.`,
-    attachments: [
-      {
-        filename: 'SKU_Setup_Package.zip',
-        content: zipBuffer,
-      },
-    ],
-  });
-
-  console.log(`Zip file containing Excel file and ${images.length} images sent successfully`);
+  if (zipBuffer.length > 3 * 1024 * 1024) { // If larger than 3MB
+    // Fallback: Send Excel file and notification about images
+    await transporter.sendMail({
+      from: '"Zach" <zachflentgewong@gmail.com>',
+      to: `${email}`,
+      subject: `SKU Setup Form - Images Too Large`,
+      text: `Attached is the SKU Setup Sheet. The images were too large to send via email. Please contact support for assistance with the images.`,
+      attachments: [
+        {
+          filename: 'SKU Setup Sheet.xlsx',
+          content: buffer,
+        },
+      ],
+    });
+    console.log(`Excel file sent. Images were too large to include.`);
+  } else {
+    // Send email with zip attachment
+    await transporter.sendMail({
+      from: '"Zach" <zachflentgewong@gmail.com>',
+      to: `${email}`,
+      subject: `SKU Setup Forms and Images`,
+      text: `Attached is a zip file containing the SKU Setup Sheet and related images.`,
+      attachments: [
+        {
+          filename: 'SKU_Setup_Package.zip',
+          content: zipBuffer,
+        },
+      ],
+    });
+    console.log(`Zip file containing Excel file and ${images.length} images sent successfully`);
+  }
 }
 
 async function optimizeImage(buffer: Buffer): Promise<Buffer> {
   return sharp(buffer)
-    .resize(1000, 1000, { fit: 'inside', withoutEnlargement: true }) // Resize large images
-    .jpeg({ quality: 80 }) // Convert to JPEG and reduce quality
-    .toBuffer();
+  .resize(800, 800, { fit: 'inside', withoutEnlargement: true }) // Reduced to 800x800
+  .jpeg({ quality: 70 }) // Reduced quality to 70%
+  .toBuffer();
 }
 
 function formatDate(dateString: string, format: 'yyyyMMddHHmmss' | 'yyyyMMdd'): string {

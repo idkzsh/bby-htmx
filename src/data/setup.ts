@@ -72,6 +72,20 @@ const inputs = [
     required: true,
   },
   {
+    name: "Street Date",
+    dbName: "ENT_STREET_DATE",
+    placeholder: "(Optional) Choose a future street date",
+    type: "datetime",
+    required: false,
+  },
+  {
+    name: "Embargo Date",
+    dbName: "None",
+    placeholder: "(Optional) Choose a future embargo date",
+    type: "datetime",
+    required: false,
+  },
+  {
     name: "Unit Cost",
     dbName: "UNIT_COST",
     placeholder: "Must be greater than 0",
@@ -320,13 +334,6 @@ const inputs = [
       "xbox": "XBOX_XBOX",
       "xbox-x": "XBOX Series X_XBOXX",
     },
-    required: false,
-  },
-  {
-    name: "Street Date",
-    dbName: "ENT_STREET_DATE",
-    placeholder: "(Optional) Choose a future street date",
-    type: "date",
     required: false,
   },
   {

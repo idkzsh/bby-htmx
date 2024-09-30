@@ -52,14 +52,6 @@ if (Astro.request.method === "POST") {
           <button class="btn text-xs" type="submit" @click="loading = true" :disabled="!fileSelected">Upload</button>
         </div>
       </form> -->
-
-    <!-- <Sidebar obj={headers} />
-      <SetupColumn
-      obj={inputs}
-      columns={columns}
-      formName="setupForm"
-      data={excelData}
-    /> -->
   </main>
 </Layout>
 
@@ -70,6 +62,11 @@ if (Astro.request.method === "POST") {
   rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css"
 />
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css"
+/>
+<script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
 
 <script define:vars={{ columns, email, inputs }} type="module" defer>
   const requiredFields = inputs
@@ -109,117 +106,96 @@ if (Astro.request.method === "POST") {
         if (input) {
           cellProperties.placeholder = input.placeholder || "";
 
-          if (input.type === "select" && input.options) {
-            cellProperties.type = "dropdown";
-            cellProperties.source = Object.values(input.options);
-          }
-
-          switch (input.name) {
-            case "Vendor Part Number":
+          switch (input.type) {
+            case "text":
+              cellProperties.type = "text";
               cellProperties.validator = function (value, callback) {
-                callback(value.length <= 20);
-              };
-              break;
-            case "SKU Title (Long)":
-              cellProperties.validator = function (value, callback) {
-                callback(value.length <= 40);
-              };
-              break;
-            case "UPC":
-            case "SECONDARY_UPC":
-              cellProperties.validator = function (value, callback) {
-                const numericValue = value.toString().replace(/\D/g, "");
                 callback(
-                  numericValue.length >= 12 && numericValue.length <= 13
+                  typeof value === "string" &&
+                    value.length >= input.minLen &&
+                    value.length <= input.maxLen
                 );
               };
+              cellProperties.allowInvalid = false;
+              break;
+
+            case "select":
+              cellProperties.type = "dropdown";
+              cellProperties.source = Array.isArray(input.options)
+                ? input.options
+                : Object.values(input.options);
+
+              cellProperties.allowInvalid = false;
+              break;
+            case "datetime":
+              cellProperties.type = "date";
+              cellProperties.dateFormat = "YYYY-MM-DD HH:mm";
+              cellProperties.correctFormat = true;
+              cellProperties.datePickerConfig = {
+                format: "YYYY-MM-DD HH:mm",
+                showTime: true,
+                use24hour: true,
+                minDate: new Date(),
+                defaultDate: new Date(),
+                setDefaultDate: true,
+                onSelect: function (date) {
+                  // This function will be called when a date is selected
+                  const formattedDate = this.toString("YYYY-MM-DD HH:mm");
+                  hot.setDataAtCell(row, col, formattedDate);
+                },
+              };
+              break;
+              cellProperties.allowInvalid = false;
+            case "number":
+              cellProperties.type = "numeric";
+              cellProperties.numericFormat = { pattern: "0" };
+              cellProperties.validator = function (value, callback) {
+                callback(
+                  typeof value === "number" &&
+                    value >= input.min &&
+                    value <= input.max
+                );
+              };
+              cellProperties.renderer = function (
+                instance,
+                td,
+                row,
+                col,
+                prop,
+                value,
+                cellProperties
+              ) {
+                Handsontable.renderers.NumericRenderer.apply(this, arguments);
+                td.style.textAlign = "left";
+              };
+              cellProperties.allowInvalid = false;
+              break;
+
+            case "float":
+              cellProperties.type = "numeric";
+              cellProperties.numericFormat = { pattern: "0,0.00" };
+              cellProperties.allowInvalid = false;
+              cellProperties.validator = function (value, callback) {
+                callback(
+                  typeof value === "number" &&
+                    value >= input.min &&
+                    value <= input.max
+                );
+              };
+              cellProperties.renderer = function (
+                instance,
+                td,
+                row,
+                col,
+                prop,
+                value,
+                cellProperties
+              ) {
+                Handsontable.renderers.NumericRenderer.apply(this, arguments);
+                td.style.textAlign = "left";
+              };
               break;
           }
-
-          if (input.type === "number") {
-            cellProperties.type = "numeric";
-            cellProperties.numericFormat = { pattern: "0" };
-
-            cellProperties.validator = function (value, callback) {
-              callback(
-                typeof value === "number" &&
-                  value >= input.min &&
-                  value <= input.max
-              );
-            };
-
-            cellProperties.renderer = function (
-              instance,
-              td,
-              row,
-              col,
-              prop,
-              value,
-              cellProperties
-            ) {
-              Handsontable.renderers.NumericRenderer.apply(this, arguments);
-              td.style.textAlign = "left";
-            };
-          }
-          cellProperties.allowInvalid = false;
-
-          if (input.type === "float") {
-            cellProperties.type = "numeric";
-            cellProperties.numericFormat = { pattern: "0,0.00" };
-            cellProperties.allowInvalid = false;
-            cellProperties.validator = function (value, callback) {
-              callback(
-                typeof value === "number" &&
-                  value >= input.min &&
-                  value <= input.max
-              );
-            };
-
-            cellProperties.renderer = function (
-              instance,
-              td,
-              row,
-              col,
-              prop,
-              value,
-              cellProperties
-            ) {
-              Handsontable.renderers.NumericRenderer.apply(this, arguments);
-              td.style.textAlign = "left";
-            };
-          }
-        }
-
-        switch (rowHeader) {
-          case "Vendor Part Number":
-            cellProperties.validator = function (value, callback) {
-              if (value.length <= 20) {
-                callback(true);
-              } else {
-                callback(false);
-              }
-            };
-            cellProperties.allowInvalid = false;
-            break;
-          case "SKU Title (Long)":
-            cellProperties.validator = function (value, callback) {
-              if (value.length <= 40) {
-                callback(true);
-              } else {
-                callback(false);
-              }
-            };
-            cellProperties.allowInvalid = false;
-            break;
-          case "UPC":
-            cellProperties.validator = function (value, callback) {
-              const numericValue = value.toString().replace(/\D/g, "");
-              const isValid =
-                numericValue.length >= 12 && numericValue.length <= 13;
-              callback(isValid);
-            };
-            cellProperties.allowInvalid = false;
-            break;
         }
 
         return cellProperties;

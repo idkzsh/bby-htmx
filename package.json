@@ -25,6 +25,7 @@
     "exceljs": "^4.4.0",
     "htm": "^3.1.1",
     "htmx.org": "^1.9.10",
+    "jszip": "^3.10.1",
     "nodemailer": "^6.9.15",
     "openai": "^4.28.4",
     "pdfjs-dist": "^4.0.379",

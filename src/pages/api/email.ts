@@ -2,11 +2,13 @@ import type { APIRoute } from "astro";
 import nodemailer from 'nodemailer';
 import { excelTemplateBuffer } from '../../lib/excelTemplate';
 import { getEnv } from '../../utils/env';
+import JSZip from 'jszip';
 
 
 export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   const formData = await request.formData();
   const setupDataString = formData.get('setupData');
+  const images = formData.getAll('images') as File[];
 
   console.log(formData)
 
@@ -28,7 +30,7 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
       throw new Error("Email is missing from form data");
     }
 
-    await sendEmail(buffer, email.toString());
+    await sendEmail(buffer, email.toString(), images);
     
     return redirect("/complete");
   } catch (error) {
@@ -142,7 +144,7 @@ function getExcelColumn(columnIndex: number): string {
   return columnName;
 }
 
-async function sendEmail(buffer: Buffer, email: String) {
+async function sendEmail(buffer: Buffer, email: String, images: File[]) {
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 587,
@@ -153,6 +155,15 @@ async function sendEmail(buffer: Buffer, email: String) {
     },
   });
 
+  const zip = new JSZip();
+
+  for (const image of images) {
+    const imageBuffer = await image.arrayBuffer();
+    zip.file(image.name, imageBuffer);
+  }
+
+  const zipBuffer = await zip.generateAsync({ type: "nodebuffer" });
+
   await transporter.sendMail({
     from: '"Zach" <zachflentgewong@gmail.com>',
     to: `${email}`,
@@ -162,6 +173,10 @@ async function sendEmail(buffer: Buffer, email: String) {
       {
         filename: "updated_setup_template.xlsm",
         content: buffer,
+      },
+      {
+        filename: "assets.zip",
+        content: zipBuffer,
       },
     ],
   });

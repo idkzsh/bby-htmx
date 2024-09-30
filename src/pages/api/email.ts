@@ -2,14 +2,11 @@ import type { APIRoute } from "astro";
 import nodemailer from 'nodemailer';
 import { excelTemplateBuffer } from '../../lib/excelTemplate';
 import { getEnv } from '../../utils/env';
-import JSZip from 'jszip';
-import sharp from 'sharp';
 
 
 export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   const formData = await request.formData();
   const setupDataString = formData.get('setupData');
-  const images = formData.getAll('images') as File[];
 
   console.log(formData)
 
@@ -31,7 +28,7 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
       throw new Error("Email is missing from form data");
     }
 
-    await sendEmail(buffer, email.toString(), images);
+    await sendEmail(buffer, email.toString());
     
     return redirect("/complete");
   } catch (error) {
@@ -145,7 +142,7 @@ function getExcelColumn(columnIndex: number): string {
   return columnName;
 }
 
-async function sendEmail(buffer: Buffer, email: String, images: File[]) {
+async function sendEmail(buffer: Buffer, email: String) {
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 587,
@@ -156,66 +153,20 @@ async function sendEmail(buffer: Buffer, email: String, images: File[]) {
     },
   });
 
-  const zip = new JSZip();
-
-  // Add Excel file to zip
-  zip.file('SKU Setup Sheet.xlsx', buffer);
-
-  // Process and add images to zip
-  for (const image of images) {
-    const imageBuffer = await image.arrayBuffer();
-    const optimizedImageBuffer = await optimizeImage(Buffer.from(imageBuffer));
-    zip.file(image.name, optimizedImageBuffer);
-  }
-
-  // Generate zip file
-  const zipBuffer = await zip.generateAsync({ 
-    type: 'nodebuffer',
-    compression: 'DEFLATE',
-    compressionOptions: {
-      level: 9 // max compression
-    }
+  await transporter.sendMail({
+    from: '"Zach" <zachflentgewong@gmail.com>',
+    to: `${email}`,
+    subject: "Updated Excel File",
+    text: "Please find the updated Excel file attached.",
+    attachments: [
+      {
+        filename: "updated_setup_template.xlsm",
+        content: buffer,
+      },
+    ],
   });
 
-  // Send email with zip attachment
-  if (zipBuffer.length > 3 * 1024 * 1024) { // If larger than 3MB
-    // Fallback: Send Excel file and notification about images
-    await transporter.sendMail({
-      from: '"Zach" <zachflentgewong@gmail.com>',
-      to: `${email}`,
-      subject: `SKU Setup Form - Images Too Large`,
-      text: `Attached is the SKU Setup Sheet. The images were too large to send via email. Please contact support for assistance with the images.`,
-      attachments: [
-        {
-          filename: 'SKU Setup Sheet.xlsx',
-          content: buffer,
-        },
-      ],
-    });
-    console.log(`Excel file sent. Images were too large to include.`);
-  } else {
-    // Send email with zip attachment
-    await transporter.sendMail({
-      from: '"Zach" <zachflentgewong@gmail.com>',
-      to: `${email}`,
-      subject: `SKU Setup Forms and Images`,
-      text: `Attached is a zip file containing the SKU Setup Sheet and related images.`,
-      attachments: [
-        {
-          filename: 'SKU_Setup_Package.zip',
-          content: zipBuffer,
-        },
-      ],
-    });
-    console.log(`Zip file containing Excel file and ${images.length} images sent successfully`);
-  }
-}
-
-async function optimizeImage(buffer: Buffer): Promise<Buffer> {
-  return sharp(buffer)
-  .resize(800, 800, { fit: 'inside', withoutEnlargement: true }) // Reduced to 800x800
-  .jpeg({ quality: 70 }) // Reduced quality to 70%
-  .toBuffer();
+  console.log("Email sent successfully");
 }
 
 function formatDate(dateString: string, format: 'yyyyMMddHHmmss' | 'yyyyMMdd'): string {

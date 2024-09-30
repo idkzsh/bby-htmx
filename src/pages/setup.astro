@@ -62,13 +62,61 @@ if (Astro.request.method === "POST") {
   rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css"
 />
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css"
-/>
-<script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
 
 <script define:vars={{ columns, email, inputs }} type="module" defer>
+  class DateTimeEditor extends Handsontable.editors.TextEditor {
+    constructor(hotInstance) {
+      super(hotInstance);
+    }
+
+    createElements() {
+      super.createElements();
+
+      this.dateInput = document.createElement("input");
+      this.dateInput.setAttribute("type", "date");
+      this.dateInput.style.width = "150px";
+
+      this.timeInput = document.createElement("input");
+      this.timeInput.setAttribute("type", "time");
+      this.timeInput.style.width = "120px";
+
+      this.TEXTAREA.parentElement.appendChild(this.dateInput);
+      this.TEXTAREA.parentElement.appendChild(this.timeInput);
+      this.TEXTAREA.style.display = "none";
+
+      const today = new Date().toISOString().split("T")[0];
+      this.dateInput.setAttribute("min", today);
+    }
+
+    getValue() {
+      return `${this.dateInput.value} ${this.timeInput.value}`;
+    }
+
+    setValue(value) {
+      if (value && typeof value === "string") {
+        const [date, time] = value.split(" ");
+        this.dateInput.value = date;
+        this.timeInput.value = time || "";
+      } else {
+        this.dateInput.value = "";
+        this.timeInput.value = "";
+      }
+    }
+
+    open() {
+      super.open();
+      const [date, time] = (this.originalValue || "").split(" ");
+      this.dateInput.value = date || "";
+      this.timeInput.value = time || "";
+    }
+  }
+
+  function parseDate(dateString) {
+    const [datePart, timePart] = dateString.split(" ");
+    const [year, month, day] = datePart.split("-");
+    const [hour, minute] = timePart ? timePart.split(":") : [0, 0];
+    return new Date(year, month - 1, day, hour, minute);
+  }
   const requiredFields = inputs
     .filter((input) => input.required)
     .map((input) => input.name);
@@ -128,24 +176,12 @@ if (Astro.request.method === "POST") {
               cellProperties.allowInvalid = false;
               break;
             case "datetime":
-              cellProperties.type = "date";
-              cellProperties.dateFormat = "YYYY-MM-DD HH:mm";
-              cellProperties.correctFormat = true;
-              cellProperties.datePickerConfig = {
-                format: "YYYY-MM-DD HH:mm",
-                showTime: true,
-                use24hour: true,
-                minDate: new Date(),
-                defaultDate: new Date(),
-                setDefaultDate: true,
-                onSelect: function (date) {
-                  // This function will be called when a date is selected
-                  const formattedDate = this.toString("YYYY-MM-DD HH:mm");
-                  hot.setDataAtCell(row, col, formattedDate);
-                },
-              };
+              cellProperties.type = "text";
+              cellProperties.editor = DateTimeEditor;
               break;
               cellProperties.allowInvalid = false;
+              break;
+
             case "number":
               cellProperties.type = "numeric";
               cellProperties.numericFormat = { pattern: "0" };
@@ -199,6 +235,15 @@ if (Astro.request.method === "POST") {
         }
 
         return cellProperties;
+      },
+      momentDate: false,
+      dateValidator: function (value, callback) {
+        if (!value || value.trim() === "") {
+          callback(true);
+        } else {
+          const date = parseDate(value);
+          callback(date instanceof Date && !isNaN(date));
+        }
       },
       manualColumnResize: true,
       manualColumnResizeMinWidth: 100,

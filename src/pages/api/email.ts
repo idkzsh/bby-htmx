@@ -8,6 +8,8 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   const formData = await request.formData();
   const setupDataString = formData.get('setupData');
 
+  console.log(formData)
+
   if (!setupDataString || typeof setupDataString !== 'string') {
     return new Response(JSON.stringify({ error: "Invalid setup data" }), {
       status: 400,
@@ -17,7 +19,6 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
 
   try {
     const setupData = JSON.parse(setupDataString);
-    console.log(setupData);
 
     const buffer = await processExcelFile(setupData);
 

@@ -36,6 +36,7 @@ if (Astro.request.method === "POST") {
     }
   }
 }
+
 ---
 
 <Layout>
@@ -43,8 +44,8 @@ if (Astro.request.method === "POST") {
     class="flex w-[90%] h-[98%] bg-white mt-2 rounded-md border tracking-tight justify-center items-center"
     id="main"
   >
-    <form action="/api/email" method="POST" id="assetsForm" class="hidden">
-    </form>
+    <form action="/api/email" method="POST" id="assetsForm" class="flex w-full h-full tracking-tight justify-center items-center" enctype="multipart/form-data">
+    
     <div class="h-[90%] px-4">
       <!-- <h1 class="text-2xl font-bold mb-6">Asset Upload</h1> -->
 
@@ -75,6 +76,7 @@ if (Astro.request.method === "POST") {
         </label>
         <input
           id="image-upload"
+          name="images"
           type="file"
           class="hidden"
           accept="image/*"
@@ -94,6 +96,7 @@ if (Astro.request.method === "POST") {
       id="setupDataInput"
       value={JSON.stringify(setupDataJSON)}
     />
+  </form>
     <!-- Hidden inputs will be dynamically added here -->
   </main>
 </Layout>
@@ -137,6 +140,7 @@ if (Astro.request.method === "POST") {
       const newFiles = Array.from(event.target.files);
       uploadedFiles = [...uploadedFiles, ...newFiles];
       updateImagePreviews();
+      updateFileInput();
     }
 
     function updateImagePreviews() {
@@ -185,37 +189,43 @@ if (Astro.request.method === "POST") {
         }
       });
     }
+
+    function updateFileInput() {
+      const dataTransfer = new DataTransfer();
+      uploadedFiles.forEach(file => dataTransfer.items.add(file));
+      imageUpload.files = dataTransfer.files;
+    }
   });
 
   document.addEventListener("submitAssetsForm", function () {
-    //   assetsForm
-    //     .querySelectorAll('input[type="hidden"]')
-    //     .forEach((input) => input.remove());
+  //   //   assetsForm
+  //   //     .querySelectorAll('input[type="hidden"]')
+  //   //     .forEach((input) => input.remove());
 
-    //   if (setupDataObject) {
-    //     for (let [key, value] of Object.entries(setupDataObject)) {
-    //       const input = document.createElement("input");
-    //       input.type = "hidden";
-    //       input.name = `setupData_${key}`;
-    //       input.value = value;
-    //       assetsForm.appendChild(input);
-    //     }
-    //   } else {
-    //     console.log("No setupData available");
-    //   }
+  //   //   if (setupDataObject) {
+  //   //     for (let [key, value] of Object.entries(setupDataObject)) {
+  //   //       const input = document.createElement("input");
+  //   //       input.type = "hidden";
+  //   //       input.name = `setupData_${key}`;
+  //   //       input.value = value;
+  //   //       assetsForm.appendChild(input);
+  //   //     }
+  //   //   } else {
+  //   //     console.log("No setupData available");
+  //   //   }
+  //   console.log("sending")
+  //   // Add hidden inputs with Handsontable data
+  //   //   const tableData = hot.getData();
+  //   //   headerNames.forEach((header, rowIndex) => {
+  //   //     const rowData = tableData[rowIndex];
+  //   //     const input = document.createElement("input");
+  //   //     input.type = "hidden";
+  //   //     input.name = header;
+  //   //     input.value = JSON.stringify(rowData);
+  //   //     complianceForm.appendChild(input);
+  //   //   });
 
-    // Add hidden inputs with Handsontable data
-    //   const tableData = hot.getData();
-    //   headerNames.forEach((header, rowIndex) => {
-    //     const rowData = tableData[rowIndex];
-    //     const input = document.createElement("input");
-    //     input.type = "hidden";
-    //     input.name = header;
-    //     input.value = JSON.stringify(rowData);
-    //     complianceForm.appendChild(input);
-    //   });
-
-    // Submit the form
+  //   // Submit the form
     assetsForm.submit();
   });
 </script>

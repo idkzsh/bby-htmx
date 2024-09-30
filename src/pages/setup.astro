@@ -7,20 +7,8 @@ let email = Astro.url.searchParams.get("email") || "";
 
 if (columns > 50) {
   columns = 50;
-}
-
-let excelData;
-
-if (Astro.request.method === "POST") {
-  try {
-    const data = await Astro.request.formData();
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error(error.message);
-      excelData = null;
-    }
-  }
+} else if (columns <=0) {
+  columns = 1;
 }
 ---
 
@@ -175,6 +163,7 @@ if (Astro.request.method === "POST") {
 
               cellProperties.allowInvalid = false;
               break;
+
             case "datetime":
               cellProperties.type = "text";
               cellProperties.editor = DateTimeEditor;

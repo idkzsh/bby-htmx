@@ -156,7 +156,7 @@ filenames.  Autofills battery details when MSDS is selected.  -->
     class="flex w-[90%] h-[98%] bg-white mt-2 rounded-md border tracking-tight overflow-scroll"
     id="main"
   >
-    <form action="/api/email" method="POST" id="complianceForm" class="hidden">
+    <form action="/assets" method="POST" id="complianceForm" class="hidden">
       <!-- Hidden inputs will be dynamically added here -->
     </form>
     <div id="handsontable-container" class="w-full h-[400px]"></div>
@@ -344,52 +344,6 @@ filenames.  Autofills battery details when MSDS is selected.  -->
           const rowHeader = headerNames[row]; // Adjust for the two extra rows
           cellProperties.placeholder = headers[rowHeader];
         }
-
-        // ... rest of the cell properties logic ...
-
-        // Add validator for VPN row
-        // const requiredFields = ["Vendor Part Number"];
-
-        // // Add required validator to specified fields
-        // if (requiredFields.includes(rowHeader)) {
-        //   cellProperties.validator = function (value, callback) {
-        //     callback(value !== null && value !== "");
-        //   };
-        //   cellProperties.allowEmpty = false;
-        // }
-
-        // switch (rowHeader) {
-        //   case "Vendor Part Number":
-        //     cellProperties.validator = function (value, callback) {
-        //       if (value.length <= 20) {
-        //         callback(true);
-        //       } else {
-        //         callback(false);
-        //       }
-        //     };
-        //     cellProperties.allowInvalid = false;
-        //     break;
-        //   case "SKU Title (Long)":
-        //     cellProperties.validator = function (value, callback) {
-        //       if (value.length <= 40) {
-        //         callback(true);
-        //       } else {
-        //         callback(false);
-        //       }
-        //     };
-        //     cellProperties.allowInvalid = false;
-        //     break;
-        //   case "UPC":
-        //     cellProperties.validator = function (value, callback) {
-        //       const numericValue = value.toString().replace(/\D/g, "");
-        //       const isValid =
-        //         numericValue.length >= 12 && numericValue.length <= 13;
-        //       callback(isValid);
-        //     };
-        //     cellProperties.allowInvalid = false;
-        //     break;
-        // }
-
         return cellProperties;
       },
       manualColumnResize: true,
@@ -439,17 +393,17 @@ filenames.  Autofills battery details when MSDS is selected.  -->
       columnsInput.value = columns;
       complianceForm.appendChild(columnsInput);
 
-      const emailInput = document.createElement("input");
-      emailInput.type = "hidden";
-      emailInput.name = "email";
-      emailInput.value = setupDataJSON['email'];
-      complianceForm.appendChild(emailInput);
+      // const emailInput = document.createElement("input");
+      // emailInput.type = "hidden";
+      // emailInput.name = "email";
+      // emailInput.value = setupDataJSON['email'];
+      // complianceForm.appendChild(emailInput);
 
       if (setupDataObject) {
         for (let [key, value] of Object.entries(setupDataObject)) {
           const input = document.createElement("input");
           input.type = "hidden";
-          input.name = `setupData_${key}`;
+          input.name = `${key}`;
           input.value = value;
           complianceForm.appendChild(input);
         }

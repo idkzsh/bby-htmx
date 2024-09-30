@@ -6,14 +6,22 @@ import { getEnv } from '../../utils/env';
 
 export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   const formData = await request.formData();
-  const formDataObject = Object.fromEntries(formData.entries());
+  const setupDataString = formData.get('setupData');
 
-  console.log(formDataObject)
+  if (!setupDataString || typeof setupDataString !== 'string') {
+    return new Response(JSON.stringify({ error: "Invalid setup data" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 
   try {
-    const buffer = await processExcelFile(formDataObject);
+    const setupData = JSON.parse(setupDataString);
+    console.log(setupData);
 
-    const email = formDataObject['email']
+    const buffer = await processExcelFile(setupData);
+
+    const email = setupData.email;
 
     if (!email) {
       throw new Error("Email is missing from form data");
@@ -31,24 +39,15 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   }
 };
 
-async function processExcelFile(formDataObject: Record<string, any>) {
+async function processExcelFile(setupData: Record<string, any>) {
   try {
 
     const XlsxPopulate = await import('xlsx-populate') as any;
     
     const workbook = await XlsxPopulate.default.fromDataAsync(excelTemplateBuffer);
     const sheet = workbook.sheet(0);
-
-    const parseJSON = (value: string) => {
-      try {
-        return JSON.parse(value);
-      } catch (error) {
-        console.log("Parsing failed, returning original value");
-        return value;
-      }
-    };
-    
-    const columns = parseInt(formDataObject.columns) || 1;
+   
+    const columns = parseInt(setupData.columns) || 1;
     console.log("Number of columns:", columns);
 
     const cellMappings = {
@@ -58,8 +57,8 @@ async function processExcelFile(formDataObject: Record<string, any>) {
       "30": 'SKU Title (Long)',
       "31": 'UPC',
       "32": 'Secondary UPC',
-      "33": 'Brand',
-      "34": 'Model',
+      "33": 'Brand Name',
+      "34": 'Model Number',
       "35": 'Manufacturer',
       "38": 'Unit Cost',
       "39": 'Retail Price',
@@ -89,32 +88,40 @@ async function processExcelFile(formDataObject: Record<string, any>) {
       "70": 'Product Warranty Coverage',
       "71": 'Extended Parts Warranty',
       "72": 'Return Restrictions',
+      "73": 'Embargo Date',
       "74": 'Expiration Date/Lot Number',
       "75": 'Shelf Life',
       "76": 'Data Flag',
       "78": 'Dangerous Product/Material',
     };
 
-    for (const [row, key] of Object.entries(cellMappings)) {
-      const fullKey = `setupData_${key}`;
-      const value = formDataObject[fullKey];
-      console.log(`Processing ${fullKey}:`, value);
-      
-      if (value !== undefined) {
-        const parsedValues = parseJSON(value);
-        if (Array.isArray(parsedValues)) {
+
+      for (const [row, key] of Object.entries(cellMappings)) {
+        const value = setupData[key];
+        console.log(`Processing ${key}:`, value);
+        
+        if (value !== undefined) {
+          const parsedValues = Array.isArray(value) ? value : [value];
           for (let i = 0; i < columns && i < parsedValues.length; i++) {
             const cellReference = `${getExcelColumn(i + 5)}${row}`; // E, F, G, ..., Z, AA, AB, etc.
-            console.log(`Setting ${key} in cell ${cellReference}:`, parsedValues[i]);
-            sheet.cell(cellReference).value(parsedValues[i]);
+            let formattedValue = parsedValues[i];
+            
+            // Format Street Date
+            if (key === 'Street Date') {
+              formattedValue = formatDate(formattedValue, 'yyyyMMddHHmmss');
+            }
+            // Format Embargo Date
+            else if (key === 'Embargo Date') {
+              formattedValue = formatDate(formattedValue, 'yyyyMMdd');
+            }
+            
+            console.log(`Setting ${key} in cell ${cellReference}:`, formattedValue);
+            sheet.cell(cellReference).value(formattedValue);
           }
         } else {
-          console.log(`Setting ${key} in cell E${row}:`, parsedValues);
-          sheet.cell(`E${row}`).value(parsedValues);
+          console.log(`No value found for ${key}`);
         }
-      } else {
-        console.log(`No value found for ${fullKey}`);
-      }
+      
     }
 
     return await workbook.outputAsync();
@@ -159,4 +166,27 @@ async function sendEmail(buffer: Buffer, email: String) {
   });
 
   console.log("Email sent successfully");
+}
+
+function formatDate(dateString: string, format: 'yyyyMMddHHmmss' | 'yyyyMMdd'): string {
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    console.warn(`Invalid date: ${dateString}`);
+    return dateString; // Return original string if it's not a valid date
+  }
+
+  const pad = (num: number) => num.toString().padStart(2, '0');
+
+  const yyyy = date.getFullYear();
+  const MM = pad(date.getMonth() + 1);
+  const dd = pad(date.getDate());
+  const HH = pad(date.getHours());
+  const mm = pad(date.getMinutes());
+  const ss = pad(date.getSeconds());
+
+  if (format === 'yyyyMMddHHmmss') {
+    return `${yyyy}${MM}${dd}${HH}${mm}${ss}`;
+  } else {
+    return `${yyyy}${MM}${dd}`;
+  }
 }

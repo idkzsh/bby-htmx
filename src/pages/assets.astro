@@ -1,0 +1,149 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+let setupData;
+let columns: number = 1;
+const setupDataJSON: Record<string, string> = {};
+
+if (Astro.request.method === "POST") {
+  try {
+    setupData = await Astro.request.formData();
+    columns = Number(setupData.get("columns"));
+
+    // Convert setupData to a JSON object so we don't need to do string manipulation
+    for (const [key, value] of setupData.entries()) {
+      setupDataJSON[key] = typeof value === "string" ? value : value.name;
+    }
+
+    // Parse array-like strings into actual arrays
+    for (const key in setupDataJSON) {
+      if (
+        setupDataJSON[key].startsWith("[") &&
+        setupDataJSON[key].endsWith("]")
+      ) {
+        try {
+          setupDataJSON[key] = JSON.parse(setupDataJSON[key]);
+        } catch (e) {
+          console.error(`Failed to parse ${key} as JSON:`, e);
+        }
+      }
+    }
+
+    // console.log("Server-side setupDataJSON:", setupDataJSON);
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+  }
+}
+
+// Convert setupData to a plain object if it exists
+const setupDataObject = setupData ? Object.fromEntries(setupData) : null;
+
+---
+
+<Layout>
+  <main
+    class="flex w-[90%] h-[98%] bg-white mt-2 rounded-md border tracking-tight"
+    id="main"
+  >
+  <div class="w-full p-6">
+    <h1 class="text-2xl font-bold mb-6">Asset Upload</h1>
+    
+    <div class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">Upload Images</h2>
+      <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+        <label for="image-upload" class="cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          <span class="mt-2 block text-sm font-medium text-gray-900">
+            Click to upload or drag and drop
+          </span>
+          <span class="mt-1 block text-xs text-gray-500">
+            PNG, JPG, GIF up to 10MB
+          </span>
+        </label>
+        <input id="image-upload" type="file" class="hidden" accept="image/*" multiple />
+      </div>
+    </div>
+
+    <div>
+      <h2 class="text-xl font-semibold mb-4">Upload Other Assets</h2>
+      <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+        <label for="asset-upload" class="cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span class="mt-2 block text-sm font-medium text-gray-900">
+            Click to upload or drag and drop
+          </span>
+          <span class="mt-1 block text-xs text-gray-500">
+            PDF, DOC, ZIP up to 50MB
+          </span>
+        </label>
+        <input id="asset-upload" type="file" class="hidden" multiple />
+      </div>
+    </div>
+  </div>
+  <form action="/api/email" method="POST" id="assetsForm" class="hidden">
+    <input type="hidden" name="setupData" id="setupDataInput" value={JSON.stringify(setupDataJSON)}>
+    <!-- Hidden inputs will be dynamically added here -->
+  </form>
+  </main>
+</Layout>
+
+<script define:vars={{ columns, setupDataJSON, setupDataObject }}>
+        document.addEventListener("submitComplianceForm", function () {
+      const requiredFields = [""];
+      const missingFields = [];
+
+      // Check required fields
+      // requiredFields.forEach((field, rowIndex) => {
+      //   for (let col = 0; col < columns; col++) {
+      //     const cellValue = hot.getDataAtCell(rowIndex, col);
+      //     if (!cellValue || cellValue.trim() === "") {
+      //       missingFields.push(`${field} for SKU ${col + 1}`);
+      //     }
+      //   }
+      // });
+
+      // if (missingFields.length > 0) {
+      //   alert(
+      //     `Please fill in the following required fields:\n${missingFields.join("\n")}`
+      //   );
+      //   return;
+      // }
+
+    //   assetsForm
+    //     .querySelectorAll('input[type="hidden"]')
+    //     .forEach((input) => input.remove());
+
+
+    //   if (setupDataObject) {
+    //     for (let [key, value] of Object.entries(setupDataObject)) {
+    //       const input = document.createElement("input");
+    //       input.type = "hidden";
+    //       input.name = `setupData_${key}`;
+    //       input.value = value;
+    //       assetsForm.appendChild(input);
+    //     }
+    //   } else {
+    //     console.log("No setupData available");
+    //   }
+
+      // Add hidden inputs with Handsontable data
+    //   const tableData = hot.getData();
+    //   headerNames.forEach((header, rowIndex) => {
+    //     const rowData = tableData[rowIndex];
+    //     const input = document.createElement("input");
+    //     input.type = "hidden";
+    //     input.name = header;
+    //     input.value = JSON.stringify(rowData);
+    //     complianceForm.appendChild(input);
+    //   });
+
+      // Submit the form
+      assetsForm.submit();
+    });
+</script>

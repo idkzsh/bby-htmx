@@ -1,4 +1,5 @@
 ---
+import AssetsNavbar from "../components/assetsNavbar.astro";
 import ComplianceNavbar from "../components/ComplianceNavbar.astro";
 import Navbar from "../components/Navbar.astro";
 import SetupNavbar from "../components/SetupNavbar.astro";
@@ -8,6 +9,7 @@ import "../global.css";
 const { title } = Astro.props;
 const isSetupPage = Astro.url.pathname === "/setup";
 const isCompliancePage = Astro.url.pathname === "/compliance";
+const isAssetsPage = Astro.url.pathname === "/assets";
 
 
 ---
@@ -25,6 +27,7 @@ const isCompliancePage = Astro.url.pathname === "/compliance";
     {(() => {
       if (isSetupPage) return <SetupNavbar />;
       if (isCompliancePage) return <ComplianceNavbar />;
+      if (isAssetsPage) return <AssetsNavbar />;
       return <Navbar />;
     })()}
     <slot />

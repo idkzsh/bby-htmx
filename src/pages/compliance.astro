@@ -148,7 +148,6 @@ filenames.  Autofills battery details when MSDS is selected.  -->
     msdsForm.reset();
   });
 
-  // looping through however many columns there are
 </script>
 
 <Layout>
@@ -190,16 +189,6 @@ filenames.  Autofills battery details when MSDS is selected.  -->
       >Submit</button
     >
   </nav> -->
-
-  <!-- <ComplianceSidebar obj={headers} /> -->
-  <!-- 
-    <ComplianceColumn
-      columns={columns}
-      obj={inputs}
-      formName="complianceForm"
-      setupData={setupData}
-      email={email}
-    /> -->
 </Layout>
 
 <script
@@ -392,12 +381,6 @@ filenames.  Autofills battery details when MSDS is selected.  -->
       columnsInput.name = "columns";
       columnsInput.value = columns;
       complianceForm.appendChild(columnsInput);
-
-      // const emailInput = document.createElement("input");
-      // emailInput.type = "hidden";
-      // emailInput.name = "email";
-      // emailInput.value = setupDataJSON['email'];
-      // complianceForm.appendChild(emailInput);
 
       if (setupDataObject) {
         for (let [key, value] of Object.entries(setupDataObject)) {

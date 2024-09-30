@@ -36,89 +36,99 @@ if (Astro.request.method === "POST") {
     }
   }
 }
-
-// Convert setupData to a plain object if it exists
-const setupDataObject = setupData ? Object.fromEntries(setupData) : null;
-
 ---
 
 <Layout>
   <main
-    class="flex w-[90%] h-[98%] bg-white mt-2 rounded-md border tracking-tight"
+    class="flex w-[90%] h-[98%] bg-white mt-2 rounded-md border tracking-tight justify-center items-center"
     id="main"
   >
-  <div class="w-full p-6">
-    <h1 class="text-2xl font-bold mb-6">Asset Upload</h1>
-    
-    <div class="mb-8">
-      <h2 class="text-xl font-semibold mb-4">Upload Images</h2>
-      <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-        <label for="image-upload" class="cursor-pointer">
-          <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-          <span class="mt-2 block text-sm font-medium text-gray-900">
-            Click to upload or drag and drop
-          </span>
-          <span class="mt-1 block text-xs text-gray-500">
-            PNG, JPG, GIF up to 10MB
-          </span>
-        </label>
-        <input id="image-upload" type="file" class="hidden" accept="image/*" multiple />
-      </div>
-    </div>
+    <form action="/api/email" method="POST" id="assetsForm" class="hidden">
+    </form>
+    <div class="h-[90%] px-4">
+      <!-- <h1 class="text-2xl font-bold mb-6">Asset Upload</h1> -->
 
-    <div>
-      <h2 class="text-xl font-semibold mb-4">Upload Other Assets</h2>
-      <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-        <label for="asset-upload" class="cursor-pointer">
-          <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <span class="mt-2 block text-sm font-medium text-gray-900">
-            Click to upload or drag and drop
-          </span>
-          <span class="mt-1 block text-xs text-gray-500">
-            PDF, DOC, ZIP up to 50MB
-          </span>
-        </label>
-        <input id="asset-upload" type="file" class="hidden" multiple />
-      </div>
+      
+
+        <div
+          class="flex flex-col justify-center border-2 border-dashed border-gray-300 rounded-lg p-8 text-center h-full"
+        >
+          <label for="image-upload" class="cursor-pointer">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="mx-auto h-12 w-12 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            <span class="mt-2 block text-sm font-medium text-gray-900">
+              Click to upload or drag and drop
+            </span>
+            <span class="mt-1 block text-xs text-gray-500">
+              PNG, JPG, GIF up to 10MB
+            </span>
+          </label>
+          <input
+            id="image-upload"
+            type="file"
+            class="hidden"
+            accept="image/*"
+            multiple
+          />
+        </div>
+     
+
+      
     </div>
-  </div>
-  <form action="/api/email" method="POST" id="assetsForm" class="hidden">
-    <input type="hidden" name="setupData" id="setupDataInput" value={JSON.stringify(setupDataJSON)}>
+    <div class="border-2 border-dashed border-gray-300 rounded-md w-[80%] h-[90%] overflow-scroll p-4"><div id="image-preview" class="grid grid-cols-3 gap-4"></div></div>
+
+    <input
+      type="hidden"
+      name="setupData"
+      id="setupDataInput"
+      value={JSON.stringify(setupDataJSON)}
+    />
     <!-- Hidden inputs will be dynamically added here -->
-  </form>
   </main>
 </Layout>
 
-<script define:vars={{ columns, setupDataJSON, setupDataObject }}>
-        document.addEventListener("submitComplianceForm", function () {
-      const requiredFields = [""];
-      const missingFields = [];
+<script define:vars={{ columns, setupDataJSON }}>
+  document.addEventListener("DOMContentLoaded", function() {
+    const imageUpload = document.getElementById("image-upload");
+    const imagePreview = document.getElementById("image-preview");
 
-      // Check required fields
-      // requiredFields.forEach((field, rowIndex) => {
-      //   for (let col = 0; col < columns; col++) {
-      //     const cellValue = hot.getDataAtCell(rowIndex, col);
-      //     if (!cellValue || cellValue.trim() === "") {
-      //       missingFields.push(`${field} for SKU ${col + 1}`);
-      //     }
-      //   }
-      // });
+    imageUpload.addEventListener("change", function(event) {
+      imagePreview.innerHTML = ""; // Clear existing previews
+      const files = event.target.files;
 
-      // if (missingFields.length > 0) {
-      //   alert(
-      //     `Please fill in the following required fields:\n${missingFields.join("\n")}`
-      //   );
-      //   return;
-      // }
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (file.type.startsWith("image/")) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const img = document.createElement("img");
+            img.src = e.target.result;
+            img.classList.add("w-full", "h-32", "object-cover", "rounded-md");
+            imagePreview.appendChild(img);
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+    });
+  });
 
+
+
+  document.addEventListener("submitAssetsForm", function () {
     //   assetsForm
     //     .querySelectorAll('input[type="hidden"]')
     //     .forEach((input) => input.remove());
-
 
     //   if (setupDataObject) {
     //     for (let [key, value] of Object.entries(setupDataObject)) {
@@ -132,7 +142,7 @@ const setupDataObject = setupData ? Object.fromEntries(setupData) : null;
     //     console.log("No setupData available");
     //   }
 
-      // Add hidden inputs with Handsontable data
+    // Add hidden inputs with Handsontable data
     //   const tableData = hot.getData();
     //   headerNames.forEach((header, rowIndex) => {
     //     const rowData = tableData[rowIndex];
@@ -143,7 +153,7 @@ const setupDataObject = setupData ? Object.fromEntries(setupData) : null;
     //     complianceForm.appendChild(input);
     //   });
 
-      // Submit the form
-      assetsForm.submit();
-    });
+    // Submit the form
+    assetsForm.submit();
+  });
 </script>

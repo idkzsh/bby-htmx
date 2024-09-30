@@ -1,6 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { headers, inputs } from "../data/setup";
+import { inputs } from "../data/setup";
 
 let columns = Number(Astro.url.searchParams.get("numOfSKUs") || 1);
 let email = Astro.url.searchParams.get("email") || "";
@@ -63,16 +63,24 @@ if (Astro.request.method === "POST") {
   </main>
 </Layout>
 
+<script
+  src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"
+></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css"
+/>
 
-<script src="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css" />
+<script define:vars={{ columns, email, inputs }} type="module" defer>
+  const requiredFields = inputs
+    .filter((input) => input.required)
+    .map((input) => input.name);
 
-<script define:vars={{ headers, columns, email }} type="module" defer>
   document.addEventListener("DOMContentLoaded", function () {
     const container = document.getElementById("handsontable-container");
 
-    const headerNames = Object.keys(headers);
-    const rows = headerNames.length;
+    const headerNames = inputs.map((input) => input.name);
+    const rows = inputs.length;
 
     const data = Array(rows)
       .fill()
@@ -97,17 +105,89 @@ if (Astro.request.method === "POST") {
       cells: function (row, col) {
         const cellProperties = {};
         const rowHeader = headerNames[row];
-        cellProperties.placeholder = headers[rowHeader];
+        const input = inputs.find((input) => input.name === rowHeader);
+        if (input) {
+          cellProperties.placeholder = input.placeholder || "";
 
-        // Add validator for VPN row
-        const requiredFields = ["Vendor Part Number"];
+          if (input.type === "select" && input.options) {
+            cellProperties.type = "dropdown";
+            cellProperties.source = Object.values(input.options);
+          }
 
-        // Add required validator to specified fields
-        if (requiredFields.includes(rowHeader)) {
-          cellProperties.validator = function (value, callback) {
-            callback(value !== null && value !== "");
-          };
-          cellProperties.allowEmpty = false;
+          switch (input.name) {
+            case "Vendor Part Number":
+              cellProperties.validator = function (value, callback) {
+                callback(value.length <= 20);
+              };
+              break;
+            case "SKU Title (Long)":
+              cellProperties.validator = function (value, callback) {
+                callback(value.length <= 40);
+              };
+              break;
+            case "UPC":
+            case "SECONDARY_UPC":
+              cellProperties.validator = function (value, callback) {
+                const numericValue = value.toString().replace(/\D/g, "");
+                callback(
+                  numericValue.length >= 12 && numericValue.length <= 13
+                );
+              };
+              break;
+          }
+
+          if (input.type === "number") {
+            cellProperties.type = "numeric";
+            cellProperties.numericFormat = { pattern: "0" };
+
+            cellProperties.validator = function (value, callback) {
+              callback(
+                typeof value === "number" &&
+                  value >= input.min &&
+                  value <= input.max
+              );
+            };
+
+            cellProperties.renderer = function (
+              instance,
+              td,
+              row,
+              col,
+              prop,
+              value,
+              cellProperties
+            ) {
+              Handsontable.renderers.NumericRenderer.apply(this, arguments);
+              td.style.textAlign = "left";
+            };
+          }
+          cellProperties.allowInvalid = false;
+
+          if (input.type === "float") {
+            cellProperties.type = "numeric";
+            cellProperties.numericFormat = { pattern: "0,0.00" };
+            cellProperties.allowInvalid = false;
+            cellProperties.validator = function (value, callback) {
+              callback(
+                typeof value === "number" &&
+                  value >= input.min &&
+                  value <= input.max
+              );
+            };
+
+            cellProperties.renderer = function (
+              instance,
+              td,
+              row,
+              col,
+              prop,
+              value,
+              cellProperties
+            ) {
+              Handsontable.renderers.NumericRenderer.apply(this, arguments);
+              td.style.textAlign = "left";
+            };
+          }
         }
 
         switch (rowHeader) {
@@ -149,7 +229,7 @@ if (Astro.request.method === "POST") {
       manualColumnMove: true,
       stretchH: "all",
       // Set the width of the row header column
-      
+
       // Allow row header resizing
       manualRowResize: true,
       // Prevent horizontal scrolling within cells
@@ -159,18 +239,20 @@ if (Astro.request.method === "POST") {
     });
 
     document.addEventListener("submit-handsontable", function () {
-      const requiredFields = ["Vendor Part Number"];
       const missingFields = [];
 
       // Check required fields
-      requiredFields.forEach((field, rowIndex) => {
-        for (let col = 0; col < columns; col++) {
-          const cellValue = hot.getDataAtCell(rowIndex, col);
-          if (!cellValue || cellValue.trim() === "") {
-            missingFields.push(`${field} for SKU ${col + 1}`);
+      for (let col = 0; col < columns; col++) {
+        requiredFields.forEach((field) => {
+          const rowIndex = headerNames.indexOf(field);
+          if (rowIndex !== -1) {
+            const cellValue = hot.getDataAtCell(rowIndex, col);
+            if (!cellValue || cellValue === "") {
+              missingFields.push(`${field} for SKU ${col + 1}`);
+            }
           }
-        }
-      });
+        });
+      }
 
       if (missingFields.length > 0) {
         alert(

@@ -920,4 +920,4 @@ const complianceInputs = [
 
 // const forms = {};
 
-export { complianceInputs };
+export { complianceInputs, batteryTypes };

@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import OpenAI from "openai";
-import { headers, batteryTypes, formats, unCodes } from "../../data/compliance"
+import { batteryTypes } from "../../data/compliance"
 
 const key = import.meta.env.OPENAI_API_KEY;
 

@@ -23,32 +23,27 @@ if (Astro.request.method === "POST") {
     // Process other form data entries
     for (const [key, value] of formData.entries()) {
       for (const [key, value] of formData.entries()) {
-      if (key !== "setupData" && key !== "columns") {
-        // Parse the value if it's a JSON string
-        if (typeof value === "string") {
-          try {
-            complianceDataJSON[key] = JSON.parse(value);
-          } catch {
+        if (key !== "setupData" && key !== "columns") {
+          // Parse the value if it's a JSON string
+          if (typeof value === "string") {
+            try {
+              complianceDataJSON[key] = JSON.parse(value);
+            } catch {
+              complianceDataJSON[key] = value;
+            }
+          } else if (value instanceof File) {
+            // Handle File objects if needed
+            complianceDataJSON[key] = value.name;
+          } else {
             complianceDataJSON[key] = value;
           }
-        } else if (value instanceof File) {
-          // Handle File objects if needed
-          complianceDataJSON[key] = value.name;
-        } else {
-          complianceDataJSON[key] = value;
         }
       }
-    }
     }
 
     // Convert complianceDataJSON to a JSON string
     complianceData = JSON.stringify(complianceDataJSON);
 
-    console.log("Setup Data:", setupDataJSON);
-    console.log("Compliance Data:", complianceDataJSON);
-
-    console.log("SetupData Stringified: ", JSON.stringify(setupDataJSON))
-    console.log("compliance data Stringified: ", JSON.stringify(complianceDataJSON))
   } catch (error) {
     if (error instanceof Error) {
       console.error("Error processing form data:", error.message);

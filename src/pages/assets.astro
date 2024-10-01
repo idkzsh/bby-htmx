@@ -1,42 +1,60 @@
 ---
 import Layout from "../layouts/Layout.astro";
 
+let formData;
 let setupData;
+let complianceData;
 let columns: number = 1;
-const setupDataJSON: Record<string, string> = {};
+let setupDataJSON: Record<string, any> = {};
+const complianceDataJSON: Record<string, any> = {};
 
 if (Astro.request.method === "POST") {
   try {
-    setupData = await Astro.request.formData();
-    columns = Number(setupData.get("columns"));
+    formData = await Astro.request.formData();
+    columns = Number(formData.get("columns"));
 
-    // Convert setupData to a JSON object so we don't need to do string manipulation
-    for (const [key, value] of setupData.entries()) {
-      setupDataJSON[key] = typeof value === "string" ? value : value.name;
+    setupData = formData.get("setupData");
+
+    // Parse setupData JSON string
+    if (setupData && typeof setupData === "string") {
+      setupDataJSON = JSON.parse(setupData);
     }
 
-    // Parse array-like strings into actual arrays
-    for (const key in setupDataJSON) {
-      if (
-        setupDataJSON[key].startsWith("[") &&
-        setupDataJSON[key].endsWith("]")
-      ) {
-        try {
-          setupDataJSON[key] = JSON.parse(setupDataJSON[key]);
-        } catch (e) {
-          console.error(`Failed to parse ${key} as JSON:`, e);
+    // Process other form data entries
+    for (const [key, value] of formData.entries()) {
+      for (const [key, value] of formData.entries()) {
+      if (key !== "setupData" && key !== "columns") {
+        // Parse the value if it's a JSON string
+        if (typeof value === "string") {
+          try {
+            complianceDataJSON[key] = JSON.parse(value);
+          } catch {
+            complianceDataJSON[key] = value;
+          }
+        } else if (value instanceof File) {
+          // Handle File objects if needed
+          complianceDataJSON[key] = value.name;
+        } else {
+          complianceDataJSON[key] = value;
         }
       }
     }
+    }
 
-    // console.log("Server-side setupDataJSON:", setupDataJSON);
+    // Convert complianceDataJSON to a JSON string
+    complianceData = JSON.stringify(complianceDataJSON);
+
+    console.log("Setup Data:", setupDataJSON);
+    console.log("Compliance Data:", complianceDataJSON);
+
+    console.log("SetupData Stringified: ", JSON.stringify(setupDataJSON))
+    console.log("compliance data Stringified: ", JSON.stringify(complianceDataJSON))
   } catch (error) {
     if (error instanceof Error) {
-      console.error(error.message);
+      console.error("Error processing form data:", error.message);
     }
   }
 }
-
 ---
 
 <Layout>
@@ -44,59 +62,70 @@ if (Astro.request.method === "POST") {
     class="flex w-[90%] h-[98%] bg-white mt-2 rounded-md border tracking-tight justify-center items-center"
     id="main"
   >
-    <form action="/api/email" method="POST" id="assetsForm" class="flex w-full h-full tracking-tight justify-center items-center" enctype="multipart/form-data">
-    
-    <div class="h-[90%] px-4">
-      <!-- <h1 class="text-2xl font-bold mb-6">Asset Upload</h1> -->
-
-      <div
-        id="drop-zone"
-        class="flex flex-col justify-center border-2 border-dashed border-gray-300 rounded-lg p-8 text-center h-full"
-      >
-        <label for="image-upload" class="cursor-pointer">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="mx-auto h-12 w-12 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-          </svg>
-          <span class="mt-2 block text-sm font-medium text-gray-900">
-            Click to upload or drag and drop
-          </span>
-          <span class="mt-1 block text-xs text-gray-500">
-            PNG, JPG, GIF up to 10MB
-          </span>
-        </label>
-        <input
-          id="image-upload"
-          name="images"
-          type="file"
-          class="hidden"
-          accept="image/*"
-          multiple
-        />
-      </div>
-    </div>
-    <div
-      class="border-2 border-dashed border-gray-300 rounded-md w-[80%] h-[90%] overflow-scroll p-4"
+    <form
+      action="/api/email"
+      method="POST"
+      id="assetsForm"
+      class="flex w-full h-full tracking-tight justify-center items-center"
+      enctype="multipart/form-data"
     >
-      <div id="image-preview" class="grid grid-cols-3 gap-4"></div>
-    </div>
+      <div class="h-[90%] px-4">
+        <!-- <h1 class="text-2xl font-bold mb-6">Asset Upload</h1> -->
 
-    <input
-      type="hidden"
-      name="setupData"
-      id="setupDataInput"
-      value={JSON.stringify(setupDataJSON)}
-    />
-  </form>
+        <div
+          id="drop-zone"
+          class="flex flex-col justify-center border-2 border-dashed border-gray-300 rounded-lg p-8 text-center h-full"
+        >
+          <label for="image-upload" class="cursor-pointer">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="mx-auto h-12 w-12 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            <span class="mt-2 block text-sm font-medium text-gray-900">
+              Click to upload or drag and drop
+            </span>
+            <span class="mt-1 block text-xs text-gray-500">
+              PNG, JPG, GIF up to 10MB
+            </span>
+          </label>
+          <input
+            id="image-upload"
+            name="images"
+            type="file"
+            class="hidden"
+            accept="image/*"
+            multiple
+          />
+        </div>
+      </div>
+      <div
+        class="border-2 border-dashed border-gray-300 rounded-md w-[80%] h-[90%] overflow-scroll p-4"
+      >
+        <div id="image-preview" class="grid grid-cols-3 gap-4"></div>
+      </div>
+
+      <input
+        type="hidden"
+        name="setupData"
+        id="setupDataInput"
+        value={JSON.stringify(setupDataJSON)}
+      />
+      <input
+        type="hidden"
+        name="complianceData"
+        id="complianceDataInput"
+        value={JSON.stringify(complianceDataJSON)}
+      />
+    </form>
     <!-- Hidden inputs will be dynamically added here -->
   </main>
 </Layout>
@@ -168,7 +197,7 @@ if (Astro.request.method === "POST") {
             const infoBox = document.createElement("div");
             infoBox.className =
               "absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 rounded-b-md overflow-hidden w-full h-6";
-              let fileName = file.name;
+            let fileName = file.name;
             if (fileName.length > 40) {
               fileName = fileName.substring(0, 40) + "...";
             }
@@ -192,40 +221,40 @@ if (Astro.request.method === "POST") {
 
     function updateFileInput() {
       const dataTransfer = new DataTransfer();
-      uploadedFiles.forEach(file => dataTransfer.items.add(file));
+      uploadedFiles.forEach((file) => dataTransfer.items.add(file));
       imageUpload.files = dataTransfer.files;
     }
   });
 
   document.addEventListener("submitAssetsForm", function () {
-  //   //   assetsForm
-  //   //     .querySelectorAll('input[type="hidden"]')
-  //   //     .forEach((input) => input.remove());
+    //   //   assetsForm
+    //   //     .querySelectorAll('input[type="hidden"]')
+    //   //     .forEach((input) => input.remove());
 
-  //   //   if (setupDataObject) {
-  //   //     for (let [key, value] of Object.entries(setupDataObject)) {
-  //   //       const input = document.createElement("input");
-  //   //       input.type = "hidden";
-  //   //       input.name = `setupData_${key}`;
-  //   //       input.value = value;
-  //   //       assetsForm.appendChild(input);
-  //   //     }
-  //   //   } else {
-  //   //     console.log("No setupData available");
-  //   //   }
-  //   console.log("sending")
-  //   // Add hidden inputs with Handsontable data
-  //   //   const tableData = hot.getData();
-  //   //   headerNames.forEach((header, rowIndex) => {
-  //   //     const rowData = tableData[rowIndex];
-  //   //     const input = document.createElement("input");
-  //   //     input.type = "hidden";
-  //   //     input.name = header;
-  //   //     input.value = JSON.stringify(rowData);
-  //   //     complianceForm.appendChild(input);
-  //   //   });
+    //   //   if (setupDataObject) {
+    //   //     for (let [key, value] of Object.entries(setupDataObject)) {
+    //   //       const input = document.createElement("input");
+    //   //       input.type = "hidden";
+    //   //       input.name = `setupData_${key}`;
+    //   //       input.value = value;
+    //   //       assetsForm.appendChild(input);
+    //   //     }
+    //   //   } else {
+    //   //     console.log("No setupData available");
+    //   //   }
+    //   console.log("sending")
+    //   // Add hidden inputs with Handsontable data
+    //   //   const tableData = hot.getData();
+    //   //   headerNames.forEach((header, rowIndex) => {
+    //   //     const rowData = tableData[rowIndex];
+    //   //     const input = document.createElement("input");
+    //   //     input.type = "hidden";
+    //   //     input.name = header;
+    //   //     input.value = JSON.stringify(rowData);
+    //   //     complianceForm.appendChild(input);
+    //   //   });
 
-  //   // Submit the form
+    //   // Submit the form
     assetsForm.submit();
   });
 </script>

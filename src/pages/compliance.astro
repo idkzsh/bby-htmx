@@ -1,6 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { headers, batteryTypes } from "../data/compliance";
+import { complianceInputs } from "../data/compliance";
 
 let columns: number = 1;
 let setupData;
@@ -40,10 +40,8 @@ if (Astro.request.method === "POST") {
 }
 
 // Convert setupData to a plain object if it exists
-const setupDataObject = setupData ? Object.fromEntries(setupData) : null;
-
-
-
+// const setupDataObject = setupData ? Object.fromEntries(setupData) : null;
+// console.log("compliance page: " + JSON.stringify(setupDataJSON));
 ---
 
 <!-- unfortunately the cdn must be used for pdfjs as far as i can tell as it does not work very well on serverless as a dependency -->
@@ -53,8 +51,7 @@ const setupDataObject = setupData ? Object.fromEntries(setupData) : null;
 
 <!-- Parses uploaded MSDS PDF files using pdf.js to extract text.  Sends text
 to /api/gpt endpoint to extract battery details. * Populates dropdown with MSDS
-filenames.  Autofills battery details when MSDS is selected.  -->
-<script type="module">
+filenames.  Autofills battery details when MSDS is selected.  --><!-- <script type="module">
   const { pdfjsLib } = globalThis;
   const msdsForm = document.getElementById("msdsForm");
   const spinner = document.getElementById("spinner"); // Get the spinner element
@@ -147,15 +144,19 @@ filenames.  Autofills battery details when MSDS is selected.  -->
 
     msdsForm.reset();
   });
-
-</script>
-
+</script> -->
 <Layout>
   <main
     class="flex w-[90%] h-[98%] bg-white mt-2 rounded-md border tracking-tight overflow-scroll"
     id="main"
   >
     <form action="/assets" method="POST" id="complianceForm" class="hidden">
+      <input
+        type="hidden"
+        name="setupData"
+        id="setupDataInput"
+        value={JSON.stringify(setupDataJSON)}
+      />
       <!-- Hidden inputs will be dynamically added here -->
     </form>
     <div id="handsontable-container" class="w-full h-[400px]"></div>
@@ -199,12 +200,19 @@ filenames.  Autofills battery details when MSDS is selected.  -->
   href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css"
 />
 
-<script define:vars={{ headers, columns, setupDataJSON, setupDataObject, batteryTypes }}>
+<script
+  define:vars={{
+    columns,
+    setupDataJSON,
+    complianceInputs,
+  }}
+>
   document.addEventListener("DOMContentLoaded", function () {
     const container = document.getElementById("handsontable-container");
 
-    const headerNames = Object.keys(headers);
-    const rows = headerNames.length;
+    const rows = complianceInputs.length;
+
+    let headerNames = complianceInputs.map((input) => input.name);
 
     const data = Array(rows)
       .fill()
@@ -212,42 +220,34 @@ filenames.  Autofills battery details when MSDS is selected.  -->
         Array(columns)
           .fill()
           .map((_, colIndex) => {
-            const header = headerNames[rowIndex];
-            if (setupDataJSON[header] && Array.isArray(setupDataJSON[header])) {
-              return setupDataJSON[header][colIndex] || "";
+            const inputName = complianceInputs[rowIndex].name;
+            if (
+              setupDataJSON[inputName] &&
+              Array.isArray(setupDataJSON[inputName])
+            ) {
+              return setupDataJSON[inputName][colIndex] || "";
             }
             return "";
           })
       );
 
-    const readOnly = [
-      "UPC",
-      "SKU Title (Long)",
-      "Model Number",
-      "Mercury Section",
-      "Packaging Section",
-      "Battery Section",
-      "Limited Quantities Section",
-      "Other Certifications Section",
-    ];
-
-    
-
     const hot = new Handsontable(container, {
       data: data,
-      rowHeaders: headerNames,
+      rowHeaders: complianceInputs.map((input) => input.name),
       rowHeaderWidth: 250, // Adjust this value as needed
       afterGetRowHeader: function (row, TH) {
-        if (readOnly.includes(headerNames[row])) {
+        const rowName = complianceInputs[row].name;
+
+        if (complianceInputs[row].type === "readonly") {
           TH.style.fontWeight = "bold";
           TH.style.backgroundColor = "#c0c0c0";
         }
-        if (headerNames[row].includes("Battery Type") || headerNames[row].includes("- UN")) {
+        if (rowName.includes("Battery Type") || rowName.includes("- UN")) {
           TH.style.fontWeight = "bold";
           TH.style.backgroundColor = "#d0d0f0";
         }
 
-        if (headerNames[row] === "VENDOR ACKNOWLEDGEMENT") {
+        if (rowName === "VENDOR ACKNOWLEDGEMENT") {
           TH.style.fontWeight = "bold";
           TH.style.backgroundColor = "#F3F0c0";
         }
@@ -265,20 +265,144 @@ filenames.  Autofills battery details when MSDS is selected.  -->
       licenseKey: "non-commercial-and-evaluation",
       cells: function (row, col) {
         const cellProperties = {};
-        const rowHeader = headerNames[row]; // Adjust for the two extra rows
+        const rowName = complianceInputs[row].name; // Adjust for the two extra rows
 
-        if (rowHeader.includes("Battery Type")) {
-            cellProperties.type = 'dropdown';
-            cellProperties.source = batteryTypes;
-            cellProperties.allowInvalid = false;
-          // Add more cases for other dropdown fields as needed
+        const input = complianceInputs.find((input) => input.name === rowName);
+        if (input) {
+          switch (input.type) {
+            case "text":
+              cellProperties.type = "text";
+              cellProperties.placeholder = input.placeholder;
+              cellProperties.validator = function (value, callback) {
+                callback(
+                  typeof value === "string" &&
+                    value.length >= input.minLen &&
+                    value.length <= input.maxLen
+                );
+              };
+
+              break;
+
+            case "select":
+              cellProperties.type = "dropdown";
+              cellProperties.placeholder = input.placeholder;
+
+              if (rowName.endsWith("- Size/Format")) {
+                const batteryTypeIndex = rowName.split(" ")[0];
+                const batteryTypeRow = complianceInputs.findIndex(
+                  (input) => input.name === `${batteryTypeIndex} - Battery Type`
+                );
+
+                cellProperties.source = function (query, process) {
+                  const batteryType = this.instance.getDataAtCell(
+                    batteryTypeRow,
+                    this.col
+                  );
+
+                  let options = [];
+                  if (
+                    input.options &&
+                    typeof input.options === "object" &&
+                    batteryType
+                  ) {
+                    options = input.options[batteryType] || [];
+                  }
+
+                  console.log(`Dropdown options for ${rowName}:`, options);
+                  process(options);
+                };
+              } else {
+                cellProperties.source = Array.isArray(input.options)
+                  ? input.options
+                  : Object.values(input.options);
+              }
+              break;
+
+            case "number":
+              cellProperties.type = "numeric";
+              cellProperties.numericFormat = { pattern: "0" };
+              cellProperties.value = input.placeholder || "";
+              cellProperties.validator = function (value, callback) {
+                if (value === null || value === "") {
+                  callback(true); // Allow empty values
+                } else {
+                  callback(
+                    typeof value === "number" &&
+                      value >= input.min &&
+                      value <= input.max
+                  );
+                }
+              };
+              cellProperties.renderer = function (
+                instance,
+                td,
+                row,
+                col,
+                prop,
+                value,
+                cellProperties
+              ) {
+                Handsontable.renderers.NumericRenderer.apply(this, arguments);
+                td.style.textAlign = "left";
+                if (value === "" || value === null) {
+                  td.innerHTML = input.placeholder || "";
+                }
+              };
+              break;
+
+            case "float":
+              cellProperties.type = "numeric";
+              cellProperties.numericFormat = { pattern: "0,0.0000" };
+              cellProperties.value = input.placeholder || "";
+              cellProperties.validator = function (value, callback) {
+                if (value === null || value === "") {
+                  callback(true); // Allow empty values
+                } else {
+                  callback(
+                    typeof value === "number" &&
+                      value >= input.min &&
+                      value <= input.max
+                  );
+                }
+              };
+              cellProperties.renderer = function (
+                instance,
+                td,
+                row,
+                col,
+                prop,
+                value,
+                cellProperties
+              ) {
+                Handsontable.renderers.NumericRenderer.apply(this, arguments);
+                td.style.textAlign = "left";
+                if (value === "" || value === null) {
+                  td.innerHTML = input.placeholder || "0.0000";
+                }
+              };
+              break;
+
+            case "readonly":
+              cellProperties.readOnly = true;
+              cellProperties.renderer = function (
+                instance,
+                td,
+                row,
+                col,
+                prop,
+                value,
+                cellProperties
+              ) {
+                Handsontable.renderers.TextRenderer.apply(this, arguments);
+                td.style.backgroundColor = "#c0c0c0";
+                td.style.textAlign = "center";
+                td.style.verticalAlign = "middle";
+              };
+              break;
+          }
         }
 
-        if (rowHeader === "VENDOR ACKNOWLEDGEMENT") {
-            cellProperties.type = 'dropdown';
-            cellProperties.source = ["Y", "N"];
-            cellProperties.allowInvalid = false;
-          // Add more cases for other dropdown fields as needed
+        if (rowName === "VENDOR ACKNOWLEDGEMENT") {
           cellProperties.renderer = function (
             instance,
             td,
@@ -290,33 +414,11 @@ filenames.  Autofills battery details when MSDS is selected.  -->
           ) {
             Handsontable.renderers.TextRenderer.apply(this, arguments);
             td.style.backgroundColor = "#F3F0c0";
-
           };
         }
 
-        // Make the first two rows non-editable
-        if (readOnly.includes(headerNames[row])) {
-          cellProperties.readOnly = true;
-          cellProperties.renderer = function (
-            instance,
-            td,
-            row,
-            col,
-            prop,
-            value,
-            cellProperties
-          ) {
-            Handsontable.renderers.TextRenderer.apply(this, arguments);
-            td.style.backgroundColor = "#c0c0c0";
-            td.style.textAlign = "center";
-            td.style.verticalAlign = "middle";
-          };
-        } else {
-          
-          cellProperties.placeholder = headers[rowHeader];
-        }
-
-        if (headerNames[row].includes("Battery Type") || headerNames[row].includes("- UN")) {
+        if (rowName.includes("Battery Type") || rowName.includes("- UN")) {
+          cellProperties.placeholder = input.placeholder;
           cellProperties.renderer = function (
             instance,
             td,
@@ -329,9 +431,6 @@ filenames.  Autofills battery details when MSDS is selected.  -->
             Handsontable.renderers.TextRenderer.apply(this, arguments);
             td.style.backgroundColor = "#d0d0f0";
           };
-        } else {
-          const rowHeader = headerNames[row]; // Adjust for the two extra rows
-          cellProperties.placeholder = headers[rowHeader];
         }
         return cellProperties;
       },
@@ -347,33 +446,64 @@ filenames.  Autofills battery details when MSDS is selected.  -->
       wordWrap: true,
       // Optional: Adjust cell padding for better text visibility
       cellPadding: 5,
-      fixedRowsTop: 4
+      fixedRowsTop: 4,
     });
 
     document.addEventListener("submitComplianceForm", function () {
-      const requiredFields = [""];
       const missingFields = [];
+      const data = hot.getData();
 
-      // Check required fields
-      // requiredFields.forEach((field, rowIndex) => {
-      //   for (let col = 0; col < columns; col++) {
-      //     const cellValue = hot.getDataAtCell(rowIndex, col);
-      //     if (!cellValue || cellValue.trim() === "") {
-      //       missingFields.push(`${field} for SKU ${col + 1}`);
-      //     }
-      //   }
-      // });
+      for (let col = 0; col < columns; col++) {
+        const dangerousGoods = setupDataJSON["Dangerous Product/Material"][col];
+        const vendorAcknowledgement =
+          data[
+            complianceInputs.findIndex(
+              (input) => input.name === "VENDOR ACKNOWLEDGEMENT"
+            )
+          ][col];
 
-      // if (missingFields.length > 0) {
-      //   alert(
-      //     `Please fill in the following required fields:\n${missingFields.join("\n")}`
-      //   );
-      //   return;
-      // }
+        if (dangerousGoods === "Y_1") {
+          // const batteryFields = [
+          //   "Battery Type - UN 3480",
+          //   "Battery Type - UN 3481",
+          //   "Battery Type - UN 3090",
+          //   "Battery Type - UN 3091",
+          // ];
+          // const limitedQuantityField = "Limited Quantities";
 
-      complianceForm
-        .querySelectorAll('input[type="hidden"]')
-        .forEach((input) => input.remove());
+          // const hasBattery = batteryFields.some(
+          //   (field) =>
+          //     data[complianceInputs.findIndex((input) => input.name === field)][
+          //       col
+          //     ] !== ""
+          // );
+          // const hasLimitedQuantity =
+          //   data[
+          //     complianceInputs.findIndex(
+          //       (input) => input.name === limitedQuantityField
+          //     )
+          //   ][col] !== "";
+
+          // if (!hasBattery && !hasLimitedQuantity) {
+          //   missingFields.push(
+          //     `At least one Battery Type or Limited Quantities for SKU ${col + 1}`
+          //   );
+          // }
+
+          if (vendorAcknowledgement !== "Y") {
+            missingFields.push(
+              `Vendor Acknowledgement must be Y for SKU ${col + 1}`
+            );
+          }
+        }
+      }
+
+      if (missingFields.length > 0) {
+        alert(
+          `Dangerous Goods was selected for below SKUs. Please fill in the following required fields:\n${missingFields.join("\n")}`
+        );
+        return;
+      }
 
       // Add hidden input for columns
       const columnsInput = document.createElement("input");
@@ -381,18 +511,6 @@ filenames.  Autofills battery details when MSDS is selected.  -->
       columnsInput.name = "columns";
       columnsInput.value = columns;
       complianceForm.appendChild(columnsInput);
-
-      if (setupDataObject) {
-        for (let [key, value] of Object.entries(setupDataObject)) {
-          const input = document.createElement("input");
-          input.type = "hidden";
-          input.name = `${key}`;
-          input.value = value;
-          complianceForm.appendChild(input);
-        }
-      } else {
-        console.log("No setupData available");
-      }
 
       // Add hidden inputs with Handsontable data
       const tableData = hot.getData();
@@ -406,7 +524,7 @@ filenames.  Autofills battery details when MSDS is selected.  -->
       });
 
       // Submit the form
-      complianceForm.submit();
+      // complianceForm.submit();
     });
   });
 </script>

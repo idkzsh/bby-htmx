@@ -11,6 +11,10 @@ const complianceDataJSON: Record<string, any> = {};
 if (Astro.request.method === "POST") {
   try {
     formData = await Astro.request.formData();
+
+    console.log(formData)
+
+
     columns = Number(formData.get("columns"));
 
     setupData = formData.get("setupData");

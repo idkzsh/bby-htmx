@@ -7,7 +7,7 @@ let email = Astro.url.searchParams.get("email") || "";
 
 if (columns > 50) {
   columns = 50;
-} else if (columns <=0) {
+} else if (columns <= 0) {
   columns = 1;
 }
 ---
@@ -115,6 +115,8 @@ if (columns > 50) {
     const headerNames = inputs.map((input) => input.name);
     const rows = inputs.length;
 
+    const invalidVals = [];
+
     const data = Array(rows)
       .fill()
       .map(() => Array(columns).fill(""));
@@ -146,13 +148,34 @@ if (columns > 50) {
             case "text":
               cellProperties.type = "text";
               cellProperties.validator = function (value, callback) {
-                callback(
-                  typeof value === "string" &&
+                const isValid =
+                  value === null ||
+                  value === "" ||
+                  (typeof value === "string" &&
                     value.length >= input.minLen &&
-                    value.length <= input.maxLen
+                    value.length <= input.maxLen);
+
+                updateInvalidVals(
+                  row,
+                  col,
+                  isValid,
+                  `${rowHeader} for SKU ${col + 1}`
                 );
+                callback(isValid);
               };
-              cellProperties.allowInvalid = false;
+              cellProperties.allowInvalid = true;
+              cellProperties.renderer = function (
+                instance,
+                td,
+                row,
+                col,
+                prop,
+                value,
+                cellProperties
+              ) {
+                Handsontable.renderers.NumericRenderer.apply(this, arguments);
+                td.style.textAlign = "left";
+              };
               break;
 
             case "select":
@@ -161,24 +184,79 @@ if (columns > 50) {
                 ? input.options
                 : Object.values(input.options);
 
-              cellProperties.allowInvalid = false;
+              cellProperties.allowInvalid = true;
+              cellProperties.validator = function (value, callback) {
+                const isValid =
+                  !value ||
+                  value === "" ||
+                  cellProperties.source.includes(value);
+                updateInvalidVals(
+                  row,
+                  col,
+                  isValid,
+                  `${rowHeader} for SKU ${col + 1}`
+                );
+                callback(true); // Always return true to allow any input
+              };
+              cellProperties.renderer = function (
+                instance,
+                td,
+                row,
+                col,
+                prop,
+                value,
+                cellProperties
+              ) {
+                Handsontable.renderers.DropdownRenderer.apply(this, arguments);
+                td.style.textAlign = "left";
+                if (value === "" || value === null) {
+                  td.innerHTML = input.placeholder || "";
+                }
+              };
+              cellProperties.renderer = getRenderer(rowHeader);
               break;
 
             case "datetime":
               cellProperties.type = "text";
               cellProperties.editor = DateTimeEditor;
-              cellProperties.allowInvalid = false;
+              cellProperties.allowInvalid = true; // Allow invalid entries temporarily
+              cellProperties.validator = function (value, callback) {
+                const isValid =
+                  !value ||
+                  value.trim() === "" ||
+                  (parseDate(value) instanceof Date &&
+                    !isNaN(parseDate(value)));
+
+                updateInvalidVals(
+                  row,
+                  col,
+                  isValid,
+                  `${rowHeader} for SKU ${col + 1}`
+                );
+                callback(true); // Always return true to allow any input
+              };
+              cellProperties.renderer = getRenderer(rowHeader);
               break;
+
 
             case "number":
               cellProperties.type = "numeric";
               cellProperties.numericFormat = { pattern: "0" };
               cellProperties.validator = function (value, callback) {
-                callback(
-                  typeof value === "number" &&
+                const isValid =
+                  value === null ||
+                  value === "" ||
+                  (typeof value === "number" &&
                     value >= input.min &&
-                    value <= input.max
+                    value <= input.max);
+
+                updateInvalidVals(
+                  row,
+                  col,
+                  isValid,
+                  `${rowHeader} for SKU ${col + 1}`
                 );
+                callback(isValid);
               };
               cellProperties.renderer = function (
                 instance,
@@ -192,19 +270,28 @@ if (columns > 50) {
                 Handsontable.renderers.NumericRenderer.apply(this, arguments);
                 td.style.textAlign = "left";
               };
-              cellProperties.allowInvalid = false;
+              cellProperties.allowInvalid = true;
               break;
 
             case "float":
               cellProperties.type = "numeric";
               cellProperties.numericFormat = { pattern: "0,0.00" };
-              cellProperties.allowInvalid = false;
+              cellProperties.allowInvalid = true;
               cellProperties.validator = function (value, callback) {
-                callback(
-                  typeof value === "number" &&
+                const isValid =
+                  value === null ||
+                  value === "" ||
+                  (typeof value === "number" &&
                     value >= input.min &&
-                    value <= input.max
+                    value <= input.max);
+
+                updateInvalidVals(
+                  row,
+                  col,
+                  isValid,
+                  `${rowHeader} for SKU ${col + 1}`
                 );
+                callback(isValid);
               };
               cellProperties.renderer = function (
                 instance,
@@ -247,6 +334,33 @@ if (columns > 50) {
       cellPadding: 5,
     });
 
+    function updateInvalidVals(row, col, isValid, cellIdentifier) {
+      const index = invalidVals.findIndex(
+        (item) => item.row === row && item.col === col
+      );
+      if (!isValid && index === -1) {
+        invalidVals.push({ row, col, cellIdentifier });
+      } else if (isValid && index !== -1) {
+        invalidVals.splice(index, 1);
+      }
+    }
+
+    function getRenderer(rowHeader) {
+      return function (instance, td, row, col, prop, value, cellProperties) {
+        Handsontable.renderers.TextRenderer.apply(this, arguments);
+        td.style.textAlign = "left";
+
+        const isInvalid = invalidVals.some(
+          (item) => item.row === row && item.col === col
+        );
+        td.style.backgroundColor = isInvalid ? "#ffcccc" : "";
+
+        if (value === "" || value === null) {
+          td.innerHTML = cellProperties.placeholder || "";
+        }
+      };
+    }
+
     document.addEventListener("submit-handsontable", function () {
       const missingFields = [];
 
@@ -267,6 +381,15 @@ if (columns > 50) {
         alert(
           `Please fill in the following required fields:\n${missingFields.join("\n")}`
         );
+        return;
+      }
+
+      if (invalidVals.length > 0) {
+        const invalidCells = invalidVals
+          .map((item) => item.cellIdentifier)
+          .join("\n");
+        alert(`Please correct the following invalid values:\n${invalidCells}`);
+        event.preventDefault(); // Prevent form submission
         return;
       }
 

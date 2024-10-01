@@ -2,9 +2,7 @@
 
 ---
 
-<div
-  class="w-48 h-screen bg-neutral-100 flex flex-col items-center pt-1"
->
+<div class="w-48 h-screen bg-neutral-100 flex flex-col items-center pt-1">
   <div
     hx-get="/"
     hx-target="body"
@@ -23,6 +21,7 @@
         hx-get="/api/setup-config"
         hx-swap="innerHTML transition:true"
         hx-target="#main"
+        hx-push-url="true"
         >Create New SKUs
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -36,21 +35,41 @@
         >
       </button>
       <button
-      class="flex border bg-white rounded-md justify-between items-center hover:bg-gray-200 text-sm p-2 gap-2"
-      hx-get="/api/setup-config"
-      hx-swap="innerHTML transition:true"
-      hx-target="#main"
-      >Contact Us
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="25" fill="teal"><path d="M3 3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3ZM20 7.23792L12.0718 14.338L4 7.21594V19H20V7.23792ZM4.51146 5L12.0619 11.662L19.501 5H4.51146Z"></path></svg>
-    </button>
+        class="flex border bg-white rounded-md justify-between items-center hover:bg-gray-200 text-sm p-2 gap-2"
+        hx-get="/contact"
+        hx-target="body"
+        hx-swap="outerHTML transition:true"
+        hx-push-url="true"
+        >Contact Us
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="15"
+          height="25"
+          fill="teal"
+          ><path
+            d="M3 3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3ZM20 7.23792L12.0718 14.338L4 7.21594V19H20V7.23792ZM4.51146 5L12.0619 11.662L19.501 5H4.51146Z"
+          ></path></svg
+        >
+      </button>
       <button
-      class="flex border bg-white rounded-md justify-between items-center hover:bg-gray-200 text-sm p-2 gap-2"
-      hx-get="/api/setup-config"
-      hx-swap="innerHTML transition:true"
-      hx-target="#main"
-      >FAQs
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="25"  fill="teal"><path d="M12 19C12.8284 19 13.5 19.6716 13.5 20.5C13.5 21.3284 12.8284 22 12 22C11.1716 22 10.5 21.3284 10.5 20.5C10.5 19.6716 11.1716 19 12 19ZM12 2C15.3137 2 18 4.68629 18 8C18 10.1646 17.2474 11.2907 15.3259 12.9231C13.3986 14.5604 13 15.2969 13 17H11C11 14.526 11.787 13.3052 14.031 11.3989C15.5479 10.1102 16 9.43374 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8V9H6V8C6 4.68629 8.68629 2 12 2Z"></path></svg>
-    </button>
+        class="flex border bg-white rounded-md justify-between items-center hover:bg-gray-200 text-sm p-2 gap-2"
+        hx-get="/faq"
+        hx-target="body"
+        hx-swap="outerHTML transition:true"
+        hx-push-url="true"
+        >FAQs
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="15"
+          height="25"
+          fill="teal"
+          ><path
+            d="M12 19C12.8284 19 13.5 19.6716 13.5 20.5C13.5 21.3284 12.8284 22 12 22C11.1716 22 10.5 21.3284 10.5 20.5C10.5 19.6716 11.1716 19 12 19ZM12 2C15.3137 2 18 4.68629 18 8C18 10.1646 17.2474 11.2907 15.3259 12.9231C13.3986 14.5604 13 15.2969 13 17H11C11 14.526 11.787 13.3052 14.031 11.3989C15.5479 10.1102 16 9.43374 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8V9H6V8C6 4.68629 8.68629 2 12 2Z"
+          ></path></svg
+        >
+      </button>
     </div>
   </div>
 </div>

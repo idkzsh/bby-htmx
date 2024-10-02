@@ -18,9 +18,9 @@
     <div class="flex flex-col gap-2">
       <button
         class="flex border bg-white rounded-md justify-between items-center hover:bg-gray-200 text-sm p-2 gap-2"
-        hx-get="/api/setup-config"
+        hx-get="/new"
         hx-swap="innerHTML transition:true"
-        hx-target="#main"
+        hx-target="main"
         hx-push-url="true"
         >Create New SKUs
         <svg
@@ -37,8 +37,8 @@
       <button
         class="flex border bg-white rounded-md justify-between items-center hover:bg-gray-200 text-sm p-2 gap-2"
         hx-get="/contact"
-        hx-target="body"
-        hx-swap="outerHTML transition:true"
+        hx-target="main"
+        hx-swap="innerHTML transition:true"
         hx-push-url="true"
         >Contact Us
         <svg
@@ -55,8 +55,8 @@
       <button
         class="flex border bg-white rounded-md justify-between items-center hover:bg-gray-200 text-sm p-2 gap-2"
         hx-get="/faq"
-        hx-target="body"
-        hx-swap="outerHTML transition:true"
+        hx-swap="innerHTML transition:true"
+        hx-target="main"
         hx-push-url="true"
         >FAQs
         <svg

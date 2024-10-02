@@ -1,0 +1,66 @@
+---
+import { d } from "../data/hierarchy";
+import Layout from "../layouts/Layout.astro";
+const isHTMXRequest = Astro.request.headers.get('HX-Request') === 'true';
+---
+{isHTMXRequest ? (
+
+    <form
+      action="/setup"
+      class="border rounded-md flex flex-col p-4 gap-4 shadow-md font-normal text-base tracking-tight"
+      id="new"
+    >
+      <label for="email">Email</label>
+      <input name="email" type="email" class="border rounded-md p-1 w-80" />
+      <label for="department">Product Type</label>
+      <select
+        name="department"
+        id="department"
+        class="border h-10 rounded-md px-2"
+      >
+        {d.map((category, index) => <option value={index}>{category}</option>)}
+      </select>
+      <label for="numOfSKUs"># of SKUs</label>
+      <input name="numOfSKUs" type="number" class="border rounded-md p-1" />
+      <button
+        type="submit"
+        form="new"
+        class="w-80 hover:opacity-80 bg-black text-white rounded-md p-2"
+        >Submit</button
+      >
+    </form>
+
+) :
+<Layout title="new">
+  <main
+    class="flex flex-col w-[89.5%] h-[98%] bg-white mt-2 rounded-md border justify-center items-center gap-8 font-bold tracking-tighter text-3xl"
+    id="main"
+  >
+    <form
+      action="/setup"
+      class="border rounded-md flex flex-col p-4 gap-4 shadow-md font-normal text-base tracking-tight"
+      id="new"
+    >
+      <label for="email">Email</label>
+      <input name="email" type="email" class="border rounded-md p-1 w-80" />
+      <label for="department">Product Type</label>
+      <select
+        name="department"
+        id="department"
+        class="border h-10 rounded-md px-2"
+      >
+        {d.map((category, index) => <option value={index}>{category}</option>)}
+      </select>
+      <label for="numOfSKUs"># of SKUs</label>
+      <input name="numOfSKUs" type="number" class="border rounded-md p-1" />
+      <button
+        type="submit"
+        form="new"
+        class="w-80 hover:opacity-80 bg-black text-white rounded-md p-2"
+        >Submit</button
+      >
+    </form>
+  </main>
+</Layout>
+}
+

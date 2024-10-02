@@ -3,7 +3,11 @@ import Layout from "../layouts/Layout.astro";
 import { inputs } from "../data/setup";
 
 let columns = Number(Astro.url.searchParams.get("numOfSKUs") || 1);
-let email = Astro.url.searchParams.get("email") || "";
+let email = Astro.url.searchParams.get("email");
+
+if (!email) {
+  return Astro.redirect("/")
+}
 
 if (columns > 50) {
   columns = 50;

@@ -1,12 +1,23 @@
 ---
-import Layout from "../layouts/Layout.astro"
+import Layout from "../layouts/Layout.astro";
+const isHTMXRequest = Astro.request.headers.get("HX-Request") === "true";
 ---
 
-<Layout title="FAQs">
-    <main
-    class="flex w-[90%] h-[98%] bg-white mt-2 rounded-md border tracking-tight justify-center items-center"
-    id="main"
-  >
-faq - under construction
-</main>
-</Layout>
+{
+  isHTMXRequest ? (
+    <div class="border rounded-md flex flex-col p-4 gap-4 shadow-md font-normal text-base tracking-tight">
+      faq - under construction
+    </div>
+  ) : (
+    <Layout title="FAQs">
+      <main
+        class="flex w-[89.5%] h-[98%] bg-white mt-2 rounded-md border tracking-tight justify-center items-center"
+        id="main"
+      >
+        <div class="border rounded-md flex flex-col p-4 gap-4 shadow-md font-normal text-base tracking-tight">
+          faq - under construction
+        </div>
+      </main>
+    </Layout>
+  )
+}

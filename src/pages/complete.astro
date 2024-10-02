@@ -1,6 +1,13 @@
 ---
 import Layout from "../layouts/Layout.astro";
 
+const referer = Astro.request.headers.get('referer');
+const isLinkClick = referer && new URL(referer).hostname === Astro.url.hostname;
+
+if (isLinkClick === null) {
+  return Astro.redirect("/")
+}
+
 let columns: number = 1;
 let setupData;
 

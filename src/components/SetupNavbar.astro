@@ -53,10 +53,8 @@ let columns = Number(Astro.url.searchParams.get("numOfSKUs") || 1);
         </div>
         <button
           class="flex border bg-white rounded-md justify-between items-center hover:bg-gray-200 text-sm p-2 gap-2"
-          hx-get="/new"
-          hx-swap="outerHTML transition:true"
-          hx-target="body"
-          >Import Excel File
+          id="import-excel-modal"
+          >Import Template
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"

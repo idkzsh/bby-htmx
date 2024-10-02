@@ -25,6 +25,7 @@ if (columns > 50) {
       <!-- Hidden inputs will be dynamically added here -->
     </form>
     <div id="handsontable-container" class="w-full h-[400px]"></div>
+
     <!-- <form
         class="flex items-center justify-center gap-2 w-[600px]"
         id="uploadForm"
@@ -45,6 +46,25 @@ if (columns > 50) {
         </div>
       </form> -->
   </main>
+
+  <div id="excelModal" class="modal hidden fixed inset-0 overflow-y-auto h-full w-full z-100">
+    <div class="relative top-20 mx-auto p-5 border w-[30%] shadow-lg rounded-md bg-white z-100">
+      <h3 class="text-lg font-semibold mb-4">Import Excel Template</h3>
+      <form id="uploadForm" name="uploadForm" method="POST" enctype="multipart/form-data">
+        <input
+          type="file"
+          class="mb-4 w-full p-2 border rounded"
+          id="excelFileInput"
+          name="excelFileInput"
+          accept=".csv, .xlsx, .xlsb"
+        />
+        <div class="flex justify-between">
+          <button type="submit" id="template-upload" class="text-xs bg-black text-white px-4 py-2 rounded-md">Download Template</button>
+          <button type="button" id="closeModal" class="text-xs bg-black text-white px-4 py-2 rounded-md">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </Layout>
 
 <script
@@ -428,6 +448,26 @@ if (columns > 50) {
       // Submit the form
       setupForm.submit();
     });
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('excelModal');
+    const btn = document.getElementById('import-excel-modal');
+    const closeBtn = document.getElementById('closeModal');
+
+    btn.onclick = function() {
+      modal.classList.remove('hidden');
+    }
+
+    closeBtn.onclick = function() {
+      modal.classList.add('hidden');
+    }
+
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.classList.add('hidden');
+      }
+    }
   });
 </script>
 

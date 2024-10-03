@@ -48,7 +48,7 @@ if (Astro.request.method === "POST") {
 
 // Convert setupData to a plain object if it exists
 // const setupDataObject = setupData ? Object.fromEntries(setupData) : null;
-// console.log("compliance page: " + JSON.stringify(setupDataJSON));
+console.log("compliance page: " + JSON.stringify(setupDataJSON));
 ---
 
 <!-- unfortunately the cdn must be used for pdfjs as far as i can tell as it does not work very well on serverless as a dependency -->
@@ -329,7 +329,7 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
             case "number":
               cellProperties.type = "numeric";
               cellProperties.numericFormat = { pattern: "0" };
-              cellProperties.value = input.placeholder || "";
+              cellProperties.placeholder = input.placeholder;
               cellProperties.validator = function (value, callback) {
                 if (value === null || value === "") {
                   callback(true); // Allow empty values
@@ -352,16 +352,13 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
               ) {
                 Handsontable.renderers.NumericRenderer.apply(this, arguments);
                 td.style.textAlign = "left";
-                if (value === "" || value === null) {
-                  td.innerHTML = input.placeholder || "";
-                }
               };
               break;
 
             case "float":
               cellProperties.type = "numeric";
               cellProperties.numericFormat = { pattern: "0,0.0000" };
-              cellProperties.value = input.placeholder || "";
+              cellProperties.placeholder = input.placeholder;
               cellProperties.validator = function (value, callback) {
                 if (value === null || value === "") {
                   callback(true); // Allow empty values

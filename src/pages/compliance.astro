@@ -1,12 +1,13 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { complianceInputs } from "../data/compliance";
+import MSDSinfo from "../components/MSDSinfo.astro";
 
-const referer = Astro.request.headers.get('referer');
+const referer = Astro.request.headers.get("referer");
 const isLinkClick = referer && new URL(referer).hostname === Astro.url.hostname;
 
 if (isLinkClick === null) {
-  return Astro.redirect("/")
+  return Astro.redirect("/");
 }
 
 let columns: number = 1;
@@ -154,7 +155,7 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
 </script> -->
 <Layout>
   <main
-    class="flex w-[90%] h-[98%] bg-white mt-2 rounded-md border tracking-tight overflow-scroll"
+    class="flex w-[89.5%] h-[98%] bg-white mt-2 rounded-md border tracking-tight overflow-scroll"
     id="main"
   >
     <form action="/assets" method="POST" id="complianceForm" class="hidden">
@@ -198,6 +199,68 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
       >Submit</button
     >
   </nav> -->
+  <div
+    id="complianceModal"
+    class="modal hidden absolute inset-0 overflow-y-auto h-full w-full z-[10000]"
+  >
+    <div
+      class="relative top-20 mx-auto p-5 border w-[30%] h-[50%] shadow-lg rounded-md bg-white z-100"
+    >
+      <h3 class="text-lg font-semibold mb-4">Upload MSDS Files</h3>
+
+      <MSDSinfo
+        batteryType="Lithium-Ion"
+        requirements={[
+          "Watt hour (WH) rating + Battery net weight (kg)",
+          "OR",
+          "Milliampere (mAh) rating + Voltage (V) + Battery net weight (kg)",
+        ]}
+        tooltip="lithiumIon"
+      />
+      <MSDSinfo
+        batteryType="Lithium Metal"
+        requirements={["Lithium Content (g) + Battery net weight (kg)"]}
+        tooltip="lithiumMetal"
+      />
+
+      <form
+        id="msdsForm"
+        name="msdsForm"
+        method="POST"
+        enctype="multipart/form-data"
+      >
+        <input
+          type="file"
+          class="mb-4 w-full p-2 border rounded"
+          id="msdsFileInput"
+          name="msdsFileInput"
+          accept=".pdf"
+          multiple
+        />
+        <div
+        id="msdsPreview"
+        class="mb-4 w-full h-36 border-dashed border-2 border-gray-300 rounded-md p-2 overflow-y-scroll overflow-x-hidden"
+      >
+
+      </div>
+        <div class="flex justify-between">
+          <button
+            type="submit"
+            id="uploadMsds"
+            class="text-xs bg-black text-white px-4 py-2 rounded-md"
+            >Upload MSDS</button
+          >
+          <button
+            type="button"
+            id="closeModal"
+            class="text-xs bg-black text-white px-4 py-2 rounded-md"
+            >Close</button
+          >
+        </div>
+      </form>
+
+    </div>
+  </div>
 </Layout>
 
 <script
@@ -537,13 +600,84 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
     const complianceForm = document.getElementById("complianceForm");
     let selectedFiles = [];
 
-    document.addEventListener("filesSelected", function(event) {
+    document.addEventListener("filesSelected", function (event) {
       selectedFiles = event.detail;
     });
+  });
 
+  document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("complianceModal");
+    const btn = document.getElementById("msds-file-upload");
+    const closeBtn = document.getElementById("closeModal");
+
+    btn.onclick = function () {
+      modal.classList.remove("hidden");
+    };
+
+    closeBtn.onclick = function () {
+      modal.classList.add("hidden");
+    };
+
+    window.onclick = function (event) {
+      if (event.target == modal) {
+        modal.classList.add("hidden");
+      }
+    };
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const fileInput = document.getElementById("msdsFileInput");
+    const hiddenInput = document.getElementById("selectedFilesInput");
+
+    fileInput?.addEventListener("change", function () {
+      if (
+        hiddenInput instanceof HTMLInputElement &&
+        fileInput instanceof HTMLInputElement
+      ) {
+        hiddenInput.value = Array.from(fileInput.files || [])
+          .map((file) => file.name)
+          .join(", ");
+      }
+    });
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const fileInput = document.getElementById("msdsFileInput");
+    const msdsPreview = document.getElementById("msdsPreview");
+    const msdsForm = document.getElementById("msdsForm");
+    let uploadedFiles = new Set(); // To keep track of unique files
+
+    fileInput?.addEventListener("change", function (event) {
+      if (event.target instanceof HTMLInputElement) {
+        const files = event.target.files;
+
+        if (files) {
+          for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            if (!uploadedFiles.has(file.name)) {
+              uploadedFiles.add(file.name);
+              const fileItem = document.createElement("div");
+              fileItem.className = "mb-2";
+              fileItem.textContent = `${uploadedFiles.size}. ${file.name}`;
+              msdsPreview.appendChild(fileItem);
+            }
+          }
+        }
+      }
+    });
+
+    msdsForm?.addEventListener("submit", function(event) {
+      event.preventDefault();
+      
+      // Close the modal
+      const modal = document.getElementById("complianceModal");
+      modal?.classList.add("hidden");
+
+      // Optionally, you can trigger the submission of the complianceForm here
+      // document.getElementById("complianceForm")?.submit();
+    });
   });
 </script>
-
 
 <style>
   /* Optional: Add custom styles to improve header visibility */

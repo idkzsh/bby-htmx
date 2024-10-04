@@ -17,17 +17,11 @@
     <div class="flex flex-col justify-between h-full">
       <div class="flex flex-col gap-2">
         <label
-          for="msdsFileInput"
+          for="msds-file-upload"
+          id="msds-file-upload"
           class="flex border bg-white rounded-md justify-between items-center hover:bg-gray-200 text-sm p-2 gap-2 cursor-pointer"
         >
           Upload MSDS
-          <input
-            type="file"
-            id="msdsFileInput"
-            class="hidden"
-            accept=".pdf,.doc,.docx"
-            multiple
-          />
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -120,10 +114,13 @@
     const fileInput = document.getElementById("msdsFileInput");
     const hiddenInput = document.getElementById("selectedFilesInput");
 
-    fileInput?.addEventListener("change", function() {
-      if (hiddenInput instanceof HTMLInputElement && fileInput instanceof HTMLInputElement) {
+    fileInput?.addEventListener("change", function () {
+      if (
+        hiddenInput instanceof HTMLInputElement &&
+        fileInput instanceof HTMLInputElement
+      ) {
         hiddenInput.value = Array.from(fileInput.files || [])
-          .map(file => file.name)
+          .map((file) => file.name)
           .join(", ");
       }
     });

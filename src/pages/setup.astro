@@ -18,7 +18,7 @@ if (columns > 50) {
 
 <Layout title="Setup">
   <main
-    class="flex w-[90%] h-[98%] bg-white mt-2 rounded-md border tracking-tight overflow-scroll"
+    class="flex w-[89.5%] h-[98%] bg-white mt-2 rounded-md border tracking-tight overflow-scroll"
     id="main"
   >
     <form action="/compliance" method="POST" id="setupForm" class="hidden">
@@ -47,7 +47,7 @@ if (columns > 50) {
       </form> -->
   </main>
 
-  <div id="excelModal" class="modal hidden fixed inset-0 overflow-y-auto h-full w-full z-100">
+  <div id="excelModal" class="absolute modal hidden inset-0 overflow-y-auto h-full w-full z-[10000]">
     <div class="relative top-20 mx-auto p-5 border w-[30%] shadow-lg rounded-md bg-white z-100">
       <h3 class="text-lg font-semibold mb-4">Import Excel Template</h3>
       <form id="uploadForm" name="uploadForm" method="POST" enctype="multipart/form-data">

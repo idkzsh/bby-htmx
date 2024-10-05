@@ -1,7 +1,9 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { getSmartsheetData } from './api/smartsheet';
 import { inputs } from "../data/setup";
 import { cellMappings } from "../data/setup";
+
 
 const referer = Astro.request.headers.get("referer");
 const isLinkClick = referer && new URL(referer).hostname === Astro.url.hostname;
@@ -23,6 +25,26 @@ if (columns > 50) {
 } else if (columns <= 0) {
   columns = 1;
 }
+
+const { sampleData } = await getSmartsheetData();
+
+type SampleDataItem = string; // Adjust this type based on the actual data structure
+
+const itemsToRemove: SampleDataItem[] = [
+  "Product ID",
+  "* Primary UPC",
+  "SKU Owner",
+  "Model Number",
+  "RMS Long Description",
+  "SKU Required in Advance",
+  "Embargo Date"
+];
+
+const filteredSampleData = (sampleData as SampleDataItem[][]).map((subArray: SampleDataItem[]) => 
+  subArray.filter((item: SampleDataItem) => !itemsToRemove.includes(item))
+);
+
+console.log(filteredSampleData[0].length);
 ---
 
 <Layout title="Setup">
@@ -53,7 +75,7 @@ if (columns > 50) {
   href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css"
 />
 
-<script is:inline define:vars={{ cellMappings,columns, email, inputs }} type="module" defer>
+<script is:inline define:vars={{ cellMappings,columns, email, inputs, filteredSampleData }} type="module" defer>
   class DateTimeEditor extends Handsontable.editors.TextEditor {
     constructor(hotInstance) {
       super(hotInstance);
@@ -114,10 +136,11 @@ if (columns > 50) {
   document.addEventListener("DOMContentLoaded", function () {
     const container = document.getElementById("handsontable-container");
 
-    const headerNames = inputs.map((input) => input.name);
-    const rows = inputs.length;
+    const headerNames = inputs.map((input) => input.name).concat(filteredSampleData[0]);
+    const rows = inputs.length + filteredSampleData[0].length;
 
     const invalidVals = [];
+    const readOnlyFields = ["Product Specs/Information", "Product Data"]
 
     const data = Array(rows)
       .fill()
@@ -128,6 +151,11 @@ if (columns > 50) {
       rowHeaders: headerNames,
       rowHeaderWidth: 250, // Adjust this value as needed
       afterGetRowHeader: function (row, TH) {
+        const rowHeader = headerNames[row];
+        if (readOnlyFields.includes(rowHeader)) {
+          TH.style.fontWeight = "bold";
+          TH.style.backgroundColor = "#c0c0c0";
+        }
         // Force text wrapping for all row headers
         TH.style.whiteSpace = "normal";
         TH.style.overflow = "visible";
@@ -191,7 +219,7 @@ if (columns > 50) {
                 ? input.options
                 : Object.values(input.options);
 
-              cellProperties.allowInvalid = true;
+              cellProperties.allowInvalid = false;
               cellProperties.validator = function (value, callback) {
                 const isValid =
                   !value ||
@@ -203,24 +231,8 @@ if (columns > 50) {
                   isValid,
                   `${rowHeader} for SKU ${col + 1}`
                 );
-                callback(true); // Always return true to allow any input
+                callback(isValid);
               };
-              cellProperties.renderer = function (
-                instance,
-                td,
-                row,
-                col,
-                prop,
-                value,
-                cellProperties
-              ) {
-                Handsontable.renderers.DropdownRenderer.apply(this, arguments);
-                td.style.textAlign = "left";
-                if (value === "" || value === null) {
-                  td.innerHTML = input.placeholder || "";
-                }
-              };
-              cellProperties.renderer = getRenderer(rowHeader);
               break;
 
             case "datetime":
@@ -310,6 +322,24 @@ if (columns > 50) {
               ) {
                 Handsontable.renderers.NumericRenderer.apply(this, arguments);
                 td.style.textAlign = "left";
+              };
+              break;
+
+              case "readonly":
+              cellProperties.readOnly = true;
+              cellProperties.renderer = function (
+                instance,
+                td,
+                row,
+                col,
+                prop,
+                value,
+                cellProperties
+              ) {
+                Handsontable.renderers.TextRenderer.apply(this, arguments);
+                td.style.backgroundColor = "#c0c0c0";
+                td.style.textAlign = "center";
+                td.style.verticalAlign = "middle";
               };
               break;
           }

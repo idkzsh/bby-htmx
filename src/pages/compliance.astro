@@ -538,7 +538,8 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
       const data = hot.getData();
 
       for (let col = 0; col < columns; col++) {
-        const dangerousGoods = setupDataJSON["Dangerous Product/Material"][col];
+        const hasBattery = setupDataJSON["Has Battery"][col];
+        const hasLimitedQuantities = setupDataJSON["Has Limited Quantities"][col];
         const vendorAcknowledgement =
           data[
             complianceInputs.findIndex(
@@ -546,7 +547,7 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
             )
           ][col];
 
-        if (dangerousGoods === "Y_1") {
+        if (hasBattery === "Y" || hasLimitedQuantities === "Y") {
           // const batteryFields = [
           //   "Battery Type - UN 3480",
           //   "Battery Type - UN 3481",

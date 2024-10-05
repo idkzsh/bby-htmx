@@ -1,5 +1,9 @@
 const inputs = [
   {
+    name: "Product Data",
+    type: "readonly",
+  },
+  {
     name: "Vendor Part Number",
     dbName: "VPN",
     placeholder: "Maximum 20 Characters",
@@ -409,12 +413,24 @@ const inputs = [
     required: true,
   },
   {
-    name: "Dangerous Product/Material",
-    dbName: "DANGEROUS_PRODUCT",
+    name: "Has Battery",
+    dbName: "none",
     placeholder: "(Required) Select Y or N",
     type: "select",
-    options: ["Y_1", "N_0"],
+    options: ["Y", "N"],
     required: true,
+  },
+  {
+    name: "Has Limited Quantities",
+    dbName: "none",
+    placeholder: "(Required) Select Y or N",
+    type: "select",
+    options: ["Y", "N"],
+    required: true,
+  },
+  {
+    name: "Product Specs/Information",
+    type: "readonly",
   },
 ];
 

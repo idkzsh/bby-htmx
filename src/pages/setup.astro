@@ -12,7 +12,7 @@ if (isLinkClick === null) {
 
 let columns = Number(Astro.url.searchParams.get("numOfSKUs") || 1);
 let email = Astro.url.searchParams.get("email");
-const dept = Astro.url.searchParams.get("department") || "";
+const dept = JSON.stringify(Array(columns).fill(Astro.url.searchParams.get("department") || ""));
 
 if (!email) {
   return Astro.redirect("/");
@@ -34,56 +34,15 @@ if (columns > 50) {
       <input type="hidden" name="columns" value={columns} />
       <input type="hidden" name="email" value={email} />
       <input type="hidden" name="dept" value={dept} />
+      {
+        inputs.map((input) => (
+          <input type="hidden" name={input.name} value={[input.name]} />
+        ))
+      }
       <!-- Hidden inputs will be dynamically added here -->
     </form>
     <div id="handsontable-container" class="w-full h-[400px]"></div>
   </main>
-
-  <div
-    id="excelModal"
-    class="absolute modal hidden justify-center items-center overflow-y-auto h-full w-full z-[10000] bg-black bg-opacity-50"
-  >
-    <div class="border w-[30%] h-auto shadow-lg rounded-md bg-white p-4">
-      <form
-        id="uploadForm"
-        name="uploadForm"
-        method="POST"
-        enctype="multipart/form-data"
-        class="flex flex-col justify-evenly w-full h-full gap-2"
-      >
-        <div class="flex justify-between h-8">
-          <h3 class="text-lg font-semibold mb-4">Import Excel Template</h3>
-          <button
-            type="button"
-            id="closeModal"
-            class="text-xs bg-black text-white px-4 rounded-md hover:opacity-80">Close</button
-          >
-        </div>
-        <input
-          type="file"
-          class="mb-4 w-full p-2 border rounded"
-          id="excelFileInput"
-          name="excelFileInput"
-          accept=".csv, .xlsx, .xlsb"
-        />
-
-        <div class="flex justify-between h-8">
-          <button
-            type="button"
-            id="download-template"
-            class="text-xs bg-teal-700 text-white px-4 py-2 rounded-md w-[10rem] hover:opacity-80 transition-colors duration-300"
-            >Download Template</button
-          >
-          <button
-            type="submit"
-            id="template-upload"
-            class="text-xs bg-black text-white px-4 py-2 rounded-md hover:opacity-80"
-            >Submit</button
-          >
-        </div>
-      </form>
-    </div>
-  </div>
 </Layout>
 
 <script
@@ -94,7 +53,7 @@ if (columns > 50) {
   href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css"
 />
 
-<script define:vars={{ columns, email, inputs }} type="module" defer>
+<script is:inline define:vars={{ cellMappings,columns, email, inputs }} type="module" defer>
   class DateTimeEditor extends Handsontable.editors.TextEditor {
     constructor(hotInstance) {
       super(hotInstance);
@@ -173,6 +132,11 @@ if (columns > 50) {
         TH.style.whiteSpace = "normal";
         TH.style.overflow = "visible";
         TH.style.textAlign = "left";
+      },
+      afterChange: function (changes, source) {
+        if (source !== "loadData") {
+          updateFormInputs();
+        }
       },
       colHeaders: Array(columns)
         .fill()
@@ -403,6 +367,37 @@ if (columns > 50) {
       };
     }
 
+    function updateFormInputs() {
+      const tableData = hot.getData();
+      headerNames.forEach((header, rowIndex) => {
+        let input = setupForm.querySelector(`input[name="${header}"]`);
+        if (!input) {
+          input = document.createElement("input");
+          input.type = "hidden";
+          input.name = header;
+          setupForm.appendChild(input);
+        }
+        // Get all values for this row across all columns
+        const rowData = tableData[rowIndex];
+        input.value = JSON.stringify(rowData);
+      });
+    }
+
+    // Initial form population
+    updateFormInputs();
+
+    /**
+     * Validates the Handsontable data before form submission.
+     * 
+     * This function performs two main checks:
+     * 1. Ensures all required fields are filled out for each SKU.
+     * 2. Verifies that all cell values are of the correct data type and format.
+     * 
+     * If any required fields are missing or any values are invalid, it prevents
+     * form submission and displays an alert to the user with the specific issues.
+     * 
+     * If all validations pass, it allows the form to be submitted.
+     */
     document.addEventListener("submit-handsontable", function () {
       const missingFields = [];
 
@@ -435,83 +430,8 @@ if (columns > 50) {
         return;
       }
 
-      // Add hidden inputs with Handsontable data
-      const tableData = hot.getData();
-      headerNames.forEach((header, rowIndex) => {
-        const rowData = tableData[rowIndex];
-        const input = document.createElement("input");
-        input.type = "hidden";
-        input.name = header;
-        input.value = JSON.stringify(rowData);
-        setupForm.appendChild(input);
-      });
-
       // Submit the form
       setupForm.submit();
-    });
-  });
-
-  document.addEventListener("DOMContentLoaded", function () {
-    const modal = document.getElementById("excelModal");
-    const btn = document.getElementById("import-excel-modal");
-    const closeBtn = document.getElementById("closeModal");
-
-    btn.onclick = function () {
-      modal.classList.remove("hidden");
-      modal.classList.add("flex");
-    };
-
-    closeBtn.onclick = function () {
-      modal.classList.add("hidden");
-      modal.classList.remove("flex");
-    };
-
-    window.onclick = function (event) {
-      if (event.target == modal) {
-        modal.classList.add("hidden");
-        modal.classList.remove("flex");
-      }
-    };
-  });
-
-
-</script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-<script is:inline define:vars={{ cellMappings }}>
-  window.cellMappings = cellMappings;
-</script>
-
-<script is:raw>
-  document.addEventListener('DOMContentLoaded', function() {
-    const downloadButton = document.getElementById('download-template');
-
-    downloadButton.addEventListener('click', function() {
-      try {
-        // Create a new workbook
-        const workbook = XLSX.utils.book_new();
-        const wsData = [['Column A']];
-
-        // Populate data with cellMappings
-        Object.entries(window.cellMappings).forEach(([key, value]) => {
-          if (value != "dept") {
-            wsData.push([value]); // Use the value, not the key
-          }
-        });
-
-        // Create worksheet
-        const ws = XLSX.utils.aoa_to_sheet(wsData);
-
-        // Add worksheet to workbook
-        XLSX.utils.book_append_sheet(workbook, ws, "Template");
-
-        // Generate Excel file and trigger download
-        XLSX.writeFile(workbook, 'template.xlsx');
-      } catch (error) {
-        console.error('Error generating Excel file:', error);
-        alert('An error occurred while generating the Excel file. Please try again.');
-      }
     });
   });
 </script>

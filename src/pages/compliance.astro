@@ -201,28 +201,46 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
   </nav> -->
   <div
     id="complianceModal"
-    class="modal hidden absolute inset-0 overflow-y-auto h-full w-full z-[10000]"
+    class="justify-center items-center modal hidden absolute overflow-y-auto h-full w-full z-[10000]"
   >
     <div
-      class="relative top-20 mx-auto p-5 border w-[30%] h-[50%] shadow-lg rounded-md bg-white z-100"
+      class="flex flex-col justify-evenly w-[40%] h-[50%] shadow-lg rounded-md bg-white z-100 p-4 border"
     >
-      <h3 class="text-lg font-semibold mb-4">Upload MSDS Files</h3>
-
-      <MSDSinfo
-        batteryType="Lithium-Ion"
-        requirements={[
-          "Watt hour (WH) rating + Battery net weight (kg)",
-          "OR",
-          "Milliampere (mAh) rating + Voltage (V) + Battery net weight (kg)",
-        ]}
-        tooltip="lithiumIon"
-      />
-      <MSDSinfo
-        batteryType="Lithium Metal"
-        requirements={["Lithium Content (g) + Battery net weight (kg)"]}
-        tooltip="lithiumMetal"
-      />
-
+      <h3 class="text-lg font-semibold">Upload MSDS Files</h3>
+      <ul class="list-disc pl-8 ml-4">
+        <li>
+          <MSDSinfo
+            batteryType="Lithium-Ion"
+            requirements={[
+              "UN Number",
+              "Watt hour (WH) rating + Battery net weight (kg)",
+            ]}
+            tooltip="lithiumIon"
+          />
+        </li>
+        <li>
+          <MSDSinfo
+            batteryType="Lithium Metal"
+          requirements={[
+            "UN Number",
+            "Lithium Content (g) + Battery net weight (kg)",
+          ]}
+            tooltip="lithiumMetal"
+          />
+        </li>
+        <li>
+          <MSDSinfo
+            batteryType="Limited Quantities"
+          requirements={[
+            "UN Number",
+            "if product is a solid: mass per unit in kilograms (kg)",
+            "if product is a liquid, compressed gas, or aerosol canister: volume of the container in liters (L)",
+            "information specific to the product in question",
+          ]}
+            tooltip="limitedQuantities"
+          />
+        </li>
+      </ul>
       <form
         id="msdsForm"
         name="msdsForm"
@@ -238,11 +256,10 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
           multiple
         />
         <div
-        id="msdsPreview"
-        class="mb-4 w-full h-36 border-dashed border-2 border-gray-300 rounded-md p-2 overflow-y-scroll overflow-x-hidden"
-      >
-
-      </div>
+          id="msdsPreview"
+          class="mb-4 w-full h-36 border-dashed border-2 border-gray-300 rounded-md p-2 overflow-y-scroll overflow-x-hidden"
+        >
+        </div>
         <div class="flex justify-between">
           <button
             type="submit"
@@ -258,7 +275,6 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
           >
         </div>
       </form>
-
     </div>
   </div>
 </Layout>
@@ -612,15 +628,18 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
 
     btn.onclick = function () {
       modal.classList.remove("hidden");
+      modal.classList.add("flex");
     };
 
     closeBtn.onclick = function () {
       modal.classList.add("hidden");
+      modal.classList.remove("flex");
     };
 
     window.onclick = function (event) {
       if (event.target == modal) {
         modal.classList.add("hidden");
+        modal.classList.remove("flex");
       }
     };
   });
@@ -666,15 +685,13 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
       }
     });
 
-    msdsForm?.addEventListener("submit", function(event) {
+    msdsForm?.addEventListener("submit", function (event) {
       event.preventDefault();
-      
+
       // Close the modal
       const modal = document.getElementById("complianceModal");
       modal?.classList.add("hidden");
-
-      // Optionally, you can trigger the submission of the complianceForm here
-      // document.getElementById("complianceForm")?.submit();
+      modal?.classList.remove("flex");
     });
   });
 </script>

@@ -6,7 +6,7 @@ let columns = Number(Astro.url.searchParams.get("numOfSKUs") || 1);
 let email = Astro.url.searchParams.get("email");
 
 if (!email) {
-  return Astro.redirect("/")
+  return Astro.redirect("/");
 }
 
 if (columns > 50) {
@@ -47,10 +47,26 @@ if (columns > 50) {
       </form> -->
   </main>
 
-  <div id="excelModal" class="absolute modal hidden inset-0 overflow-y-auto h-full w-full z-[10000]">
-    <div class="relative top-20 mx-auto p-5 border w-[30%] shadow-lg rounded-md bg-white z-100">
-      <h3 class="text-lg font-semibold mb-4">Import Excel Template</h3>
-      <form id="uploadForm" name="uploadForm" method="POST" enctype="multipart/form-data">
+  <div
+    id="excelModal"
+    class="absolute modal hidden justify-center items-center overflow-y-auto h-full w-full z-[10000]"
+  >
+    <div class="border w-[30%] h-auto shadow-lg rounded-md bg-white z-100 p-4">
+      <form
+        id="uploadForm"
+        name="uploadForm"
+        method="POST"
+        enctype="multipart/form-data"
+        class="flex flex-col justify-evenly w-full h-full gap-2"
+      >
+        <div class="flex justify-between h-8">
+          <h3 class="text-lg font-semibold mb-4">Import Excel Template</h3>
+          <button
+            type="button"
+            id="closeModal"
+            class="text-xs bg-black text-white px-4 rounded-md">Close</button
+          >
+        </div>
         <input
           type="file"
           class="mb-4 w-full p-2 border rounded"
@@ -58,9 +74,20 @@ if (columns > 50) {
           name="excelFileInput"
           accept=".csv, .xlsx, .xlsb"
         />
-        <div class="flex justify-between">
-          <button type="submit" id="template-upload" class="text-xs bg-black text-white px-4 py-2 rounded-md">Download Template</button>
-          <button type="button" id="closeModal" class="text-xs bg-black text-white px-4 py-2 rounded-md">Close</button>
+
+        <div class="flex justify-between h-8">
+          <button
+            type="button"
+            id="template-upload"
+            class="text-xs bg-black text-white px-4 py-2 rounded-md w-[10rem]"
+            >Download Template</button
+          >
+          <button
+            type="submit"
+            id="template-upload"
+            class="text-xs bg-black text-white px-4 py-2 rounded-md"
+            >Submit</button
+          >
         </div>
       </form>
     </div>
@@ -262,7 +289,6 @@ if (columns > 50) {
               cellProperties.renderer = getRenderer(rowHeader);
               break;
 
-
             case "number":
               cellProperties.type = "numeric";
               cellProperties.numericFormat = { pattern: "0" };
@@ -450,24 +476,27 @@ if (columns > 50) {
     });
   });
 
-  document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById('excelModal');
-    const btn = document.getElementById('import-excel-modal');
-    const closeBtn = document.getElementById('closeModal');
+  document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("excelModal");
+    const btn = document.getElementById("import-excel-modal");
+    const closeBtn = document.getElementById("closeModal");
 
-    btn.onclick = function() {
-      modal.classList.remove('hidden');
-    }
+    btn.onclick = function () {
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    };
 
-    closeBtn.onclick = function() {
-      modal.classList.add('hidden');
-    }
+    closeBtn.onclick = function () {
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    };
 
-    window.onclick = function(event) {
+    window.onclick = function (event) {
       if (event.target == modal) {
-        modal.classList.add('hidden');
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
       }
-    }
+    };
   });
 </script>
 

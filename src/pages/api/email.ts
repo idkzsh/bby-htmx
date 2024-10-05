@@ -51,8 +51,10 @@ async function processExcelFile(setupData: Record<string, any>) {
     const columns = parseInt(setupData.columns) || 1;
     console.log("Number of columns:", columns);
 
+    console.log(setupData.dept)
+
     const cellMappings = {
-      "28": "Department",
+      "28": "dept",
       "37": 'Vendor Part Number',
       "29": 'SKU Title (Short)',
       "30": 'SKU Title (Long)',

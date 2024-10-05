@@ -1,12 +1,18 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { inputs } from "../data/setup";
+import { cellMappings } from "../data/setup";
+
+const referer = Astro.request.headers.get("referer");
+const isLinkClick = referer && new URL(referer).hostname === Astro.url.hostname;
+
+if (isLinkClick === null) {
+  return Astro.redirect("/");
+}
 
 let columns = Number(Astro.url.searchParams.get("numOfSKUs") || 1);
 let email = Astro.url.searchParams.get("email");
 const dept = Astro.url.searchParams.get("department") || "";
-
-console.log(dept)
 
 if (!email) {
   return Astro.redirect("/");
@@ -64,7 +70,7 @@ if (columns > 50) {
         <div class="flex justify-between h-8">
           <button
             type="button"
-            id="template-upload"
+            id="download-template"
             class="text-xs bg-teal-700 text-white px-4 py-2 rounded-md w-[10rem] hover:opacity-80 transition-colors duration-300"
             >Download Template</button
           >
@@ -466,6 +472,47 @@ if (columns > 50) {
         modal.classList.remove("flex");
       }
     };
+  });
+
+
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script is:inline define:vars={{ cellMappings }}>
+  window.cellMappings = cellMappings;
+</script>
+
+<script is:raw>
+  document.addEventListener('DOMContentLoaded', function() {
+    const downloadButton = document.getElementById('download-template');
+
+    downloadButton.addEventListener('click', function() {
+      try {
+        // Create a new workbook
+        const workbook = XLSX.utils.book_new();
+        const wsData = [['Column A']];
+
+        // Populate data with cellMappings
+        Object.entries(window.cellMappings).forEach(([key, value]) => {
+          if (value != "dept") {
+            wsData.push([value]); // Use the value, not the key
+          }
+        });
+
+        // Create worksheet
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+        // Add worksheet to workbook
+        XLSX.utils.book_append_sheet(workbook, ws, "Template");
+
+        // Generate Excel file and trigger download
+        XLSX.writeFile(workbook, 'template.xlsx');
+      } catch (error) {
+        console.error('Error generating Excel file:', error);
+        alert('An error occurred while generating the Excel file. Please try again.');
+      }
+    });
   });
 </script>
 

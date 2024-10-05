@@ -1,16 +1,16 @@
 import type { APIRoute } from "astro";
-import nodemailer from 'nodemailer';
-import { excelTemplateBuffer } from '../../lib/excelTemplate';
-import { getEnv } from '../../utils/env';
-
+import nodemailer from "nodemailer";
+import { excelTemplateBuffer } from "../../lib/excelTemplate";
+import { getEnv } from "../../utils/env";
+import { cellMappings } from "../../data/setup";
 
 export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   const formData = await request.formData();
-  const setupDataString = formData.get('setupData');
+  const setupDataString = formData.get("setupData");
 
-  console.log(formData)
+  console.log(formData);
 
-  if (!setupDataString || typeof setupDataString !== 'string') {
+  if (!setupDataString || typeof setupDataString !== "string") {
     return new Response(JSON.stringify({ error: "Invalid setup data" }), {
       status: 400,
       headers: { "Content-Type": "application/json" },
@@ -29,7 +29,7 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
     }
 
     await sendEmail(buffer, email.toString());
-    
+
     return redirect("/complete");
   } catch (error) {
     console.error("Error in POST route:", error);
@@ -42,89 +42,44 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
 
 async function processExcelFile(setupData: Record<string, any>) {
   try {
+    const XlsxPopulate = (await import("xlsx-populate")) as any;
 
-    const XlsxPopulate = await import('xlsx-populate') as any;
-    
-    const workbook = await XlsxPopulate.default.fromDataAsync(excelTemplateBuffer);
+    const workbook = await XlsxPopulate.default.fromDataAsync(
+      excelTemplateBuffer
+    );
     const sheet = workbook.sheet(0);
-   
+
     const columns = parseInt(setupData.columns) || 1;
     console.log("Number of columns:", columns);
 
-    console.log(setupData.dept)
+    for (const [row, key] of Object.entries(cellMappings)) {
+      const value = setupData[key];
+      console.log(`Processing ${key}:`, value);
 
-    const cellMappings = {
-      "28": "dept",
-      "37": 'Vendor Part Number',
-      "29": 'SKU Title (Short)',
-      "30": 'SKU Title (Long)',
-      "31": 'UPC',
-      "32": 'Secondary UPC',
-      "33": 'Brand Name',
-      "34": 'Model Number',
-      "35": 'Manufacturer',
-      "38": 'Unit Cost',
-      "39": 'Retail Price',
-      "40": 'Width (Boxed)',
-      "41": 'Height (Boxed)',
-      "42": 'Length (Boxed)',
-      "43": 'Weight (Boxed)',
-      "44": 'Width (Unboxed)',
-      "45": 'Height (Unboxed)',
-      "46": 'Length (Unboxed)',
-      "47": 'Weight (Unboxed)',
-      "48": 'Casepack',
-      "49": 'Innerpack',
-      "50": 'Unit Cost For Additional Supplier(1)',
-      "51": 'Case Pack Qty For Additional Supplier(1)',
-      "52": 'Inner Pack Qty For Additional Supplier(1)',
-      "53": 'Unit Cost For Additional Supplier(2)',
-      "54": 'Case Pack Qty For Additional Supplier(2)',
-      "55": 'Inner Pack Qty For Additional Supplier(2)',
-      "56": 'French Compliant',
-      "57": 'Energy Star',
-      "58": 'Refurbished',
-      "59": 'Consignment',
-      "60": 'Software Platform',
-      "61": 'Street Date',
-      "69": 'Product Warranty Days',
-      "70": 'Product Warranty Coverage',
-      "71": 'Extended Parts Warranty',
-      "72": 'Return Restrictions',
-      "73": 'Embargo Date',
-      "74": 'Expiration Date/Lot Number',
-      "75": 'Shelf Life',
-      "76": 'Data Flag',
-      "78": 'Dangerous Product/Material',
-    };
+      if (value !== undefined) {
+        const parsedValues = Array.isArray(value) ? value : [value];
+        for (let i = 0; i < columns && i < parsedValues.length; i++) {
+          const cellReference = `${getExcelColumn(i + 5)}${row}`; // E, F, G, ..., Z, AA, AB, etc.
+          let formattedValue = parsedValues[i];
 
-
-      for (const [row, key] of Object.entries(cellMappings)) {
-        const value = setupData[key];
-        console.log(`Processing ${key}:`, value);
-        
-        if (value !== undefined) {
-          const parsedValues = Array.isArray(value) ? value : [value];
-          for (let i = 0; i < columns && i < parsedValues.length; i++) {
-            const cellReference = `${getExcelColumn(i + 5)}${row}`; // E, F, G, ..., Z, AA, AB, etc.
-            let formattedValue = parsedValues[i];
-            
-            // Format Street Date
-            if (key === 'Street Date') {
-              formattedValue = formatDate(formattedValue, 'yyyyMMddHHmmss');
-            }
-            // Format Embargo Date
-            else if (key === 'Embargo Date') {
-              formattedValue = formatDate(formattedValue, 'yyyyMMdd');
-            }
-            
-            console.log(`Setting ${key} in cell ${cellReference}:`, formattedValue);
-            sheet.cell(cellReference).value(formattedValue);
+          // Format Street Date
+          if (key === "Street Date") {
+            formattedValue = formatDate(formattedValue, "yyyyMMddHHmmss");
           }
-        } else {
-          console.log(`No value found for ${key}`);
+          // Format Embargo Date
+          else if (key === "Embargo Date") {
+            formattedValue = formatDate(formattedValue, "yyyyMMdd");
+          }
+
+          console.log(
+            `Setting ${key} in cell ${cellReference}:`,
+            formattedValue
+          );
+          sheet.cell(cellReference).value(formattedValue);
         }
-      
+      } else {
+        console.log(`No value found for ${key}`);
+      }
     }
 
     return await workbook.outputAsync();
@@ -135,7 +90,7 @@ async function processExcelFile(setupData: Record<string, any>) {
 }
 
 function getExcelColumn(columnIndex: number): string {
-  let columnName = '';
+  let columnName = "";
   while (columnIndex > 0) {
     columnIndex--;
     columnName = String.fromCharCode(65 + (columnIndex % 26)) + columnName;
@@ -151,7 +106,7 @@ async function sendEmail(buffer: Buffer, email: String) {
     secure: false,
     auth: {
       user: "zachflentgewong@gmail.com",
-      pass: getEnv('APP_PASS'),
+      pass: getEnv("APP_PASS"),
     },
   });
 
@@ -171,14 +126,17 @@ async function sendEmail(buffer: Buffer, email: String) {
   console.log("Email sent successfully");
 }
 
-function formatDate(dateString: string, format: 'yyyyMMddHHmmss' | 'yyyyMMdd'): string {
+function formatDate(
+  dateString: string,
+  format: "yyyyMMddHHmmss" | "yyyyMMdd"
+): string {
   const date = new Date(dateString);
   if (isNaN(date.getTime())) {
     console.warn(`Invalid date: ${dateString}`);
     return dateString; // Return original string if it's not a valid date
   }
 
-  const pad = (num: number) => num.toString().padStart(2, '0');
+  const pad = (num: number) => num.toString().padStart(2, "0");
 
   const yyyy = date.getFullYear();
   const MM = pad(date.getMonth() + 1);
@@ -187,7 +145,7 @@ function formatDate(dateString: string, format: 'yyyyMMddHHmmss' | 'yyyyMMdd'): 
   const mm = pad(date.getMinutes());
   const ss = pad(date.getSeconds());
 
-  if (format === 'yyyyMMddHHmmss') {
+  if (format === "yyyyMMddHHmmss") {
     return `${yyyy}${MM}${dd}${HH}${mm}${ss}`;
   } else {
     return `${yyyy}${MM}${dd}`;

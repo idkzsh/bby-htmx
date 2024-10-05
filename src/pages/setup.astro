@@ -49,9 +49,9 @@ if (columns > 50) {
 
   <div
     id="excelModal"
-    class="absolute modal hidden justify-center items-center overflow-y-auto h-full w-full z-[10000]"
+    class="absolute modal hidden justify-center items-center overflow-y-auto h-full w-full z-[10000] bg-black bg-opacity-50"
   >
-    <div class="border w-[30%] h-auto shadow-lg rounded-md bg-white z-100 p-4">
+    <div class="border w-[30%] h-auto shadow-lg rounded-md bg-white p-4">
       <form
         id="uploadForm"
         name="uploadForm"
@@ -64,7 +64,7 @@ if (columns > 50) {
           <button
             type="button"
             id="closeModal"
-            class="text-xs bg-black text-white px-4 rounded-md">Close</button
+            class="text-xs bg-black text-white px-4 rounded-md hover:opacity-80">Close</button
           >
         </div>
         <input
@@ -79,13 +79,13 @@ if (columns > 50) {
           <button
             type="button"
             id="template-upload"
-            class="text-xs bg-black text-white px-4 py-2 rounded-md w-[10rem]"
+            class="text-xs bg-black text-white px-4 py-2 rounded-md w-[10rem] hover:opacity-80"
             >Download Template</button
           >
           <button
             type="submit"
             id="template-upload"
-            class="text-xs bg-black text-white px-4 py-2 rounded-md"
+            class="text-xs bg-black text-white px-4 py-2 rounded-md hover:opacity-80"
             >Submit</button
           >
         </div>

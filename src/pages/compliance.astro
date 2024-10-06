@@ -171,34 +171,6 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
     <div id="handsontable-container" class="w-full h-[400px]"></div>
   </main>
 
-  <!-- <nav
-    class="flex h-12 w-full border-b items-center px-2 justify-between fixed top-20 bg-background z-40"
-  >
-    <div class="flex gap-2">
-      <form
-        x-data="{ fileSelected: false }"
-        action=""
-        name="msdsForm"
-        id="msdsForm"
-        class="flex w-auto"
-        enctype="multipart/form-data"
-        method="POST"
-      >
-        <input
-          name="MSDS"
-          id="MSDS"
-          type="file"
-          accept=".pdf"
-          @change="fileSelected = $event.target.files.length > 0"
-          multiple
-        />
-
-      </form>
-    </div>
-    <button class="btn text-xs" type="submit" form="complianceForm"
-      >Submit</button
-    >
-  </nav> -->
   <div
     id="complianceModal"
     class="justify-center items-center modal hidden absolute overflow-y-auto h-full w-full z-[9999] bg-black bg-opacity-50"
@@ -548,33 +520,6 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
           ][col];
 
         if (hasBattery === "Y" || hasLimitedQuantities === "Y") {
-          // const batteryFields = [
-          //   "Battery Type - UN 3480",
-          //   "Battery Type - UN 3481",
-          //   "Battery Type - UN 3090",
-          //   "Battery Type - UN 3091",
-          // ];
-          // const limitedQuantityField = "Limited Quantities";
-
-          // const hasBattery = batteryFields.some(
-          //   (field) =>
-          //     data[complianceInputs.findIndex((input) => input.name === field)][
-          //       col
-          //     ] !== ""
-          // );
-          // const hasLimitedQuantity =
-          //   data[
-          //     complianceInputs.findIndex(
-          //       (input) => input.name === limitedQuantityField
-          //     )
-          //   ][col] !== "";
-
-          // if (!hasBattery && !hasLimitedQuantity) {
-          //   missingFields.push(
-          //     `At least one Battery Type or Limited Quantities for SKU ${col + 1}`
-          //   );
-          // }
-
           if (vendorAcknowledgement !== "Y") {
             missingFields.push(
               `Vendor Acknowledgement must be Y for SKU ${col + 1}`
@@ -610,15 +555,6 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
 
       // Submit the form
       complianceForm.submit();
-    });
-  });
-
-  document.addEventListener("DOMContentLoaded", function () {
-    const complianceForm = document.getElementById("complianceForm");
-    let selectedFiles = [];
-
-    document.addEventListener("filesSelected", function (event) {
-      selectedFiles = event.detail;
     });
   });
 

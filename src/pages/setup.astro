@@ -1,9 +1,9 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { getSmartsheetData } from './api/smartsheet';
+import { getSmartsheetData } from "./api/smartsheet";
 import { inputs } from "../data/setup";
 import { cellMappings } from "../data/setup";
-
+import { d } from "../data/hierarchy";
 
 const referer = Astro.request.headers.get("referer");
 const isLinkClick = referer && new URL(referer).hostname === Astro.url.hostname;
@@ -14,7 +14,24 @@ if (isLinkClick === null) {
 
 let columns = Number(Astro.url.searchParams.get("numOfSKUs") || 1);
 let email = Astro.url.searchParams.get("email");
-const dept = JSON.stringify(Array(columns).fill(Astro.url.searchParams.get("department") || ""));
+const dept = JSON.stringify(
+  Array(columns).fill(Astro.url.searchParams.get("department") || "")
+);
+
+const numDept = Astro.url.searchParams.get("department") || "";
+
+const smartSheet = Astro.url.searchParams.get("subCategory") || "";
+
+let selectedSmartsheet = smartSheet;
+
+if (smartSheet === "") {
+  
+  d.forEach((dept) => {
+    if (String(dept.dept) === numDept) {
+      selectedSmartsheet = dept.value;
+    }
+  });
+}
 
 if (!email) {
   return Astro.redirect("/");
@@ -26,7 +43,7 @@ if (columns > 50) {
   columns = 1;
 }
 
-const { sampleData } = await getSmartsheetData();
+const { sampleData } = getSmartsheetData(selectedSmartsheet);
 
 type SampleDataItem = string; // Adjust this type based on the actual data structure
 
@@ -37,14 +54,15 @@ const itemsToRemove: SampleDataItem[] = [
   "Model Number",
   "RMS Long Description",
   "SKU Required in Advance",
-  "Embargo Date"
+  "Embargo Date",
 ];
 
-const filteredSampleData = (sampleData as SampleDataItem[][]).map((subArray: SampleDataItem[]) => 
-  subArray.filter((item: SampleDataItem) => !itemsToRemove.includes(item))
+const filteredSampleData = (sampleData as SampleDataItem[][]).map(
+  (subArray: SampleDataItem[]) =>
+    subArray.filter((item: SampleDataItem) => !itemsToRemove.includes(item))
 );
 
-console.log(filteredSampleData[0].length);
+// console.log(filteredSampleData[0]);
 ---
 
 <Layout title="Setup">
@@ -55,13 +73,25 @@ console.log(filteredSampleData[0].length);
     <form action="/compliance" method="POST" id="setupForm" class="hidden">
       <input type="hidden" name="columns" value={columns} />
       <input type="hidden" name="email" value={email} />
+      <!-- Product Data inputs -->
       <input type="hidden" name="dept" value={dept} />
       {
         inputs.map((input) => (
           <input type="hidden" name={input.name} value={[input.name]} />
         ))
       }
-      <!-- Hidden inputs will be dynamically added here -->
+      <!-- Product Specs/Information inputs -->
+      {
+        filteredSampleData[0].map((row) => (
+          <input type="hidden" name={row} value={[row]} />
+        ))
+      }
+
+      <input
+        type="hidden"
+        name="Dangerous Product/Material"
+        value={["testing"]}
+      />
     </form>
     <div id="handsontable-container" class="w-full h-[400px]"></div>
   </main>
@@ -75,7 +105,18 @@ console.log(filteredSampleData[0].length);
   href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css"
 />
 
-<script is:inline define:vars={{ cellMappings,columns, email, inputs, filteredSampleData }} type="module" defer>
+<script
+  is:inline
+  define:vars={{
+    cellMappings,
+    columns,
+    email,
+    inputs,
+    filteredSampleData,
+  }}
+  type="module"
+  defer
+>
   class DateTimeEditor extends Handsontable.editors.TextEditor {
     constructor(hotInstance) {
       super(hotInstance);
@@ -136,11 +177,13 @@ console.log(filteredSampleData[0].length);
   document.addEventListener("DOMContentLoaded", function () {
     const container = document.getElementById("handsontable-container");
 
-    const headerNames = inputs.map((input) => input.name).concat(filteredSampleData[0]);
+    const headerNames = inputs
+      .map((input) => input.name)
+      .concat(filteredSampleData[0]);
     const rows = inputs.length + filteredSampleData[0].length;
 
     const invalidVals = [];
-    const readOnlyFields = ["Product Specs/Information", "Product Data"]
+    const readOnlyFields = ["Product Specs/Information", "Product Data"];
 
     const data = Array(rows)
       .fill()
@@ -325,7 +368,7 @@ console.log(filteredSampleData[0].length);
               };
               break;
 
-              case "readonly":
+            case "readonly":
               cellProperties.readOnly = true;
               cellProperties.renderer = function (
                 instance,
@@ -399,6 +442,8 @@ console.log(filteredSampleData[0].length);
 
     function updateFormInputs() {
       const tableData = hot.getData();
+      const dangerousProduct = Array(columns).fill("N_0");
+
       headerNames.forEach((header, rowIndex) => {
         let input = setupForm.querySelector(`input[name="${header}"]`);
         if (!input) {
@@ -407,10 +452,34 @@ console.log(filteredSampleData[0].length);
           input.name = header;
           setupForm.appendChild(input);
         }
-        // Get all values for this row across all columns
+
+        // console.log(header);
         const rowData = tableData[rowIndex];
         input.value = JSON.stringify(rowData);
+
+        if (header === "Has Battery" || header === "Has Limited Quantities") {
+          console.log(`Checking ${header}:`, rowData);
+          rowData.forEach((value, colIndex) => {
+            if (value === "Y") {
+              console.log(
+                `${header} is Y for column ${colIndex}, setting dangerousProduct to Y_1`
+              );
+              dangerousProduct[colIndex] = "Y_1";
+            }
+          });
+        }
       });
+
+      // Update the Dangerous Product/Material input after the loop
+      const dangerousInput = setupForm.querySelector(
+        'input[name="Dangerous Product/Material"]'
+      );
+      if (dangerousInput) {
+        dangerousInput.value = JSON.stringify(dangerousProduct);
+        console.log("Updated Dangerous Product/Material to:", dangerousProduct);
+      } else {
+        console.error("Couldn't find Dangerous Product/Material input");
+      }
     }
 
     // Initial form population
@@ -418,14 +487,14 @@ console.log(filteredSampleData[0].length);
 
     /**
      * Validates the Handsontable data before form submission.
-     * 
+     *
      * This function performs two main checks:
      * 1. Ensures all required fields are filled out for each SKU.
      * 2. Verifies that all cell values are of the correct data type and format.
-     * 
+     *
      * If any required fields are missing or any values are invalid, it prevents
      * form submission and displays an alert to the user with the specific issues.
-     * 
+     *
      * If all validations pass, it allows the form to be submitted.
      */
     document.addEventListener("submit-handsontable", function () {

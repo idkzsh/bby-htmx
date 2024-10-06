@@ -129,19 +129,14 @@ h1 {
   justify-content: center;
   align-items: center;
   background-color: white;
-  width: 9rem;
-  height: 9rem;
-  /* color: var(--btn-txt); */
-  font-size: small;
+  width: 6rem;
+  height: 6rem;
+  font-size: 12px;
   font-weight: normal;
-  padding: 0.3rem 0.5rem;
-  /* border: 0.5px solid lightgray; */
-  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
   border-radius: calc(var(--radius) - 2px);
 }
 
 .btn:hover {
-
   transform: scale(1.05); /* Scale up by 5% on hover */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }

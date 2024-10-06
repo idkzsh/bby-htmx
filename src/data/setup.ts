@@ -296,7 +296,7 @@ const inputs = [
   {
     name: "Refurbished",
     dbName: "REFURBISHED",
-    placeholder: "(Required) Choose Y or N",
+    placeholder: "Choose Y or N",
     type: "select",
     options: ["Y_1", "N_0"],
     required: true,
@@ -304,7 +304,7 @@ const inputs = [
   {
     name: "Consignment",
     dbName: "CONSIGNMENT",
-    placeholder: "(Required) Choose Y or N",
+    placeholder: "Choose Y or N",
     type: "select",
     options: ["Y_1", "N_0"],
     required: true,
@@ -343,7 +343,7 @@ const inputs = [
   {
     name: "Product Warranty Days",
     dbName: "RA_PRODUCT_WRNTY_DAYS",
-    placeholder: "(Required) Select from list of values",
+    placeholder: "Select from list of values",
     type: "select",
     options: ["0", "30", "45", "60", "90", "120", "180", "182", "270", "365", "548", "730"],
     required: true,
@@ -351,7 +351,7 @@ const inputs = [
   {
     name: "Product Warranty Coverage",
     dbName: "PRODUCT_WRNTY_COVERAGE",
-    placeholder: "(Required) Select from list of values",
+    placeholder: "Select from list of values",
     type: "select",
     options: [
       "PARTS & LABOUR",
@@ -407,7 +407,7 @@ const inputs = [
   {
     name: "Data Flag",
     dbName: "DATA_FLAG",
-    placeholder: "(Required) Select Y or N",
+    placeholder: "Select Y or N",
     type: "select",
     options: ["Y", "N"],
     required: true,
@@ -415,7 +415,7 @@ const inputs = [
   {
     name: "Has Battery",
     dbName: "none",
-    placeholder: "(Required) Select Y or N",
+    placeholder: "Select Y or N",
     type: "select",
     options: ["Y", "N"],
     required: true,
@@ -423,7 +423,7 @@ const inputs = [
   {
     name: "Has Limited Quantities",
     dbName: "none",
-    placeholder: "(Required) Select Y or N",
+    placeholder: "Select Y or N",
     type: "select",
     options: ["Y", "N"],
     required: true,

@@ -13,7 +13,8 @@ import Layout from "../layouts/Layout.astro";
 
 <Layout>
   <main
-    class="flex flex-col w-[89.5%] h-[98%] bg-white mt-2 rounded-md border justify-center items-center gap-8 font-bold tracking-tighter text-3xl" id="main"
+    class="flex flex-col w-[89.5%] h-[98%] bg-white mt-2 rounded-md border justify-center items-center gap-8 font-bold tracking-tight text-3xl"
+    id="main"
   >
     BestBuy Canada SKU Setup Portal
     <div class="flex gap-4">
@@ -23,28 +24,73 @@ import Layout from "../layouts/Layout.astro";
         hx-get="/new"
         hx-swap="innerHTML transition:true"
         hx-target="main"
-        hx-push-url="true">New SKUs
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="25" height="25" fill="teal"><path d="M9.97308 18H11V13H13V18H14.0269C14.1589 16.7984 14.7721 15.8065 15.7676 14.7226C15.8797 14.6006 16.5988 13.8564 16.6841 13.7501C17.5318 12.6931 18 11.385 18 10C18 6.68629 15.3137 4 12 4C8.68629 4 6 6.68629 6 10C6 11.3843 6.46774 12.6917 7.31462 13.7484C7.40004 13.855 8.12081 14.6012 8.23154 14.7218C9.22766 15.8064 9.84103 16.7984 9.97308 18ZM10 20V21H14V20H10ZM5.75395 14.9992C4.65645 13.6297 4 11.8915 4 10C4 5.58172 7.58172 2 12 2C16.4183 2 20 5.58172 20 10C20 11.8925 19.3428 13.6315 18.2443 15.0014C17.624 15.7748 16 17 16 18.5V21C16 22.1046 15.1046 23 14 23H10C8.89543 23 8 22.1046 8 21V18.5C8 17 6.37458 15.7736 5.75395 14.9992Z" ></path></svg>
-        </button
-      >
+        hx-push-url="true"
+        >New SKUs
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="25"
+          height="25"
+          fill="teal"
+          ><path
+            d="M9.97308 18H11V13H13V18H14.0269C14.1589 16.7984 14.7721 15.8065 15.7676 14.7226C15.8797 14.6006 16.5988 13.8564 16.6841 13.7501C17.5318 12.6931 18 11.385 18 10C18 6.68629 15.3137 4 12 4C8.68629 4 6 6.68629 6 10C6 11.3843 6.46774 12.6917 7.31462 13.7484C7.40004 13.855 8.12081 14.6012 8.23154 14.7218C9.22766 15.8064 9.84103 16.7984 9.97308 18ZM10 20V21H14V20H10ZM5.75395 14.9992C4.65645 13.6297 4 11.8915 4 10C4 5.58172 7.58172 2 12 2C16.4183 2 20 5.58172 20 10C20 11.8925 19.3428 13.6315 18.2443 15.0014C17.624 15.7748 16 17 16 18.5V21C16 22.1046 15.1046 23 14 23H10C8.89543 23 8 22.1046 8 21V18.5C8 17 6.37458 15.7736 5.75395 14.9992Z"
+          ></path></svg
+        >
+      </button>
       <button
         class="flex-col btn border"
         hx-get="/contact"
         hx-push-url="true"
         hx-swap="innerHTML transition:true"
-        hx-target="main">Contact
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="25" height="25" fill="teal"><path d="M3 3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3ZM20 7.23792L12.0718 14.338L4 7.21594V19H20V7.23792ZM4.51146 5L12.0619 11.662L19.501 5H4.51146Z"></path></svg>
-        </button
-      >
+        hx-target="main"
+        >Contact
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="25"
+          height="25"
+          fill="teal"
+          ><path
+            d="M3 3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3ZM20 7.23792L12.0718 14.338L4 7.21594V19H20V7.23792ZM4.51146 5L12.0619 11.662L19.501 5H4.51146Z"
+          ></path></svg
+        >
+      </button>
       <button
         class="flex-col btn border"
         hx-get="/faq"
         hx-push-url="true"
         hx-swap="innerHTML transition:true"
-        hx-target="main">FAQs
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="25" height="25"  fill="teal"><path d="M12 19C12.8284 19 13.5 19.6716 13.5 20.5C13.5 21.3284 12.8284 22 12 22C11.1716 22 10.5 21.3284 10.5 20.5C10.5 19.6716 11.1716 19 12 19ZM12 2C15.3137 2 18 4.68629 18 8C18 10.1646 17.2474 11.2907 15.3259 12.9231C13.3986 14.5604 13 15.2969 13 17H11C11 14.526 11.787 13.3052 14.031 11.3989C15.5479 10.1102 16 9.43374 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8V9H6V8C6 4.68629 8.68629 2 12 2Z"></path></svg>
-        </button
-      >
+        hx-target="main"
+        >FAQs
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="25"
+          height="25"
+          fill="teal"
+          ><path
+            d="M12 19C12.8284 19 13.5 19.6716 13.5 20.5C13.5 21.3284 12.8284 22 12 22C11.1716 22 10.5 21.3284 10.5 20.5C10.5 19.6716 11.1716 19 12 19ZM12 2C15.3137 2 18 4.68629 18 8C18 10.1646 17.2474 11.2907 15.3259 12.9231C13.3986 14.5604 13 15.2969 13 17H11C11 14.526 11.787 13.3052 14.031 11.3989C15.5479 10.1102 16 9.43374 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8V9H6V8C6 4.68629 8.68629 2 12 2Z"
+          ></path></svg
+        >
+      </button>
+      <a
+        href="https://partners.bestbuy.com/web/guest"
+        target="_blank"
+        class="flex-col btn border"
+        >BBY Partner Portal
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 100 60"
+          width="30"
+          height="25"
+          class="fill-yellow-400"
+          style="transform: rotate(5deg);"
+        >
+          <path
+            d="M95 5H15L5 20v20l10 15h80c2.76 0 5-2.24 5-5V10c0-2.76-2.24-5-5-5zM20 30c0-2.76 2.24-5 5-5s5 2.24 5 5-2.24 5-5 5-5-2.24-5-5z"
+          ></path>
+        </svg>
+      </a>
     </div>
   </main>
 </Layout>

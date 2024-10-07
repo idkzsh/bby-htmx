@@ -48,41 +48,6 @@ let selectedDept = 0;
         Submit
       </button>
     </form>
-
-<script>
-
-    const dept = document.getElementById("department");
-    const subCategory = document.getElementById("subCategory");
-    
-    if (dept instanceof HTMLSelectElement && subCategory instanceof HTMLSelectElement) {
-      dept.addEventListener("change", () => {
-        const selectedDept = Number(dept.value);
-        console.log(selectedDept)
-        
-        // Show/hide subCategory based on selection
-        if (selectedDept === 9) {
-          subCategory.classList.remove("hidden");
-          subCategory.previousElementSibling?.classList.remove("hidden");
-        } else {
-          subCategory.classList.add("hidden");
-          subCategory.previousElementSibling?.classList.add("hidden");
-        }
-        
-        // Filter and show only relevant options
-        Array.from(subCategory.options).forEach(option => {
-          if (option instanceof HTMLOptionElement) {
-            option.style.display = option.dataset.dept === String(selectedDept) ? "" : "none";
-          }
-        });
-        
-        // Reset selection
-        subCategory.selectedIndex = 0;
-      });
-    }
-
-</script>
-
-
   ) : (
     <Layout title="new">
       <main
@@ -131,44 +96,61 @@ let selectedDept = 0;
         </form>
       </main>
     </Layout>
-
-
-<script  define:vars={{initialSelectedDept: selectedDept}} >
-  console.log(document.getElementById("department"))
-  document.addEventListener("DOMContentLoaded", () => {
-    const dept = document.getElementById("department");
-    const subCategory = document.getElementById("subCategory");
-    
-    if (dept instanceof HTMLSelectElement && subCategory instanceof HTMLSelectElement) {
-      dept.addEventListener("change", () => {
-        const selectedDept = Number(dept.value);
-        console.log(selectedDept)
-        
-        // Show/hide subCategory based on selection
-        if (selectedDept === 9) {
-          subCategory.classList.remove("hidden");
-          subCategory.previousElementSibling?.classList.remove("hidden");
-        } else {
-          subCategory.classList.add("hidden");
-          subCategory.previousElementSibling?.classList.add("hidden");
-        }
-        
-        // Filter and show only relevant options
-        Array.from(subCategory.options).forEach(option => {
-          if (option instanceof HTMLOptionElement) {
-            option.style.display = option.dataset.dept === String(selectedDept) ? "" : "none";
-          }
-        });
-        
-        // Reset selection
-        subCategory.selectedIndex = 0;
-      });
-    }
-  });
-</script>
   )
 
 
 
 }
 
+
+
+<script>
+  function initializeForm() {
+    const deptSelect = document.getElementById("department");
+    const subCategorySelect = document.getElementById("subCategory");
+    
+    if (deptSelect instanceof HTMLSelectElement && subCategorySelect instanceof HTMLSelectElement) {
+      deptSelect.addEventListener("change", () => {
+        const selectedDeptValue = Number(deptSelect.value);
+        
+        // Show/hide subCategory based on selection
+        if (selectedDeptValue === 9) {
+          subCategorySelect.classList.remove("hidden");
+          subCategorySelect.previousElementSibling?.classList.remove("hidden");
+        } else {
+          subCategorySelect.classList.add("hidden");
+          subCategorySelect.previousElementSibling?.classList.add("hidden");
+        }
+        
+        // Filter and show only relevant options
+        Array.from(subCategorySelect.options).forEach(option => {
+          if (option instanceof HTMLOptionElement) {
+            option.style.display = option.dataset.dept === String(selectedDeptValue) ? "" : "none";
+          }
+        });
+        
+        // Reset selection
+        subCategorySelect.selectedIndex = 0;
+      });
+    }
+  }
+
+  // Function to initialize the form
+  function setupForm() {
+    initializeForm();
+  }
+
+  // For non-HTMX requests
+  if (!document.body.hasAttribute("data-htmx-history-restore")) {
+    document.addEventListener("DOMContentLoaded", setupForm);
+  }
+
+  // For HTMX requests
+  document.body.addEventListener("htmx:load", (event: Event) => {
+    // Type assertion for the custom event
+    const htmxEvent = event as CustomEvent<{ elt: HTMLElement }>;
+    if (htmxEvent.detail.elt.id === "new") {
+      setupForm();
+    }
+  });
+</script>

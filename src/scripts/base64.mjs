@@ -1,3 +1,5 @@
+// This script converts an Excel file to a base64 string and writes it to a file
+
 import * as fs from 'fs';
 import * as path from 'path';
 

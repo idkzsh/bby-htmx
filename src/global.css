@@ -124,17 +124,7 @@ h1 {
   text-align: center;
 }
 
-.btn {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: white;
-  width: 6rem;
-  height: 6rem;
-  font-size: 12px;
-  font-weight: normal;
-  border-radius: calc(var(--radius) - 2px);
-}
+
 
 .btn:hover {
   transform: scale(1.05); /* Scale up by 5% on hover */

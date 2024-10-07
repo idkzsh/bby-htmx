@@ -1,13 +1,17 @@
 ---
+// This page allows the user to upload assets to the server
 import Layout from "../layouts/Layout.astro";
 
+// Check if the user got here by clicking a link
 const referer = Astro.request.headers.get('referer');
 const isLinkClick = referer && new URL(referer).hostname === Astro.url.hostname;
 
+// If the user got here by clicking a link, redirect them to the home page
 if (isLinkClick === null) {
   return Astro.redirect("/")
 }
 
+// Initialize form data
 let formData;
 let setupData;
 let complianceData;
@@ -15,13 +19,13 @@ let columns: number = 1;
 let setupDataJSON: Record<string, any> = {};
 const complianceDataJSON: Record<string, any> = {};
 
+// If the request method is POST, process the form data
 if (Astro.request.method === "POST") {
   try {
+
     formData = await Astro.request.formData();
 
     console.log(formData)
-
-
     columns = Number(formData.get("columns"));
 
     setupData = formData.get("setupData");
@@ -136,20 +140,23 @@ if (Astro.request.method === "POST") {
   </main>
 </Layout>
 
+<!-- This script handles the file upload and preview -->
 <script define:vars={{ columns, setupDataJSON }}>
   let uploadedFiles = [];
 
+  // When the DOM is loaded, initialize the file upload and preview elements
   document.addEventListener("DOMContentLoaded", function () {
     const imageUpload = document.getElementById("image-upload");
     const imagePreview = document.getElementById("image-preview");
     const dropZone = document.getElementById("drop-zone");
 
+    // If the image upload element exists, add an event listener for when the user selects files
     if (imageUpload) {
       imageUpload.addEventListener("change", handleFiles);
     }
 
     if (dropZone) {
-      // Drag and drop events
+      // Add event listeners for drag and drop events
       dropZone.addEventListener("dragover", (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -171,26 +178,39 @@ if (Astro.request.method === "POST") {
       });
     }
 
+    // Function to handle file uploads
     function handleFiles(event) {
+      // Get the new files from the event
       const newFiles = Array.from(event.target.files);
+      // Add the new files to the uploaded files array
       uploadedFiles = [...uploadedFiles, ...newFiles];
+      // Update the image previews
       updateImagePreviews();
-      updateFileInput();
+      // Update the file input
     }
 
+    // Function to update the image previews
     function updateImagePreviews() {
       imagePreview.innerHTML = ""; // Clear existing previews
+
+      // Loop through the uploaded files
       uploadedFiles.forEach((file, index) => {
+        // Check if the file is an image
         if (file.type.startsWith("image/")) {
+          // Create a FileReader to read the file
           const reader = new FileReader();
+          // When the file is read, create an image element and add it to the image preview
           reader.onload = function (e) {
+            // Create a container for the image
             const imgContainer = document.createElement("div");
             imgContainer.className = "relative";
 
+            // Create an image element
             const img = document.createElement("img");
             img.src = e.target.result;
             img.classList.add("w-full", "h-32", "object-cover", "rounded-md");
 
+            // Create a remove button
             const removeButton = document.createElement("button");
             removeButton.innerHTML = "&#x2715;"; // '×' symbol
             removeButton.className =
@@ -200,6 +220,7 @@ if (Astro.request.method === "POST") {
               updateImagePreviews();
             };
 
+            // Create an info box
             const infoBox = document.createElement("div");
             infoBox.className =
               "absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 rounded-b-md overflow-hidden w-full h-6";
@@ -215,9 +236,11 @@ if (Astro.request.method === "POST") {
             }
             infoBox.textContent = `${fileName} (${fileSize})`;
 
+            // Add the image, remove button, and info box to the container
             imgContainer.appendChild(img);
             imgContainer.appendChild(removeButton);
             imgContainer.appendChild(infoBox);
+            // Add the container to the image preview
             imagePreview.appendChild(imgContainer);
           };
           reader.readAsDataURL(file);
@@ -225,6 +248,7 @@ if (Astro.request.method === "POST") {
       });
     }
 
+    // Function to update the file input
     function updateFileInput() {
       const dataTransfer = new DataTransfer();
       uploadedFiles.forEach((file) => dataTransfer.items.add(file));

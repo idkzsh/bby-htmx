@@ -1,0 +1,92 @@
+---
+import { d } from "../data/hierarchy";
+import Layout from "../layouts/Layout.astro";
+const isHTMXRequest = Astro.request.headers.get("HX-Request") === "true";
+
+const email = Astro.url.searchParams.get("email");
+const department = Number(Astro.url.searchParams.get("department")) || 0;
+const columns = Astro.url.searchParams.get("numOfSKUs");
+
+const selectedDept = d.find((item) => Number(item.dept)  === department);
+
+console.log(selectedDept?.value)
+console.log(selectedDept?.value.length )
+
+if (selectedDept && selectedDept.smartsheets.length === 1) {
+  if (isHTMXRequest) {
+    return new Response(null, {
+      status: 302,
+      headers: {
+        'HX-Redirect': `/setup?email=${email}&department=${department}&numOfSKUs=${columns}`
+      }
+    });
+  } else {
+    return Astro.redirect(`/setup?email=${email}&department=${department}&numOfSKUs=${columns}&subCategory=${encodeURIComponent(selectedDept.value[0])}`);
+  }
+}
+
+---
+
+{
+  isHTMXRequest ? (
+    <form
+      action="/setup"
+      class="border rounded-md flex flex-col p-4 gap-4 shadow-md font-normal text-base tracking-tight"
+      id="subcategoryForm"
+    >
+      <input type="hidden" name="email" value={email} />
+      <input type="hidden" name="department" value={department} />
+      <input type="hidden" name="numOfSKUs" value={columns} />
+      <label for="subCategory">Sub-Category</label>
+      <select
+        name="subCategory"
+        id="subCategory"
+        class="border h-10 rounded-md px-2 overflow-hidden w-80"
+      >
+        <option value="">Select a sub-category</option>
+        {selectedDept?.smartsheets.map((item) => (
+          <option value={item}>{item}</option>
+        ))}
+      </select>
+      <button
+        type="submit"
+        class="w-80 hover:opacity-80 bg-black text-white rounded-md p-2"
+      >
+        Submit
+      </button>
+    </form>
+  ) : (
+    <Layout>
+      <main
+        class="flex flex-col w-[89.5%] h-[98%] bg-white mt-2 rounded-md border justify-center items-center gap-8 font-bold tracking-tight text-3xl"
+        id="main"
+      >
+        <form
+          action="/setup"
+          class="border rounded-md flex flex-col p-4 gap-4 shadow-md font-normal text-base tracking-tight"
+          id="subcategoryForm"
+        >
+          <input type="hidden" name="email" value={email} />
+          <input type="hidden" name="department" value={department} />
+          <input type="hidden" name="numOfSKUs" value={columns} />
+          <select
+            name="subCategory"
+            id="subCategory"
+            class="border h-10 rounded-md px-2 overflow-hidden w-80"
+          >
+            <option value="">Select a sub-category</option>
+            {selectedDept?.smartsheets.map((item) => (
+              <option value={item}>{item}</option>
+            ))}
+          </select>
+          <button
+            type="submit"
+            class="w-80 hover:opacity-80 bg-black text-white rounded-md p-2"
+          >
+            Submit
+          </button>
+        </form>
+      </main>
+    </Layout>
+  )
+}

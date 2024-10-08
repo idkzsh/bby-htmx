@@ -1,23 +1,33 @@
 ---
-// This page allows the user to upload MSDS files to the server
+// This page is where user will enter required compliance data 
+// -packaging
+// -mercury
+// -battery info
+// -hazardous material/limited quantities
+
 import Layout from "../layouts/Layout.astro";
 import { complianceInputs } from "../data/compliance";
 import MSDSinfo from "../components/MSDSinfo.astro";
 
+// Check if the user got here by clicking a link
 const referer = Astro.request.headers.get("referer");
 const isLinkClick = referer && new URL(referer).hostname === Astro.url.hostname;
 
+// If the user got here by entering the url, redirect them to the home page
 if (isLinkClick === null) {
   return Astro.redirect("/");
 }
 
+// Initialize columns, setupData, and setupDataJSON
 let columns: number = 1;
 let setupData;
 
 const setupDataJSON: Record<string, string> = {};
 
+// If the request method is POST, process the form data
 if (Astro.request.method === "POST") {
   try {
+    // Get the form data from the request
     setupData = await Astro.request.formData();
     columns = Number(setupData.get("columns"));
 
@@ -260,6 +270,7 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
   href="https://cdn.jsdelivr.net/npm/handsontable/dist/handsontable.full.min.css"
 />
 
+<!-- This script defines the columns, setupData, and setupDataJSON variables for Handsontable -->
 <script
   define:vars={{
     columns,
@@ -268,12 +279,16 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
   }}
 >
   document.addEventListener("DOMContentLoaded", function () {
+    // Get the container for the Handsontable
     const container = document.getElementById("handsontable-container");
 
+    // Get the number of rows
     const rows = complianceInputs.length;
 
+    // Get the header names
     let headerNames = complianceInputs.map((input) => input.name);
 
+    // Create the data for the Handsontable
     const data = Array(rows)
       .fill()
       .map((_, rowIndex) =>
@@ -291,6 +306,7 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
           })
       );
 
+    // Create the Handsontable
     const hot = new Handsontable(container, {
       data: data,
       rowHeaders: complianceInputs.map((input) => input.name),
@@ -298,15 +314,18 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
       afterGetRowHeader: function (row, TH) {
         const rowName = complianceInputs[row].name;
 
+        // If the row is a readonly row, set the font weight and background color
         if (complianceInputs[row].type === "readonly") {
           TH.style.fontWeight = "bold";
           TH.style.backgroundColor = "#c0c0c0";
         }
+        // If the row is a battery type or UN row, set the font weight and background color
         if (rowName.includes("Battery Type") || rowName.includes("- UN")) {
           TH.style.fontWeight = "bold";
           TH.style.backgroundColor = "#d0d0f0";
         }
 
+        // If the row is a vendor acknowledgement row, set the font weight and background color
         if (rowName === "VENDOR ACKNOWLEDGEMENT") {
           TH.style.fontWeight = "bold";
           TH.style.backgroundColor = "#F3F0c0";

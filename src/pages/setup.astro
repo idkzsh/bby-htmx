@@ -24,8 +24,7 @@ const smartSheet = Astro.url.searchParams.get("subCategory") || "";
 
 let selectedSmartsheet = smartSheet;
 
-if (smartSheet === "") {
-  
+if (smartSheet === "") {  
   d.forEach((dept) => {
     if (String(dept.dept) === numDept) {
       selectedSmartsheet = dept.value;
@@ -33,9 +32,9 @@ if (smartSheet === "") {
   });
 }
 
-if (!email) {
-  return Astro.redirect("/");
-}
+// if (!email) {
+//   return Astro.redirect("/");
+// }
 
 if (columns > 50) {
   columns = 50;
@@ -113,6 +112,7 @@ const filteredSampleData = (sampleData as SampleDataItem[][]).map(
     email,
     inputs,
     filteredSampleData,
+    selectedSmartsheet,
   }}
   type="module"
   defer
@@ -368,22 +368,45 @@ const filteredSampleData = (sampleData as SampleDataItem[][]).map(
               };
               break;
 
-            case "readonly":
+              case "readonly":
+              if (rowHeader === "Product Specs/Information") {
+                cellProperties.placeholder = selectedSmartsheet;
+                cellProperties.renderer = function (
+                  instance,
+                  td,
+                  row,
+                  col,
+                  prop,
+                  value,
+                  cellProperties
+                ) {
+                  Handsontable.renderers.TextRenderer.apply(this, arguments);
+                  td.style.backgroundColor = "#c0c0c0";
+                  td.style.textAlign = "center";
+                  td.style.verticalAlign = "middle";
+                  td.style.fontWeight = "bold";
+                  
+                  if (!value && cellProperties.placeholder) {
+                    td.innerHTML = '<span style="color: black; font-weight: bold;">' + cellProperties.placeholder + '</span>';
+                  }
+                };
+              } else {
+                cellProperties.renderer = function (
+                  instance,
+                  td,
+                  row,
+                  col,
+                  prop,
+                  value,
+                  cellProperties
+                ) {
+                  Handsontable.renderers.TextRenderer.apply(this, arguments);
+                  td.style.backgroundColor = "#c0c0c0";
+                  td.style.textAlign = "center";
+                  td.style.verticalAlign = "middle";
+                };
+              }
               cellProperties.readOnly = true;
-              cellProperties.renderer = function (
-                instance,
-                td,
-                row,
-                col,
-                prop,
-                value,
-                cellProperties
-              ) {
-                Handsontable.renderers.TextRenderer.apply(this, arguments);
-                td.style.backgroundColor = "#c0c0c0";
-                td.style.textAlign = "center";
-                td.style.verticalAlign = "middle";
-              };
               break;
           }
         }

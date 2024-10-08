@@ -32,9 +32,10 @@ if (smartSheet === "") {
   });
 }
 
-// if (!email) {
-//   return Astro.redirect("/");
-// }
+if (!email) {
+     alert("No email provided. Redirecting to home page.");
+     return Astro.redirect("/");
+}
 
 if (columns > 50) {
   columns = 50;

@@ -20,9 +20,9 @@ if (isLinkClick === null) {
 
 // Initialize columns, setupData, and setupDataJSON
 let columns: number = 1;
-let setupData;
-let hasBattery;
-let hasLimitedQuantities;
+let setupData: FormData;
+let hasBattery: string[] = [];
+let hasLimitedQuantities: string[] = [];
 
 const setupDataJSON: Record<string, string> = {};
 
@@ -32,8 +32,12 @@ if (Astro.request.method === "POST") {
     // Get the form data from the request
     setupData = await Astro.request.formData();
     columns = Number(setupData.get("columns"));
-    hasBattery = setupData.get("Has Battery");
-    hasLimitedQuantities = setupData.get("Has Limited Quantities");
+
+    const batteryValue = setupData.get("Has Battery");
+    hasBattery = typeof batteryValue === "string" ? JSON.parse(batteryValue) : [];
+
+    const limitedQuantitiesValue = setupData.get("Has Limited Quantities");
+    hasLimitedQuantities = typeof limitedQuantitiesValue === "string" ? JSON.parse(limitedQuantitiesValue) : [];
 
     // Convert setupData to a JSON object so we don't need to do string manipulation
     for (const [key, value] of setupData.entries()) {
@@ -65,7 +69,6 @@ if (Astro.request.method === "POST") {
 // Convert setupData to a plain object if it exists
 // const setupDataObject = setupData ? Object.fromEntries(setupData) : null;
 // console.log("compliance page: " + JSON.stringify(setupDataJSON));
-console.log(hasLimitedQuantities)
 ---
 
 <!-- unfortunately the cdn must be used for pdfjs as far as i can tell as it does not work very well on serverless as a dependency -->
@@ -328,7 +331,6 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
       }
 
       if (!currentlySkipping) {
-        console.log(input.name)
         headerNames.push(input.name);
       }
     }

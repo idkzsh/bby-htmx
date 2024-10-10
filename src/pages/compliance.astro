@@ -1,5 +1,5 @@
 ---
-// This page is where user will enter required compliance data 
+// This page is where user will enter required compliance data
 // -packaging
 // -mercury
 // -battery info
@@ -21,6 +21,8 @@ if (isLinkClick === null) {
 // Initialize columns, setupData, and setupDataJSON
 let columns: number = 1;
 let setupData;
+let hasBattery;
+let hasLimitedQuantities;
 
 const setupDataJSON: Record<string, string> = {};
 
@@ -30,6 +32,8 @@ if (Astro.request.method === "POST") {
     // Get the form data from the request
     setupData = await Astro.request.formData();
     columns = Number(setupData.get("columns"));
+    hasBattery = setupData.get("Has Battery");
+    hasLimitedQuantities = setupData.get("Has Limited Quantities");
 
     // Convert setupData to a JSON object so we don't need to do string manipulation
     for (const [key, value] of setupData.entries()) {
@@ -60,7 +64,8 @@ if (Astro.request.method === "POST") {
 
 // Convert setupData to a plain object if it exists
 // const setupDataObject = setupData ? Object.fromEntries(setupData) : null;
-console.log("compliance page: " + JSON.stringify(setupDataJSON));
+// console.log("compliance page: " + JSON.stringify(setupDataJSON));
+console.log(hasLimitedQuantities)
 ---
 
 <!-- unfortunately the cdn must be used for pdfjs as far as i can tell as it does not work very well on serverless as a dependency -->
@@ -204,22 +209,22 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
         <li>
           <MSDSinfo
             batteryType="Lithium Metal"
-          requirements={[
-            "UN Number",
-            "Lithium Content (g) + Battery net weight (kg)",
-          ]}
+            requirements={[
+              "UN Number",
+              "Lithium Content (g) + Battery net weight (kg)",
+            ]}
             tooltip="lithiumMetal"
           />
         </li>
         <li>
           <MSDSinfo
             batteryType="Limited Quantities"
-          requirements={[
-            "UN Number",
-            "if product is a solid: mass per unit in kilograms (kg)",
-            "if product is a liquid, compressed gas, or aerosol canister: volume of the container in liters (L)",
-            "information specific to the product in question",
-          ]}
+            requirements={[
+              "UN Number",
+              "if product is a solid: mass per unit in kilograms (kg)",
+              "if product is a liquid, compressed gas, or aerosol canister: volume of the container in liters (L)",
+              "information specific to the product in question",
+            ]}
             tooltip="limitedQuantities"
           />
         </li>
@@ -276,6 +281,8 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
     columns,
     setupDataJSON,
     complianceInputs,
+    hasBattery,
+    hasLimitedQuantities,
   }}
 >
   document.addEventListener("DOMContentLoaded", function () {
@@ -286,36 +293,90 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
     const rows = complianceInputs.length;
 
     // Get the header names
-    let headerNames = complianceInputs.map((input) => input.name);
+    let headerNames = [];
+    let skipBatterySection = !hasBattery.includes("Y");
+    let skipLimitedQuantitiesSection = !hasLimitedQuantities.includes("Y");
+    const dangerousGoods = skipBatterySection && skipLimitedQuantitiesSection;
+    let currentlySkipping = false;
+
+    for (let input of complianceInputs) {
+      if (dangerousGoods && input.name === "Battery Section") {
+        break;
+      }
+
+      if (
+        skipBatterySection &&
+        input.name === "Battery Section"
+      ) {
+        currentlySkipping = true;
+        continue;
+      }
+
+      if (
+        skipLimitedQuantitiesSection &&
+        input.name === "Limited Quantities Section"
+      ) {
+        break;
+      }
+
+      if (input.name === "Limited Quantities Section") {
+        if (skipLimitedQuantitiesSection) {
+          break;
+        } else {
+          currentlySkipping = false;
+        }
+      }
+
+      if (!currentlySkipping) {
+        console.log(input.name)
+        headerNames.push(input.name);
+      }
+    }
 
     // Create the data for the Handsontable
-    const data = Array(rows)
-      .fill()
-      .map((_, rowIndex) =>
-        Array(columns)
-          .fill()
-          .map((_, colIndex) => {
-            const inputName = complianceInputs[rowIndex].name;
-            if (
-              setupDataJSON[inputName] &&
-              Array.isArray(setupDataJSON[inputName])
-            ) {
-              return setupDataJSON[inputName][colIndex] || "";
-            }
-            return "";
-          })
-      );
+    const data = headerNames.map((inputName) =>
+      Array(columns)
+        .fill()
+        .map((_, colIndex) => {
+          if (
+            setupDataJSON[inputName] &&
+            Array.isArray(setupDataJSON[inputName])
+          ) {
+            return setupDataJSON[inputName][colIndex] || "";
+          }
+          return "";
+        })
+    );
+
+    // // Create the data for the Handsontable
+    // const data = Array(rows)
+    //   .fill()
+    //   .map((_, rowIndex) =>
+    //     Array(columns)
+    //       .fill()
+    //       .map((_, colIndex) => {
+    //         const inputName = complianceInputs[rowIndex].name;
+    //         if (
+    //           setupDataJSON[inputName] &&
+    //           Array.isArray(setupDataJSON[inputName])
+    //         ) {
+    //           return setupDataJSON[inputName][colIndex] || "";
+    //         }
+    //         return "";
+    //       })
+    //   );
 
     // Create the Handsontable
     const hot = new Handsontable(container, {
       data: data,
-      rowHeaders: complianceInputs.map((input) => input.name),
+      rowHeaders: headerNames,
       rowHeaderWidth: 250, // Adjust this value as needed
       afterGetRowHeader: function (row, TH) {
-        const rowName = complianceInputs[row].name;
+        const rowName = headerNames[row];
+        const input = complianceInputs.find(input => input.name === rowName);
 
         // If the row is a readonly row, set the font weight and background color
-        if (complianceInputs[row].type === "readonly") {
+        if (input.type === "readonly") {
           TH.style.fontWeight = "bold";
           TH.style.backgroundColor = "#c0c0c0";
         }
@@ -344,9 +405,9 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
       licenseKey: "non-commercial-and-evaluation",
       cells: function (row, col) {
         const cellProperties = {};
-        const rowName = complianceInputs[row].name; // Adjust for the two extra rows
-
+        const rowName = headerNames[row]; 
         const input = complianceInputs.find((input) => input.name === rowName);
+
         if (input) {
           switch (input.type) {
             case "text":
@@ -531,7 +592,8 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
 
       for (let col = 0; col < columns; col++) {
         const hasBattery = setupDataJSON["Has Battery"][col];
-        const hasLimitedQuantities = setupDataJSON["Has Limited Quantities"][col];
+        const hasLimitedQuantities =
+          setupDataJSON["Has Limited Quantities"][col];
         const vendorAcknowledgement =
           data[
             complianceInputs.findIndex(
@@ -631,7 +693,7 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
 
     msdsForm?.addEventListener("submit", function (event) {
       event.preventDefault();
-      msdsPreview.innerHTML = ''; // Clear previous preview
+      msdsPreview.innerHTML = ""; // Clear previous preview
       selectedFiles.forEach((file, index) => {
         const fileItem = document.createElement("div");
         fileItem.className = "mb-2";
@@ -640,7 +702,7 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
       });
 
       if (fileInput instanceof HTMLInputElement) {
-        fileInput.value = '';
+        fileInput.value = "";
       }
     });
   });

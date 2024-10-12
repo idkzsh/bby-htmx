@@ -34,7 +34,11 @@ let columns = Number(Astro.url.searchParams.get("numOfSKUs") || 1);
               <path d="M5 11H19V13H5z"></path>
             </svg>
           </button>
-          Columns
+          SKUs: {columns}
+          <svg class="hidden animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24" id="spinner-cols" width="5" height="15">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
           <button
             class="flex justify-center border w-[25px] rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:text-gray-400"
             id="increment-columns"
@@ -141,6 +145,15 @@ let columns = Number(Astro.url.searchParams.get("numOfSKUs") || 1);
       urlParams.set("numOfSKUs", columns.toString());
       const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
       window.location.href = newUrl;
-    });
+    }
+    );
+
+    const showSpinner = () => {
+      document.getElementById("spinner-cols")?.classList.remove("hidden");
+    };
+
+    incrementButton?.addEventListener("click", showSpinner);
+    decrementButton?.addEventListener("click", showSpinner);
+    document.getElementById("spinner-cols")?.classList.add("hidden");
   });
 </script>

@@ -637,6 +637,7 @@ filenames.  Autofills battery details when MSDS is selected.  --><!-- <script ty
         complianceForm.appendChild(input);
       });
 
+      document.getElementById("spinner")?.classList.remove("hidden"); 
       // Submit the form
       complianceForm.submit();
     });

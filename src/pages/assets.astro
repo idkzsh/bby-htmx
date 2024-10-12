@@ -285,6 +285,7 @@ if (Astro.request.method === "POST") {
     //   //   });
 
     //   // Submit the form
+    document.getElementById("spinner")?.classList.remove("hidden"); 
     assetsForm.submit();
   });
 </script>

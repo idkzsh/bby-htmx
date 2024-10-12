@@ -3,9 +3,10 @@ import { d } from "../data/hierarchy";
 import Layout from "../layouts/Layout.astro";
 const isHTMXRequest = Astro.request.headers.get("HX-Request") === "true";
 ---
-
+<title>Create New SKUs</title>
 {
   isHTMXRequest ? (
+    
     <form
       hx-get="/subcategory"
       hx-target="#main"

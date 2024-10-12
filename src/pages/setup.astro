@@ -553,6 +553,7 @@ const filteredSampleData = (sampleData as SampleDataItem[][]).map(
         return;
       }
 
+      document.getElementById("spinner")?.classList.remove("hidden"); 
       // Submit the form
       setupForm.submit();
     });

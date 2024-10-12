@@ -2,7 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 const isHTMXRequest = Astro.request.headers.get("HX-Request") === "true";
 ---
-
+<title>FAQs</title>
 {
   isHTMXRequest ? (
     <div class="border rounded-md flex flex-col p-4 gap-4 shadow-md font-normal text-base tracking-tight">

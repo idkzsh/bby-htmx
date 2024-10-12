@@ -48,7 +48,8 @@ const isHTMXRequest = Astro.request.headers.get("HX-Request") === "true";
       <button
         type="submit"
         form="new"
-        class="flex items-center justify-center w-80 hover:opacity-80 bg-black text-white rounded-md p-2"
+        id="submit"
+        class="flex gap-2 items-center justify-center w-80 hover:opacity-80 bg-black text-white rounded-md p-2"
       >
 
         Submit
@@ -61,7 +62,7 @@ const isHTMXRequest = Astro.request.headers.get("HX-Request") === "true";
 
     <script>
       document.getElementById("spinner")?.classList.add("hidden");
-      document.querySelector("button")?.addEventListener("click", () => {
+      document.getElementById("submit")?.addEventListener("click", (event) => {
         document.getElementById("spinner")?.classList.remove("hidden");
       });
     </script>
@@ -112,7 +113,8 @@ const isHTMXRequest = Astro.request.headers.get("HX-Request") === "true";
           <button
             type="submit"
             form="new"
-            class="flex items-center justify-center w-80 hover:opacity-80 bg-black text-white rounded-md p-2"
+            id="submit"
+            class="flex gap-2 items-center justify-center w-80 hover:opacity-80 bg-black text-white rounded-md p-2"
           >
             Submit
             <svg class="hidden animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24" id="spinner">
@@ -126,7 +128,7 @@ const isHTMXRequest = Astro.request.headers.get("HX-Request") === "true";
 
 <script>
       document.getElementById("spinner")?.classList.add("hidden");
-      document.querySelector("button")?.addEventListener("click", () => {
+      document.getElementById("submit")?.addEventListener("click", (event) => {
         document.getElementById("spinner")?.classList.remove("hidden");
       });
     </script>
